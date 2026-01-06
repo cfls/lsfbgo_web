@@ -6,6 +6,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmail;
 use App\Livewire\Dictionary;
+use App\Livewire\Numbers;
 use App\Livewire\Practice;
 use App\Livewire\Scanner;
 use App\Livewire\Settings\Appearance;
@@ -40,6 +41,7 @@ Route::get('table-au-de-bord', TableuBord::class)->name('access.dashboard');
 
 Route::get('/dictionary', Dictionary::class)->name('dictionary');
 Route::get('/practice', Practice::class)->name('practice');
+Route::get('/numbers-practice', Numbers::class)->name('numbers.practice');
 Route::get('/scanner', Scanner::class)->name('scanner');
 ;
 

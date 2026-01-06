@@ -8,7 +8,7 @@ use Livewire\Component;
 class Dictionary extends Component
 {
     public array $items = [];
-
+    public string $title = 'Dictionnaire LSFB';
     /** Filtros */
     public string $search = '';
     public string $letter = 'tous';
