@@ -1,0 +1,3 @@
+<div>
+    Practice Component
+</div>

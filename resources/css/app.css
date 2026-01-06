@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+html, body {
+    height: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: auto;
+
+}
+
+@theme {
+    --font-sans:'Quicksand', ui-sans-serif, system-ui, sans-serif;
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+    --cfls-1:#fff;
+    --cfls-2:#64bfd2;
+    --cfls-stroke:#00839f;
+    --cfls-primary:#ff9f00;  /* NARAMARILLO */
+    --cfls-secondary:#2c333e; /* azul oscuro */
+    --clfs-st0: #2c333e;
+    --clfs-st1: #2c333e;
+    --cfls-fill: none;
+    --clsf-stoke: #2c333e;
+    --cslf-black:#000000;
+
+    --color-accent: var(--color-neutral-800);
+    --color-accent-content: var(--color-neutral-800);
+    --color-accent-foreground: var(--color-white);
+    --color-primary: var(--cfls-primary);
+    --color-primary-content: var(--cfls-2);
+
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+        --cfls-1:#00839f;
+        --cfls-2:#fff;
+        --cfls-primary:#ff9f00;  /* NARAMARILLO */
+        --color-primary-foreground: var(--cfls-secondary);
+        /* Registrar los colores como utilidades Tailwind */
+        --color-cfls-primary: var(--cfls-primary);
+        --color-cfls-secondary: var(--cfls-secondary);
+        --clfs-st0: #ffffff;
+        --clfs-st1: #ffffff;
+        --cfls-fill: #ffffff;
+        --clsf-stoke: #ffffff;
+
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    },
+html, body {
+    @apply h-full min-h-screen overflow-x-hidden overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
+}
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
+
+/* Ocultar scrollbar pero permitir scroll */
+.no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE y Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+/* En iOS/Android mejora el feeling de scroll */
+.scroll-touch {
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.shake { animation: shake 0.4s; }
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn { animation: fadeIn 0.4s ease-in-out; }
+
+
+@keyframes scale-in {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.shake {
+    animation: shake 0.4s ease-in-out;
+}
+
+[data-current]::after {
+    content: none !important;
+    display: none !important;
+}
+
+footer {
+    touch-action: pan-y;
+}

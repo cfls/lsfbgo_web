@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html class="min-h-screen" lang="{{ str_replace('_', '-', app()->getLocale()) }}" >
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+
+    <title>Laravel</title>
+
+    @vite('resources/css/app.css')
+    @fluxAppearance
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    @livewireStyles
+</head>
+<body class="min-h-screen dark:bg-[var(--color-primary-foreground)] overflow-x-hidden">
+@if(session('data.token'))
+    <livewire:native-edge :title="$title ?? 'Tableu du Bord'" />
+@endif
+
+
+    <flux:main class="!p-0 overflow-x-hidden">
+        {{ $slot }}
+    </flux:main>
+
+        @vite('resources/js/app.js')
+        @fluxScripts
+        @livewireScripts
+    </body>
+</html>
