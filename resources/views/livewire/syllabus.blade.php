@@ -1,3 +1,3 @@
 <div>
-     Syllabus Component
+     Syllabus Component demo
 </div>
