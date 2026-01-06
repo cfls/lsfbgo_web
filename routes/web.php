@@ -13,6 +13,7 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
+use App\Livewire\Syllabus;
 use App\Livewire\TableuBord;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -42,6 +43,7 @@ Route::get('table-au-de-bord', TableuBord::class)->name('access.dashboard');
 Route::get('/dictionary', Dictionary::class)->name('dictionary');
 Route::get('/practice', Practice::class)->name('practice');
 Route::get('/numbers-practice', Numbers::class)->name('numbers.practice');
+Route::get('/syllabus', Syllabus::class)->name('syllabus');
 Route::get('/scanner', Scanner::class)->name('scanner');
 ;
 

@@ -1,0 +1,3 @@
+<div>
+     Syllabus Component
+</div>

@@ -132,7 +132,7 @@
                 <source src="https://res.cloudinary.com/dmhdsjmzf/video/upload/v1748439117/LES_CHIFFRES_ohbdhd.mp4"
                         type="video/mp4">
             </video>
-        
+
 
         <!-- Controles -->
         <div class="flex flex-col sm:flex-row justify-center gap-3 mt-4 w-full px-4">
