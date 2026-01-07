@@ -54,11 +54,7 @@ class ApiService
     /**
      * Realizar petición con token de autenticación
      */
-    public function withToken(string $token): self
-    {
-        Http::withToken($token);
-        return $this;
-    }
+
 
     /**
      * Login del usuario
@@ -104,6 +100,23 @@ class ApiService
             'email' => $email,
         ]);
     }
+
+
+    /**
+     * Obtener palabras para ejercicio de ortografía
+     */
+    public function getSpellings(?string $token = null): Response
+    {
+        return Http::withOptions([
+            'verify' => env('API_VERIFY_SSL', true),
+        ])
+            ->withToken($token)
+            ->acceptJson()
+            ->get(config('services.api.url') . '/v1/spellings');
+    }
+
+
+
 
 
 }

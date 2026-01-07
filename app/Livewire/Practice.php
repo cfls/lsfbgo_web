@@ -19,8 +19,8 @@ class Practice extends Component
             ],
             [
                 'title' => 'Comprendre et écrire les mots épelés',
-                'icon' => 'hand-thumb-up',
-                'route' => 'practice',
+                'icon' => 'hand-raised',
+                'route' => 'alphabet.practice',
                 'gradient' => 'from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400',
             ],
             [
