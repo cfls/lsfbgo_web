@@ -3,8 +3,14 @@
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
+use Native\Mobile\Attributes\OnNative;
+use Native\Mobile\Events\Alert\ButtonPressed;
+use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Dialog;
+use Native\Mobile\Facades\System;
 
 class Syllabus extends Component
 {
@@ -20,6 +26,7 @@ class Syllabus extends Component
     public $selectedSyllabuForPayment = null;
     public $selectedLink = null;
     public ?string $ue = null;
+
 
 
     public function mount(?string $ue = null)
@@ -56,6 +63,7 @@ class Syllabus extends Component
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/syllabus');
         // Aquí ya tienes un array asociativo
+
         $this->results = $response->json('data', []);
     }
 
@@ -75,11 +83,29 @@ class Syllabus extends Component
 
 
     // abrir modal
-    public function openPaymentModal($slug, $link)
+    public function openPaymentModal($link)
     {
-        $this->selectedSyllabuForPayment = $slug;
+
         $this->selectedLink = $link;
-        $this->showPaymentModal = true;
+
+        Dialog::alert(
+            'Accès Syllabus',
+            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
+            [
+                'Oui, ouvrir la boutique',
+                'Non, plus tard'
+            ]
+        )->id('alert-demo');;
+
+
+    }
+
+    #[OnNative(ButtonPressed::class)]
+    public function handleAlert(int $index, string $id): void
+    {
+        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
+            Browser::open($this->selectedLink);
+        }
     }
 
 // cerrar modal
@@ -89,13 +115,7 @@ class Syllabus extends Component
         $this->selectedSyllabuForPayment = null;
     }
 
-    public function alert(){
-        Dialog::alert('Alert', 'Is NativePHP the BEST way to build native mobile apps with PHP?', [
-            'Yup ✅',
-            'No Way! ⛔',
-            "It's the best 😎!",
-        ])->id('alert-demo');
-    }
+
 
     public function render()
     {

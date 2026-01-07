@@ -31,7 +31,9 @@
         <div class="space-y-4 -mx-4">
             <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide pl-4 pr-4 my-10 snap-x snap-mandatory scroll-smooth">
                 @foreach ($results as $syllabu)
+
                     @php
+
                         $userMatch = $verifyUser->firstWhere('attributes.theme', $syllabu['attributes']['slug']);
                         $isActive  = $userMatch['attributes']['active'] ?? null;
                         $route     = route('syllabus', ['ue' => $syllabu['attributes']['slug']]);
@@ -40,15 +42,22 @@
                     @endphp
 
                     <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg">
-                        <a @if (!$userMatch || !$isActive)
-                               wire:click.prevent="alert"
-                           @else
-                               wire:navigate href="{{ $route }}"
-                           @endif
-                           class="flex flex-col items-center justify-center cursor-pointer">
-                            <div class="flex flex-col items-center justify-center text-center gap-1.5 h-full p-2">
+                        <a
+                                @if (!$userMatch || !$isActive)
+                                    wire:click.prevent="openPaymentModal('{{ $link }}')"
+                                @else
+                                    wire:navigate
+                                href="{{ $route }}"
+                                @endif
+                                class="flex flex-col items-center justify-center cursor-pointer h-full"
+                        >
+                            <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
                                 <div class="size-32 bg-white/30 flex items-center justify-center">
-                                    <img src="{{ $image }}" alt="syllabus image" class="rounded-full">
+                                    <img
+                                            src="{{ $image }}"
+                                            alt="syllabus image"
+                                            class="rounded-full"
+                                    >
                                 </div>
                             </div>
                         </a>
