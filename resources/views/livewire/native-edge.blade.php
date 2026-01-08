@@ -32,6 +32,7 @@
         <native:horizontal-divider />
         <native:side-nav-group heading="Ressources" :expanded="false">
             <native:side-nav-item id="visit-site" icon="globe-alt" url="https://cfls.be" label="Cfls.be"/>
+            <native:side-nav-item active="{{ request()->routeIs('deconnect') }}" id="logout" icon="arrow-left-start-on-rectangle" url="{{ route('deconnect') }}" label="Déconnexion"/>
         </native:side-nav-group>
     </native:side-nav>
 
