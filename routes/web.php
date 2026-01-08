@@ -43,7 +43,7 @@ Route::middleware('guest')->group(function () {
 
 // Rutas protegidas (requieren token)
 Route::middleware('api.token.exists')->group(function () {
-    Route::post('logout', Logout::class)->name('deconnect');
+    Route::post('logout', Logout::class)->name('access.logout');
 });
 
 Route::get('table-au-de-bord', TableuBord::class)->name('access.dashboard');
