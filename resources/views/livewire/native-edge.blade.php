@@ -59,11 +59,12 @@
 
         />
         <native:bottom-nav-item
-                active="{{ request()->routeIs('profile') }}"
+                :active="request()->routeIs('profile')"
                 id="profile"
-                icon="user-circle"
+                label="Profil"
                 url="{{ route('profile.edit') }}"
-                label="Profil" />
+                icon="user"
+                />
 
     </native:bottom-nav>
     @endif
