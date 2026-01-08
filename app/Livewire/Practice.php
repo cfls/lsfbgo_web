@@ -24,7 +24,7 @@ class Practice extends Component
                 'gradient' => 'from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400',
             ],
             [
-                'title' => 'Jeux',
+                'title' => 'Syllabus LSFB',
                 'icon' => 'hand-thumb-up',
                 'route' => 'syllabus',
                 'gradient' => 'from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400',

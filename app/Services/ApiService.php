@@ -43,11 +43,14 @@ class ApiService
     /**
      * Realizar petición GET a la API
      */
-    public function get(string $endpoint, array $params = []): Response
+    public function get(string $endpoint, array $params = [], ?string $token = null): Response
     {
+        $token = $token ?? session('data.token') ?? session('token');
+
         return Http::withOptions(['verify' => $this->verifySsl])
             ->asJson()
             ->acceptJson()
+            ->withToken($token)
             ->get($this->baseUrl.$endpoint, $params);
     }
 
@@ -115,6 +118,30 @@ class ApiService
             ->get(config('services.api.url') . '/v1/spellings');
     }
 
+    public function allThemes()
+    {
+
+        return $this->get('/v1/verify-codes/' . session('data.user.id'));
+    }
+
+    public function MemberSyllabus(?string $token = null)
+    {
+
+        return $this->get('/v1/syllabus', [ 'token' => $token ]);
+    }
+
+
+    public function ThemeSyllabus($ue, $theme)
+    {
+
+        return $this->get('/v1/themes/'. $ue .'/'. $theme);
+    }
+
+    public function ThemeSign($ue,$theme)
+    {
+
+        return $this->get('/v1/themes/' . $ue . '/' . $theme);
+    }
 
 
 

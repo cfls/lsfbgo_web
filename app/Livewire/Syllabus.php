@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -44,26 +45,18 @@ class Syllabus extends Component
 
     public function loadAllThemes()
     {
-        $responseUser = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-        ])
-            ->withToken(session('data.token'))
-            ->acceptJson()
-            ->get(config('services.api.url') . '/v1/verify-codes/' . session('data.user.id'));
-        // save in public property
-        $verifyUser = $responseUser->json('data', []);
+        $api = app(ApiService::class);
 
+        // Asegúrate de que el token sea consistente
+        $token = session('data.token') ?? session('token');
+
+        // Si allThemes() requiere autenticación, pasa el token
+        $responseUser = $api->allThemes($token);
+        $verifyUser = $responseUser->json('data', []);
         $this->verifyUser = collect($verifyUser);
 
-
-        $response = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-        ])
-            ->withToken(session('data.token'))
-            ->acceptJson()
-            ->get(config('services.api.url') . '/v1/syllabus');
-        // Aquí ya tienes un array asociativo
-
+        // Usa el mismo token
+        $response = $api->MemberSyllabus($token);
         $this->results = $response->json('data', []);
     }
 

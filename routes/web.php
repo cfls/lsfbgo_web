@@ -16,6 +16,8 @@ use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Spelling;
 use App\Livewire\Syllabus;
 use App\Livewire\TableuBord;
+use App\Livewire\Theme;
+use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -46,6 +48,8 @@ Route::get('/practice', Practice::class)->name('practice');
 Route::get('/numbers-practice', Numbers::class)->name('numbers.practice');
 Route::get('/alphabet-practice', Spelling::class)->name('alphabet.practice');
 Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
+Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
+Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
 
 Route::get('/scanner', Scanner::class)->name('scanner');
 ;

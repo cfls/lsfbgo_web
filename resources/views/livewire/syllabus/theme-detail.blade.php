@@ -5,12 +5,12 @@
             <div class="p-2 inline-block">
                 {{-- Botón de regreso --}}
                 <a wire:navigate href="{{ route('syllabus') }}" class="text-white mb-4 inline-flex items-center gap-2">
-                    <flux:icon.arrow-left class="size-5"/>
-                    Retour
+                    <flux:icon.arrow-left-circle class="size-5"/>
+
                 </a>
 
-                <flux:subheading class="text-white text-xl pb-4">
-
+                <flux:subheading class="text-white text-xl pb-4 tex-center">
+                    {{ 'UE ' . preg_replace('/ue(\d+)-.+/', '$1', $this->selectedTheme[0]['attributes']['slug_syllabu']) }}
                 </flux:subheading>
             </div>
 
@@ -20,19 +20,19 @@
     @foreach($this->selectedTheme as $theme)
         @php
             $attrs = $theme['attributes'];
-            $slugSyllabu = $attrs['slug_syllabu'];
-            $slugTopic = $attrs['slug'];
+            $ue = $attrs['slug_syllabu'];
+            $theme = $attrs['slug'];
             $title = $attrs['title'];
             $image = $attrs['image'];
         @endphp
 
         <a wire:navigate
-           href=""
+           href="{{ route('syllabus.themes', ['ue' => $ue, 'theme' => $theme]) }}"
            class="flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300"
         >
             <img src="{{ $image }}"
                  alt="{{ $title }}"
-                 class="w-1/2 h-auto object-cover rounded-xl shadow-md bg-blue-600"
+                 class="size-32 h-auto object-cover rounded-xl shadow-md bg-blue-600"
             />
             <flux:text size="lg" class="text-center font-semibold text-gray-800 dark:text-white">
                 {{ $title }}
