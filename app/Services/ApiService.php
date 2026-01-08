@@ -143,6 +143,12 @@ class ApiService
         return $this->get('/v1/themes/' . $ue . '/' . $theme);
     }
 
+    public function ProfilUser()
+    {
+
+        return $this->get('/user/'. session('data.user.id'));
+    }
+
 
 
 

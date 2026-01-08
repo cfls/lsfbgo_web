@@ -111,7 +111,7 @@
                 <div class="relative">
                     <video
                             x-ref="player"
-                            class="w-1/2 max-w-5xl h-auto mx-auto rounded-lg shadow-lg transition-all duration-500"
+                            class="w-full max-w-5xl h-auto mx-auto rounded-lg shadow-lg transition-all duration-500"
                             :class="isTransitioning ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100 blur-0'"
                             :src="currentVideo?.url"
                             autoplay

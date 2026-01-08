@@ -3,6 +3,7 @@
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Logout;
+use App\Livewire\Auth\ProfileUser;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmail;
@@ -12,15 +13,15 @@ use App\Livewire\Practice;
 use App\Livewire\Scanner;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
+
 use App\Livewire\Settings\Profile;
-use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Spelling;
 use App\Livewire\Syllabus;
 use App\Livewire\TableuBord;
 use App\Livewire\Theme;
 use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
+
 
 
 Route::get('/', function () {
@@ -30,6 +31,8 @@ Route::get('/', function () {
     }
     return view('welcome');
 })->name('home');
+
+
 
 
 Route::get('/verify-code', VerifyEmail::class)->name('verify.email');
@@ -60,26 +63,12 @@ Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
 Route::get('/scanner', Scanner::class)->name('scanner');
 ;
 
-//Route::view('dashboard', 'dashboard')
-//    ->middleware(['auth', 'verified'])
-//    ->name('dashboard');
-
 Route::middleware(['api.token.exists'])->group(function () {
-    //Route::get('login', Login::class)->name('login');
 
-
-    Route::get('settings/profile', Profile::class)->name('profile.edit');
+    Route::get('settings/profile', ProfileUser::class)->name('profile.edit');
+    Route::get('/settings/parameters', Profile::class)->name('profile.parameters');
     Route::get('settings/password', Password::class)->name('user-password.edit');
     Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
 
-    Route::get('settings/two-factor', TwoFactor::class)
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
+
 });
