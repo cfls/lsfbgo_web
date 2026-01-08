@@ -35,6 +35,6 @@ class Logout
         Session::regenerateToken();
 
 
-        return redirect()->route('index');
+        return redirect()->route('home');
     }
 }
