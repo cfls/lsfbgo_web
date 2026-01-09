@@ -95,11 +95,6 @@
     </div>
 
     <div class="px-4 relative w-full">
-        <div class="space-y-1 ">
-            <div class="absolute top-0 right-0 -mt-5">
-                <flux:icon.light-bulb class="size-40 text-yellow-400/10"/>
-            </div>
-        </div>
         <div class="space-y-4 -mx-4">
             <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide pl-4 pr-4 my-10 snap-x snap-mandatory scroll-smooth">
                 @foreach($topics as $topic)

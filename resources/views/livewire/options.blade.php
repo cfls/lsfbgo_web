@@ -130,7 +130,7 @@
             // Cuenta cuántos temas completados del mismo tipo / syllabus
             $completedCount = $doneThemes
                 ->filter(fn($item) => $item['type'] === ($type ?? null)
-                                   && $item['syllabus'] === $slug)
+                                   && $item['syllabus'] === $ue)
                 ->count();
         @endphp
 

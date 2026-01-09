@@ -34,7 +34,7 @@
                 @foreach ($results as $syllabu)
 
                     @php
-                        $nameRoute = $this->optionGame ? 'syllabus-games' : 'syllabus';
+                        $nameRoute = $this->optionGame ? 'games' : 'syllabus';
                         $userMatch = $verifyUser->firstWhere('attributes.theme', $syllabu['attributes']['slug']);
                         $isActive  = $userMatch['attributes']['active'] ?? null;
                         $route     = route($nameRoute , ['ue' => $syllabu['attributes']['slug']]);
