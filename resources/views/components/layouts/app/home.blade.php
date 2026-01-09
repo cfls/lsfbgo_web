@@ -17,7 +17,7 @@
 </head>
 <body class="min-h-screen dark:bg-[var(--color-primary-foreground)] overflow-x-hidden">
 @if(session('data.token'))
-{{--    <livewire:native-edge :title="$title ?? 'Tableu du Bord'" />--}}
+    <livewire:native-edge :title="$title ?? 'Tableu du Bord'" />
 @endif
 
 

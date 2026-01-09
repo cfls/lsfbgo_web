@@ -62,7 +62,7 @@ Route::get('/alphabet-practice', Spelling::class)->name('alphabet.practice');
 Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
 Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
 Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
-Route::get('/syllabus-games/{ue?}', SyllabusGames::class)->name('syllabus-games');
+Route::get('/syllabus-games/{ue?}', SyllabusGames::class)->name('syllabus.games');
 Route::get('/syllabus-games/{ue}/{type?}', Options::class)->name('questions');
 
 Route::get('/syllabus-games/{ue}/{type}/{theme}', [SyllabusGameController::class, 'index'])
