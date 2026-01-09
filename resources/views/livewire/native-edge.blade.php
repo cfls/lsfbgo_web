@@ -59,6 +59,14 @@
 
         />
         <native:bottom-nav-item
+                id="jeux"
+                label="Jeux"
+                url="{{ route('games') }}"
+                icon="computer-desktop"
+                :active="request()->routeIs('games')"
+
+        />
+        <native:bottom-nav-item
                 :active="request()->routeIs('profile')"
                 id="profile"
                 label="Profil"
