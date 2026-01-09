@@ -30,13 +30,14 @@
         {{-- Lista de syllabus --}}
         <div class="space-y-4 -mx-4">
             <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide pl-4 pr-4 my-10 snap-x snap-mandatory scroll-smooth">
+
                 @foreach ($results as $syllabu)
 
                     @php
-
+                        $nameRoute = $this->optionGame ? 'syllabus-games' : 'syllabus';
                         $userMatch = $verifyUser->firstWhere('attributes.theme', $syllabu['attributes']['slug']);
                         $isActive  = $userMatch['attributes']['active'] ?? null;
-                        $route     = route('syllabus', ['ue' => $syllabu['attributes']['slug']]);
+                        $route     = route($nameRoute , ['ue' => $syllabu['attributes']['slug']]);
                         $image     = $syllabu['attributes']['image'];
                         $link      = $syllabu['attributes']['link'];
                     @endphp

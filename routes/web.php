@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SyllabusGameController;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Logout;
@@ -9,6 +10,7 @@ use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmail;
 use App\Livewire\Dictionary;
 use App\Livewire\Numbers;
+use App\Livewire\Options;
 use App\Livewire\Practice;
 use App\Livewire\Scanner;
 use App\Livewire\Settings\Appearance;
@@ -17,6 +19,7 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Spelling;
 use App\Livewire\Syllabus;
+use App\Livewire\SyllabusGames;
 use App\Livewire\TableuBord;
 use App\Livewire\Theme;
 use App\Livewire\Themes;
@@ -59,6 +62,11 @@ Route::get('/alphabet-practice', Spelling::class)->name('alphabet.practice');
 Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
 Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
 Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
+Route::get('/syllabus-games/{ue?}', SyllabusGames::class)->name('syllabus-games');
+Route::get('/syllabus-games/{ue}/{type?}', Options::class)->name('questions');
+
+Route::get('/syllabus-games/{ue}/{type}/{theme}', [SyllabusGameController::class, 'index'])
+    ->name('syllabus.play');
 
 Route::get('/scanner', Scanner::class)->name('scanner');
 ;

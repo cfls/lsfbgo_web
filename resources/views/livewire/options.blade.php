@@ -1,4 +1,25 @@
-<div  class="space-y-4   min-h-screen">
+
+<div class="space-y-4  min-h-screen">
+    @php
+        use Illuminate\Support\Str;
+
+        // prend uniquement la première partie avant le "-"
+
+
+        // met en majuscules "ue1" => "UE 1"
+        $ue = strtoupper(Str::replace('ue', 'UE ', $ue));
+
+
+        // couleurs par unité
+        // Mapeo a colores Tailwind más cercanos
+    $tailwindColors = [
+        'ue1' => 'bg-teal-700',     // #027374 ≈ teal-700
+        'ue2' => 'bg-rose-400',     // #f46070 ≈ rose-400
+        'ue3' => 'bg-amber-400',    // #f3c543 ≈ amber-400
+    ];
+
+    $bgClass = $tailwindColors[strtolower($this->ue)] ?? 'bg-gray-200';
+    @endphp
     <div
             class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none ">
         <div class="px-4">
@@ -93,36 +114,112 @@
             </div>
         </div>
     </div>
+    {{-- Lista de temas --}}
+    <div class="bg-gray-300 p-5 w-full rounded-lg space-y-5 flex flex-col items-center justify-start
+     max-h-[65vh] overflow-y-auto no-scrollbar">
 
-    <div class="px-4 relative w-full">
-        <div class="space-y-1 ">
-            <div class="absolute top-0 right-0 -mt-5">
-                <flux:icon.light-bulb class="size-40 text-yellow-400/10"/>
-            </div>
-        </div>
-        <div class="space-y-4 -mx-4">
-            <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide pl-4 pr-4 my-10 snap-x snap-mandatory scroll-smooth">
-                @foreach($topics as $topic)
-                    <a href="{{route($topic['route'])}}" wire:key="demo-{{ $loop->index }}" class=" shrink-0">
-                        <flux:card
-                                class="bg-gradient-to-br {{ $topic['gradient'] }} hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg">
-                            <div class="flex flex-col items-center justify-center text-center gap-1.5 h-full p-2">
-                                <div
-                                        class="size-16 rounded-full bg-white/30 flex items-center justify-center">
-                                    <flux:icon icon="{{$topic['icon']}}" class="size-12 text-white"/>
-                                </div>
-                                <div>
-                                    <h1 class="text-sm font-bold text-white leading-tight">{{ $topic['title'] }}</h1>
-                                </div>
-                            </div>
-                        </flux:card>
-                    </a>
-                @endforeach
-            </div>
+        @php
+            // Normaliza lista de temas completados
+            $doneThemes = collect($doneThemesData)
+                ->map(fn($item) => [
+                    'syllabus' => $item['syllabus'] ?? null,
+                    'theme'    => $item['theme'] ?? null,
+                    'type'     => $item['type'] ?? null,
+                ]);
 
-        </div>
+            // Cuenta cuántos temas completados del mismo tipo / syllabus
+            $completedCount = $doneThemes
+                ->filter(fn($item) => $item['type'] === ($type ?? null)
+                                   && $item['syllabus'] === $slug)
+                ->count();
+        @endphp
+
+
+        @foreach($this->themes as $index => $theme)
+
+            @php
+
+                $attributes = $theme['attributes'];
+                         $themeSlug  = $attributes['slug'];
+
+
+
+                         // Verifica si ya fue completado
+                         $alreadyDone = $doneThemes->contains(fn($item) =>
+
+
+                             $item['theme']    === $themeSlug &&
+                             $item['type']     === $type &&
+                             $item['syllabus'] === $ue
+                         );
+
+
+                         // Desbloqueo progresivo
+                         $isUnlocked = $index === 0 || $index <= $completedCount;
+
+                      // Siempre desbloqueados
+                             $locked = false;
+                             $isUnlocked = true;
+
+
+                             // Colores: completado = rojo, normal = color UE
+                             $colorClass = $alreadyDone ?  'bg-red-400': $bgClass;
+
+
+                             // Siempre se puede acceder
+                             $link = route('syllabus.play', [
+                                 'ue'  => $this->ue,
+                                 'type'  => $type,
+                                 'theme' => $themeSlug,
+                             ])
+            @endphp
+
+
+
+            <a href="{{ $link }}" class="w-full max-w-sm">
+
+                <div class="flex items-center justify-between p-5 border border-gray-200 rounded-lg shadow-sm text-white transition duration-300 {{$colorClass}}"
+
+                    >
+
+                    <div class="flex items-center gap-2">
+                        <flux:label class="text-lg font-semibold text-white">
+                            {{ $loop->iteration }}. {{ ucfirst($attributes['title']) }}
+                        </flux:label>
+                    </div>
+
+                    {{-- Iconos según estado --}}
+                    @if($locked)
+
+                        {{-- 🔒 Bloqueado --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                        </svg>
+
+
+                    @elseif($alreadyDone)
+
+                        {{-- ⭐ Completado --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                        </svg>
+
+
+                    @else
+
+                        {{-- ▶️ Desbloqueado --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+
+
+                    @endif
+
+                </div>
+
+            </a>
+
+        @endforeach
 
     </div>
-    <div class="pb-32"></div>
 </div>
-

@@ -26,7 +26,7 @@ class Practice extends Component
             [
                 'title' => 'Jeux',
                 'icon' => 'hand-thumb-up',
-                'route' => 'syllabus',
+                'route' => 'syllabus-games',
                 'gradient' => 'from-slate-500 to-gray-500 dark:from-slate-400 dark:to-gray-400',
             ],
 

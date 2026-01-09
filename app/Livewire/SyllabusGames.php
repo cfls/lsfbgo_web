@@ -4,19 +4,16 @@ namespace App\Livewire;
 
 use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 use Native\Mobile\Attributes\OnNative;
 use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Dialog;
-use Native\Mobile\Facades\System;
 
-class Syllabus extends Component
+class SyllabusGames extends Component
 {
-    public string $title = 'Mes Syllabus';
-    public int $optionGame = 0;
+    public string $title = 'Jeux LSFB';
+    public int $optionGame = 1;
     public $verifyUser;
     public $selectUE = [];   // aquí debe ser array, no string
     public $selectedUE = null;
@@ -28,19 +25,26 @@ class Syllabus extends Component
     public $selectedSyllabuForPayment = null;
     public $selectedLink = null;
     public ?string $ue = null;
+    public $sections = [];
 
 
 
     public function mount(?string $ue = null)
     {
-        $this->ue = $ue;
+
+
+
 
         if ($this->ue) {
             // Lógica cuando hay un UE específico
+
             $this->loadTheme($this->ue);
+
         } else {
             // Lógica para listado general
             $this->loadAllThemes();
+
+
         }
     }
 
@@ -48,31 +52,38 @@ class Syllabus extends Component
     {
         $api = app(ApiService::class);
 
-        // Asegúrate de que el token sea consistente
-        $token = session('data.token') ?? session('token');
+
 
         // Si allThemes() requiere autenticación, pasa el token
-        $responseUser = $api->allThemes($token);
+        $responseUser = $api->allThemes();
         $verifyUser = $responseUser->json('data', []);
         $this->verifyUser = collect($verifyUser);
 
+        // Asegúrate de que el token sea consistente
+        $token = session('data.token') ?? session('token');
+
         // Usa el mismo token
         $response = $api->MemberSyllabus($token);
+
         $this->results = $response->json('data', []);
     }
 
 
     public function loadTheme($ue)
     {
+
+
         $response = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
             ->withToken(session('data.token'))
             ->acceptJson()
-            ->get(config('services.api.url') . '/v1/themes/' . $ue);
+            ->get(config('services.api.url') . '/v1/sections/' . $ue);
         // save in public property
 
-        $this->selectedTheme = $response->json('data', []);
+        $this->results = $response->json('data', []);
+
+
     }
 
 
@@ -110,14 +121,10 @@ class Syllabus extends Component
     }
 
 
-
     public function render()
     {
-        return view('livewire.syllabus', [
-            'selectedTheme' => $this->selectedTheme,
-
-        ])->layout('components.layouts.app.home',[
-            'title' => 'Syllabus',
+        return view('livewire.syllabus-games')->layout('components.layouts.app.home', [
+            'title' => 'Jeux LSFB',
         ]);
     }
 }

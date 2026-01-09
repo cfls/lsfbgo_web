@@ -1,5 +1,4 @@
-<div
-        class="space-y-4 bg-white  min-h-screen">
+<div class="space-y-4  min-h-screen">
     <div
             class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none ">
         <div class="px-4">
@@ -101,7 +100,7 @@
                 <flux:icon.light-bulb class="size-40 text-yellow-400/10"/>
             </div>
 
-            <p class="text-base text-black leading-relaxed ">
+            <p class="text-base text-black dark:text-white leading-relaxed ">
                 Sélectionnez les thèmes que vous souhaitez apprendre.
             </p>
         </div>
