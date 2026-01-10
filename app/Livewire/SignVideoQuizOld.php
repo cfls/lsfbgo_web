@@ -7,10 +7,11 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Http;
 
 #[AllowDynamicProperties]
-class SignVideoQuiz extends Component
+class SignVideoQuizOld extends Component
 {
     public $questions = [];
-    public $currentIndex = 0;
+    public $currentIndex = 0; // Empezar en la pregunta 2 (índice 1)
+
     public $message = '';
     public $image;
     public $answered = false;
@@ -20,13 +21,14 @@ class SignVideoQuiz extends Component
     public $correctAnswer = '';
     public $userInput = '';
     public $completed = false;
-    public $score = 0; // ✅ Iniciar en 0 es más correcto
+    public $score = 1;
     public $slug;
     public $type;
     public $slug_theme;
     public $hasSubscription = false;
     public $selectedSyllabuForPayment;
-    public $currentQuestion;
+    public $currentQuestion;      // Current question data
+
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -34,44 +36,40 @@ class SignVideoQuiz extends Component
 
     public function mount()
     {
-        $this->hasSubscription = false;
+
+        $this->hasSubscription = false; // Valor por defecto
         $this->checkUserSubscription();
 
-        if (empty($this->questions)) {
-            $this->loadQuestions();
-        }
 
-        if (empty($this->questions)) {
-            $this->questions = [];
-            $this->completed = false;
-        }
-    }
 
-    /**
-     * 🆕 Método separado para cargar preguntas
-     */
-    protected function loadQuestions()
-    {
-        try {
+        // ⚠️ Solo cargar preguntas si no están ya definidas
+        if (empty($this->questions)) {
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
                 ->withToken(session('data.token'))
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '-themes/' . $this->slug_theme);
+                ->get(config('services.api.url') . '/v1/questions/'.  $this->slug .'-themes' .'/'. $this->slug_theme);
+
+            $data = $response->json('data', []);
+
+
+            // ✅ Mezclar al azar
+            shuffle($data);
+
+
+            // ✅ Tomar solo 15 preguntas
+            $this->questions = array_slice($data, 0, 15);
 
 
 
-            if ($response->successful()) {
-                $data = $response->json('data', []);
+        }
 
-                // ✅ Mezclar y tomar 15
-                shuffle($data);
-                $this->questions = array_slice($data, 0, 15);
-            }
-        } catch (\Throwable $e) {
-            logger()->error('Error cargando preguntas: ' . $e->getMessage());
+        // Seguridad: si no trae nada, evitamos crash
+        if (empty($this->questions)) {
             $this->questions = [];
+            $this->completed = false;
+            //$this->message = "⚠️ No se encontraron preguntas disponibles.";
         }
     }
 
@@ -79,14 +77,6 @@ class SignVideoQuiz extends Component
     {
         $this->answered = true;
         $this->isCorrect = $correct;
-
-        // 🆕 Sumar puntos también para match
-        if ($correct) {
-            $this->score += 10;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" />';
-        } else {
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-12 object-cover" />';
-        }
     }
 
     public function getTotalQuestionsProperty()
@@ -106,7 +96,7 @@ class SignVideoQuiz extends Component
                 return;
             }
 
-            $url = config('services.api.url') . '/v1/verify-codes/' . $userId;
+            $url = config('services.api.url') . '/v1/verify-codes/' . session('data.user.id');
 
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
@@ -118,14 +108,19 @@ class SignVideoQuiz extends Component
             if ($response->successful()) {
                 $subscriptionData = $response->json('data', []);
 
+
                 foreach ($subscriptionData as $sub) {
-                    if ($sub['attributes']['theme'] === $this->slug . '-themes') {
+                    if ($sub['attributes']['theme'] === $this->slug .'-themes') {
                         if ($sub['attributes']['status'] === 1) {
                             $this->hasSubscription = true;
                             return;
                         }
                     }
                 }
+
+
+            } else {
+                logger()->warning('No se pudo verificar la suscripción. Código: ' . $response->status());
             }
         } catch (\Throwable $e) {
             logger()->error('Error al verificar la suscripción: ' . $e->getMessage());
@@ -146,16 +141,24 @@ class SignVideoQuiz extends Component
             $this->answered = true;
 
             if ($givenAnswer === $correctAnswer) {
+
                 $this->isCorrect = true;
-                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" />';
+                //  $this->image = '<img src="' . asset('/img/femme_bon.png') . '" alt="bon" class="w-20 object-cover" /> ';
+                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" /> ';
                 $this->score += 10;
+
             } else {
+
                 $this->isCorrect = false;
-                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-12 object-cover" />';
+                // $this->image = '<img src="' . asset('/img/femme_eche.png') . '" alt="eche" class="w-20 object-cover" />';
+                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="bon" class="w-12 object-cover" /> ';
                 $this->message = $correctAnswer;
+
+
             }
         }
     }
+
 
     public function checkAnswer()
     {
@@ -163,13 +166,13 @@ class SignVideoQuiz extends Component
 
         $current = $this->questions[$this->currentIndex];
 
-        // Obtener todas las respuestas correctas
+        // Obtener todas las respuestas correctas como lista
         $validAnswers = array_map(
             fn($a) => strtolower($this->normalizeAnswer(trim($a))),
             explode('/', $current['answer'])
         );
 
-        // Respuesta dada por usuario
+        // respuesta dada por usuario
         $givenAnswer = strtolower(
             $this->normalizeAnswer(
                 $current['type'] === 'text'
@@ -178,7 +181,7 @@ class SignVideoQuiz extends Component
             )
         );
 
-        // Usuario puede escribir varias opciones: ej. "jusque / jusqu'a"
+        // Si el usuario escribió varias opciones: ej. "jusque / jusqu'a"
         $userAnswers = array_map(
             fn($a) => strtolower($this->normalizeAnswer(trim($a))),
             explode('/', $givenAnswer)
@@ -193,102 +196,92 @@ class SignVideoQuiz extends Component
             }
         }
 
-        // Resultado
+        // Resultado de la validación
         if ($isValid) {
             $this->isCorrect = true;
             $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" />';
             $this->score += 10;
         } else {
             $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-12 object-cover" />';
-            $this->message = implode(' / ', $validAnswers);
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="bon" class="w-12 object-cover" />';
+            $this->message = implode(' / ', $validAnswers); // mostrar las correctas
         }
     }
+
 
     public function nextStep()
     {
-        // 🆕 Verificar suscripción en la pregunta 2 (índice 1)
-        if ($this->currentIndex == 1 && !$this->hasSubscription) {
-            // 🎯 DISPARAR EVENTO: subscription-required
-            $this->dispatch('subscription-required');
-            return;
-        }
-
-        // Verificar si hay más preguntas
+// Verificamos que todavía haya más preguntas
         if ($this->currentIndex < count($this->questions) - 1) {
 
-            // 🎯 DISPARAR EVENTO: next-step (para animación)
+            // 🚀 Emitimos el evento para la animación del slide
             $this->dispatch('next-step');
-
-            // Avanzar
+            // Avanzar al siguiente índice
             $this->currentIndex++;
+
+
+
+            /***   OMITIMOS SUBSCRITION POR AHORA  ****
+            if ($this->currentIndex  == 1) {
+
+            if (!$this->hasSubscription) {
+            $this->dispatch('subscription-required');
+            return;
+            }
+            }
+             */
+
+
+
+            // Actualizar la pregunta actual
             $this->currentQuestion = $this->questions[$this->currentIndex];
 
-            // Limpiar estado
-            $this->resetQuestionState();
+            // Limpiar mensajes previos y respuestas
+            $this->message = '';
+            $this->image = null;
+            $this->answered = false;
+            $this->selectedAnswer = '';
+            $this->userInput = '';
 
-            // 🎯 Emitir evento para actualizar videos
+
+            // 🚀 Emitir evento SOLO si la pregunta tiene video principal
             if (!empty($this->currentQuestion['video'])) {
                 $this->dispatch('quiz-video-update', publicId: $this->currentQuestion['video']);
             } else {
+                // 👉 Si es tipo "video-choice", dejamos que el JS los inicialice normalmente
                 $this->dispatch('quiz-video-refresh');
             }
         } else {
-            // Terminar quiz
+            // Si no hay más preguntas, marcar como completado
             $this->completed();
-        }
-    }
 
-    /**
-     * 🆕 Método para resetear estado de pregunta
-     */
-    protected function resetQuestionState()
-    {
-        $this->message = '';
-        $this->image = null;
-        $this->answered = false;
-        $this->isCorrect = false;
-        $this->selectedAnswer = '';
-        $this->userInput = '';
-        $this->userAnswer = '';
+        }
     }
 
     public function completed()
     {
+        // Calcular el puntaje máximo posible
         $total = count($this->questions) * 10;
         $percentage = ($this->score / $total) * 100;
 
-        // ❌ Si no alcanza el 80%, falló
+        // Si el puntaje es menor a 80, no guardar en la base de datos
         if ($percentage < 80) {
-            // 🎯 DISPARAR EVENTO: quiz-failed
-            $this->dispatch('quiz-failed', percentage: round($percentage, 2));
-            return;
+            $this->dispatch('quiz-failed', percentage: $percentage);
+            return; // Muy importante: detener ejecución
         }
 
-        // ✅ Guardar resultado si tiene token
+        // ✅ Evitar guardar si ya se completó antes
         if (session('data.token')) {
-            $this->saveQuizResult();
-        }
-
-        // 🎯 DISPARAR EVENTO: quiz-finished
-        $this->dispatch('quiz-finished');
-    }
-
-    /**
-     * 🆕 Método separado para guardar resultado
-     */
-    protected function saveQuizResult()
-    {
-        try {
             $token = session('data.token');
             $userId = session('data.user.id');
 
-            // Verificar si ya existe
+
+            // Verificar si ya existe un registro de ese quiz
             $checkUrl = sprintf(
                 '%s/v1/quiz-results/check/%s/%s/%s/%s',
                 config('services.api.url'),
-                $userId,
-                $this->slug . '-themes',
+                session('data.user.id'),
+                $this->slug .'-themes',
                 $this->slug_theme,
                 $this->type
             );
@@ -300,33 +293,42 @@ class SignVideoQuiz extends Component
                 ->acceptJson()
                 ->get($checkUrl);
 
+
+
             if ($checkResponse->successful()) {
                 $data = $checkResponse->json('data', []);
                 if (!empty($data)) {
-                    // Ya existe, no guardar
+                    // ✅ Ya existe → no guardar otra vez
+                    $this->dispatch('quiz-finished');
                     return;
                 }
             }
 
-            // Guardar nuevo resultado
-            Http::withOptions([
+            // Si no existe, guardar el resultado
+            $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
                 ->withToken($token)
                 ->acceptJson()
                 ->post(config('services.api.url') . '/v1/quiz-results', [
                     'user_id'   => $userId,
-                    'syllabus'  => $this->slug . '-themes',
+                    'syllabus'  => $this->slug .'-themes',
                     'theme'     => $this->slug_theme,
                     'type'      => $this->type,
                     'score'     => $this->score,
                     'played_at' => now()->toDateString(),
                 ]);
 
-        } catch (\Throwable $e) {
-            logger()->error('Error guardando resultado del quiz: ' . $e->getMessage());
+            if ($response->failed()) {
+                $this->message = "⚠️ Error al guardar el resultado.";
+            } else {
+                $this->message = '';
+            }
         }
+
+        $this->dispatch('quiz-finished');
     }
+
 
     public function getCanValidateProperty(): bool
     {
@@ -336,17 +338,21 @@ class SignVideoQuiz extends Component
             return false;
         }
 
+        // Si la pregunta es tipo texto → validar que el usuario escribió algo
         if ($current['type'] === 'text') {
-            return !empty(trim($this->userInput));
+            return !empty(trim($this->userAnswer));
         }
 
+        // Para las demás (choice, video-choice, yes-no) → validar que haya una selección
         return !empty($this->selectedAnswer);
     }
+
 
     private function normalizeAnswer($text)
     {
         $text = strtolower(trim($text));
 
+        // Reemplazar caracteres acentuados por sus equivalentes sin acento
         $text = str_replace(
             ['á', 'à', 'ä', 'â', 'ã', 'å', 'æ',
                 'ç',
@@ -375,35 +381,31 @@ class SignVideoQuiz extends Component
         $this->redirect('/syllabus');
     }
 
-    /**
-     * 🆕 Método para reiniciar el quiz
-     */
-    public function restartQuiz()
-    {
-        $this->currentIndex = 0;
-        $this->score = 0;
-        $this->completed = false;
 
-        // Recargar preguntas
-        $this->loadQuestions();
-
-        // Resetear estado
-        $this->resetQuestionState();
-
-        // Cargar primera pregunta
-        if (!empty($this->questions)) {
-            $this->currentQuestion = $this->questions[0];
-        }
-    }
 
     public function render()
     {
-        $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
+
+
+//        if ($this->completed) {
+//
+//            return view('livewire.videos.completed', [
+//                'score' => $this->score,
+//                'total' => count($this->questions) * 10,
+//                'slug' => $this->slug
+//            ]);
+//        }
+
+        $currentQuestion = $this->questions[$this->currentIndex] ?? null;
+
+
+
+
 
 
 
         return view('livewire.sign-video-quiz', [
-            'currentQuestion' => $this->currentQuestion,
+            'currentQuestion' => $currentQuestion,
             'score' => $this->score
         ]);
     }

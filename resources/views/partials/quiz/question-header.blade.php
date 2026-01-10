@@ -1,0 +1,7 @@
+<div class="flex justify-center mx-auto mb-5 font-medium text-sm bg-blue-950 p-5 text-white rounded-lg text-center">
+    Question {{ $currentIndex + 1 }} à {{ $this->totalQuestions }}
+</div>
+
+<h2 class="font-medium text-sm mb-4 text-center text-black">
+    {{ $currentQuestion['question_text'] }}
+</h2>

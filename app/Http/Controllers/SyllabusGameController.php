@@ -15,6 +15,8 @@ class SyllabusGameController extends Controller
 
     public function index(string $slug, string $type, string $theme)
     {
+
+
         $view = self::GAME_VIEWS[$type] ?? 'syllabus.questions';
 
 

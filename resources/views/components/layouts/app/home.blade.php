@@ -45,8 +45,6 @@
         @vite('resources/js/app.js')
         @fluxScripts
         @livewireScripts
-        @stack('scripts-signquiz')
-        @stack('scripts-video-quiz')
         @stack('scripts')
     </body>
 </html>
