@@ -10,6 +10,7 @@
         @php
             $value = $option['value'] ?? '';
             $video = $option['video'] ?? '';
+
         @endphp
 
         <div

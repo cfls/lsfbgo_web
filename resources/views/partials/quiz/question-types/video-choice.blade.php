@@ -1,4 +1,4 @@
-<div x-show="!slideOut"
+<div
      x-transition:enter="transition-all ease-out duration-500"
      x-transition:enter-start="opacity-0 translate-y-3"
      x-transition:enter-end="opacity-100 translate-y-0"

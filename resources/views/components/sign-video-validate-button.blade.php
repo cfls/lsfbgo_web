@@ -5,6 +5,7 @@
     'answered' => false,
 ])
 <div class="flex flex-wrap justify-center gap-3 mb-4">
+
     @foreach($options as $option)
         <button
                 class="capitalize px-5 py-2.5 rounded-lg border

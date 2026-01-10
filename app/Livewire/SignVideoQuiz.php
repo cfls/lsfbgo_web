@@ -115,12 +115,16 @@ class SignVideoQuiz extends Component
                 ->acceptJson()
                 ->get($url);
 
+
+
             if ($response->successful()) {
                 $subscriptionData = $response->json('data', []);
 
+
+
                 foreach ($subscriptionData as $sub) {
                     if ($sub['attributes']['theme'] === $this->slug . '-themes') {
-                        if ($sub['attributes']['status'] === 1) {
+                        if ($sub['attributes']['active'] === 1) {
                             $this->hasSubscription = true;
                             return;
                         }
@@ -159,6 +163,7 @@ class SignVideoQuiz extends Component
 
     public function checkAnswer()
     {
+
         $this->answered = true;
 
         $current = $this->questions[$this->currentIndex];
@@ -207,6 +212,7 @@ class SignVideoQuiz extends Component
 
     public function nextStep()
     {
+
         // 🆕 Verificar suscripción en la pregunta 2 (índice 1)
         if ($this->currentIndex == 1 && !$this->hasSubscription) {
             // 🎯 DISPARAR EVENTO: subscription-required

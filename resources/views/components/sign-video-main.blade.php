@@ -1,21 +1,19 @@
-@props([
-    'video' => null,
-    'type' => null, // recibe el tipo de pregunta
-])
+@props(['video' => null, 'type' => null])
 
-@if($video && $type !== 'video-choice') {{-- ✅ Ocultar cuando es video-choice --}}
-<div class="mb-4"
-     wire:ignore
-     id="main-video-container">
+@if($video && $type !== 'video-choice')
+    <div class="mb-4"
+         wire:ignore
+         id="main-video-container"
+         x-data="{ src: '{{ $video }}' + '?v=' + Date.now() }">
 
+        <video
+                :src="src"
+                muted
+                autoplay
+                loop
+                playsinline
+                class="w-full rounded-xl shadow">
+        </video>
 
-    <video
-            src="{{$video}}"
-            muted
-            autoplay
-            loop
-            playsinline>
-    </video>
-
-</div>
+    </div>
 @endif
