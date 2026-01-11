@@ -27,8 +27,7 @@
 <body class="min-h-screen dark:bg-[var(--color-primary-foreground)] overflow-x-hidden">
 
 @if(session('data.token'))
-    <div>Muestra Native Edge</div>
-{{--    <livewire:native-edge :title="$title ?? 'Tableu du Bord'" />--}}
+    <livewire:native-edge :title="$title ?? 'Tableu du Bord'" />
 @endif
 
 @if(request()->routeIs('profile.parameters') || request()->routeIs('user-password.edit') || request()->routeIs('appearance.edit'))
