@@ -1,4 +1,6 @@
 <div>
+
+
     <native:top-bar
             title="{{\Native\Mobile\Facades\System::isAndroid() ? 'Tableau de bord' : $title ?? 'Tableau de bord'}}"
             show-navigation-icon="{{\Native\Mobile\Facades\System::isAndroid()}}"
@@ -39,7 +41,7 @@
         </native:side-nav-group>
     </native:side-nav>
 
-    @if(session('data.token'))
+
 
     <native:bottom-nav>
         <native:bottom-nav-item
@@ -75,6 +77,6 @@
                 />
 
     </native:bottom-nav>
-    @endif
+
 
 </div>

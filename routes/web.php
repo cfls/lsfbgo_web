@@ -49,8 +49,8 @@ Route::middleware('guest')->group(function () {
 
 // Rutas protegidas (requieren token)
 Route::middleware('api.token.exists')->group(function () {
-    Route::post('logout', Logout::class)->name('access.logout');
-});
+
+
 
 Route::get('table-au-de-bord', TableuBord::class)->name('access.dashboard');
 
@@ -69,14 +69,13 @@ Route::get('/syllabus-games/{ue}/{type}/{theme}', [SyllabusGameController::class
     ->name('syllabus.play');
 
 Route::get('/scanner', Scanner::class)->name('scanner');
-;
 
-Route::middleware(['api.token.exists'])->group(function () {
+Route::get('settings/profile', ProfileUser::class)->name('profile.edit');
+Route::get('/settings/parameters', Profile::class)->name('profile.parameters');
+Route::get('settings/password', Password::class)->name('user-password.edit');
+Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
 
-    Route::get('settings/profile', ProfileUser::class)->name('profile.edit');
-    Route::get('/settings/parameters', Profile::class)->name('profile.parameters');
-    Route::get('settings/password', Password::class)->name('user-password.edit');
-    Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
+Route::post('logout', Logout::class)->name('access.logout');
 
 
 });

@@ -2,6 +2,6 @@
     Question {{ $currentIndex + 1 }} à {{ $this->totalQuestions }}
 </div>
 
-<h2 class="font-medium text-sm mb-4 text-center text-black">
+<h2 class="font-medium text-sm mb-4 text-center text-black dark:text-white">
     {{ $currentQuestion['question_text'] }}
 </h2>

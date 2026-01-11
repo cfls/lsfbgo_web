@@ -5,6 +5,7 @@ namespace App\Livewire;
 use AllowDynamicProperties;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
+use Native\Mobile\Facades\Browser;
 
 #[AllowDynamicProperties]
 class SignVideoQuiz extends Component
@@ -102,7 +103,8 @@ class SignVideoQuiz extends Component
 
             if (!$userId || !$token) {
                 logger()->warning('Sesión no válida: usuario o token faltante.');
-                $this->hasSubscription = false;
+                Browser::open('https://lsfgo.com/syllabus');
+               // $this->hasSubscription = false;
                 return;
             }
 
@@ -133,7 +135,8 @@ class SignVideoQuiz extends Component
             }
         } catch (\Throwable $e) {
             logger()->error('Error al verificar la suscripción: ' . $e->getMessage());
-            $this->hasSubscription = false;
+            Browser::open('https://google.com');
+            // $this->hasSubscription = false;
         }
     }
 
@@ -201,11 +204,11 @@ class SignVideoQuiz extends Component
         // Resultado
         if ($isValid) {
             $this->isCorrect = true;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
         } else {
             $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-12 object-cover" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
             $this->message = implode(' / ', $validAnswers);
         }
     }
@@ -214,7 +217,7 @@ class SignVideoQuiz extends Component
     {
 
         // 🆕 Verificar suscripción en la pregunta 2 (índice 1)
-        if ($this->currentIndex == 1 && !$this->hasSubscription) {
+        if ($this->currentIndex == 5 && !$this->hasSubscription) {
             // 🎯 DISPARAR EVENTO: subscription-required
             $this->dispatch('subscription-required');
             return;

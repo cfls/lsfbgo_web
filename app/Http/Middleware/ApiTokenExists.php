@@ -15,12 +15,10 @@ class ApiTokenExists
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
-        // Verificar si existe el token en la sesión
-        if (!session()->has('data') || empty(session('data.token'))) {
-            return redirect()->route('access.login')
-                ->with('error', 'Vous devez être connecté pour accéder à cette page.');
+        if (!session()->has('data.token')) {
+            return redirect()->route('home');
         }
 
         return $next($request);
