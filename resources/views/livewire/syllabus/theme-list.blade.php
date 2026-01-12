@@ -43,13 +43,7 @@
                     @endphp
 
                     <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg">
-                        <a
-                                @if (!$userMatch || !$isActive)
-                                    wire:click.prevent="openPaymentModal('{{ $link }}')"
-                                @else
-                                    wire:navigate
-                                href="{{ $route }}"
-                                @endif
+                        <a wire:navigate href="{{ $route }}"
                                 class="flex flex-col items-center justify-center cursor-pointer h-full"
                         >
                             <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">

@@ -75,7 +75,8 @@ Route::get('/settings/parameters', Profile::class)->name('profile.parameters');
 Route::get('settings/password', Password::class)->name('user-password.edit');
 Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
 
-Route::post('logout', Logout::class)->name('access.logout');
+    Route::match(['get', 'post'], '/logout', [Logout::class, '__invoke'])
+        ->name('access.logout');
 
 
 });

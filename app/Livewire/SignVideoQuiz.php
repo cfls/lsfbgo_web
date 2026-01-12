@@ -217,9 +217,9 @@ class SignVideoQuiz extends Component
     {
 
         // 🆕 Verificar suscripción en la pregunta 2 (índice 1)
-        if ($this->currentIndex == 5 && !$this->hasSubscription) {
+        if ($this->currentIndex == 4 && !$this->hasSubscription) {
             // 🎯 DISPARAR EVENTO: subscription-required
-            $this->dispatch('subscription-required');
+            browser::open('https://cfls.be/boutique/syllabus-1');
             return;
         }
 

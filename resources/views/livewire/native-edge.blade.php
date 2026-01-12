@@ -2,8 +2,9 @@
 
 
     <native:top-bar
-            title="{{\Native\Mobile\Facades\System::isAndroid() ? 'Tableau de bord' : $title ?? 'Tableau de bord'}}"
+            title="{{\Native\Mobile\Facades\System::isAndroid() ? $title : 'Native Edge'  }}"
             show-navigation-icon="{{\Native\Mobile\Facades\System::isAndroid()}}"
+
     >
         <native:top-bar-action
                 id="home"
@@ -71,12 +72,11 @@
         <native:bottom-nav-item
                 :active="request()->routeIs('profile')"
                 id="profile"
-                label="Profil"
+                label="Profila"
                 url="{{ route('profile.edit') }}"
                 icon="user"
                 />
 
     </native:bottom-nav>
-
 
 </div>
