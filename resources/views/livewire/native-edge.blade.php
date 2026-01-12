@@ -72,7 +72,7 @@
         <native:bottom-nav-item
                 :active="request()->routeIs('profile')"
                 id="profile"
-                label="Profila"
+                label="Profil"
                 url="{{ route('profile.edit') }}"
                 icon="user"
                 />

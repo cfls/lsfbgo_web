@@ -17,24 +17,14 @@ class Dragdrop extends Component
     public $type;
     public $theme;
     public $refreshKey = 0;
-    public int $completedGames = 0;   // Cuántas partidas ha completado
-    public int $totalScore = 0;       // Puntos acumulados
-
-
-    // 🔒 Nuevo control de suscripción y demo
+    public int $completedGames = 0;
+    public int $totalScore = 0;
     public bool $isComplete = false;
-    public bool $hasSubscription = false;
-    public bool $demoPlayed = false;
-    public bool $isPlaying = false;
 
     public function mount()
     {
 
-//        logger('TOKEN EN PRODUCCIÓN:', [session('data.token')]);
-        $this->completedGames = 1;
-
-
-        // 2️⃣ Cargar palabras
+        // Cargar palabras
         $response = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
@@ -43,8 +33,19 @@ class Dragdrop extends Component
             ->get(config('services.api.url') . '/v1/spell/');
 
         $wordsData = $response->json('data', $response->json());
-        $this->words = collect($wordsData)->map(fn($w) => $w['attributes'] ?? $w)->toArray();
 
+        // 🔍 Agrega este log para ver qué datos llegan
+        //  \Log::info('📦 Datos de API:', ['words' => $wordsData]);
+
+        $this->words = collect($wordsData)
+            ->map(fn($w) => $w['attributes'] ?? $w)
+           // ->filter(fn($word) => strlen($word['name'] ?? '') <= 6)
+            ->take(5)
+            ->values()
+            ->toArray();
+
+        // 🔍 Log de las palabras procesadas
+        //  \Log::info('✅ Palabras procesadas:', ['words' => $this->words]);
 
         // 3️⃣ Cargar letras
         $responseLetters = Http::withOptions([
@@ -58,7 +59,6 @@ class Dragdrop extends Component
         $this->letters = collect($lettersData)->map(function ($l) {
             $item = $l['attributes'] ?? $l;
 
-            // Si es string, conviértelo en array consistente
             if (is_string($item)) {
                 $item = [
                     'symbol' => $item,
@@ -76,14 +76,17 @@ class Dragdrop extends Component
     {
         $this->completed = false;
 
+        //  \Log::info("🔄 loadRandomWord() - Reseteando completed a false");
+
         if (empty($this->words)) {
             logger('❌ No words available in API');
             return;
         }
 
         $random = $this->words[array_rand($this->words)];
-
         $this->currentWord = $random['attributes'] ?? $random;
+
+        //  \Log::info("📝 Nueva palabra cargada: " . ($this->currentWord['name'] ?? 'N/A'));
 
         $wordName = $this->currentWord['name'] ?? '';
         if ($wordName === '') {
@@ -97,6 +100,8 @@ class Dragdrop extends Component
         foreach ($this->letters as &$l) {
             $l['used'] = false;
         }
+
+        $this->dispatch('$refresh');
     }
 
     public function dropLetter($slotIndex, $symbol)
@@ -162,30 +167,37 @@ class Dragdrop extends Component
         if ($allCorrect) {
             $this->completed = true;
 
-            // Si es demo, marcar como jugado
-            if (!$this->hasSubscription) {
-                $this->demoPlayed = true;
-            }
+            //  \Log::info("✅ checkComplete(): Palabra completada!");
 
+            // Incrementar AQUÍ directamente
+            $this->completedGames++;
+
+            //  \Log::info("🎮 Juegos completados: {$this->completedGames}");
+
+            // Dispatch solo para mostrar animación
             $this->dispatch('word-completed', word: $this->currentWord['name']);
-            $this->completed();
+
+            // Si completó 5, mostrar final
+            if ($this->completedGames >= 5) {
+                $this->dispatch('game-completed');
+            }
         }
     }
 
     public function nextWord()
     {
-        // 🚫 Si ya jugó 5 partidas → mostrar mensaje y no cargar más
+        //  \Log::info("🎮 nextWord() INICIO");
+
+        // Resetear completed
+        $this->completed = false;
+
+        // Verificar si ya terminó
         if ($this->completedGames >= 5) {
-            $this->dispatch('go-next-theme');
+            //  \Log::info("🏁 Ya completó 5 juegos");
             return;
         }
 
-        // Si es demo y ya jugó una, mostrar modal
-        if (!$this->hasSubscription && $this->demoPlayed) {
-            $this->dispatch('demo-ended');
-            return;
-        }
-
+        //  \Log::info("📝 Cargando nueva palabra...");
         $this->loadRandomWord();
         $this->refreshKey++;
     }
@@ -197,92 +209,7 @@ class Dragdrop extends Component
         return preg_replace('/[^a-z0-9]/', '', $text);
     }
 
-    public function completed(): void
-    {
-        // 🧮 Sumar puntaje de esta partida
-        $this->score = 100;
-        $this->totalScore += $this->score;
-        $this->completedGames++;
-
-        \Log::info("Juego completado #{$this->completedGames} con total {$this->totalScore} puntos.");
-
-        // 🎯 Si aún no llega a 5 partidas → seguir jugando sin guardar
-        if ($this->completedGames < 5) {
-            $this->loadRandomWord();   // Genera nueva palabra aleatoria
-            $this->refreshKey++;
-            return;
-        }
-
-        // 🚀 Si ya jugó 5 partidas → marcar como completo y guardar en BD
-        $this->isComplete = true;
-
-        $token = session('data.token');
-        $userId = session('data.user.id');
-
-        if (!$token || !$userId) {
-            logger()->warning('⚠️ No hay sesión válida para guardar el resultado.');
-            return;
-        }
-
-        // Verificar si ya existe un registro de ese quiz
-        $checkUrl = sprintf(
-            '%s/v1/quiz-results/check/%s/%s/%s/%s',
-            config('services.api.url'),
-            session('data.user.id'),
-            $this->slug,
-            $this->theme,
-            $this->type
-        );
-
-        $checkResponse = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-        ])
-            ->withToken($token)
-            ->acceptJson()
-            ->get($checkUrl);
-
-
-
-        if ($checkResponse->successful()) {
-            $data = $checkResponse->json('data', []);
-
-            if (!empty($data)) {
-
-                // ✅ Ya existe → no guardar otra vez
-                $this->dispatch('game-completed');
-                return;
-            }
-        }
-
-        try {
-            $response = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken($token)
-                ->acceptJson()
-                ->post(config('services.api.url') . '/v1/quiz-results', [
-                    'user_id'   => $userId,
-                    'syllabus'  => $this->slug,
-                    'theme'     => $this->theme,
-                    'type'      => $this->type,
-                    'score'     => $this->totalScore,
-                    'played_at' => now()->toDateTimeString(),
-                ]);
-
-            if ($response->failed()) {
-                logger()->error('⚠️ Error al guardar resultado: ' . $response->body());
-            } else {
-                logger()->info("🎉 Resultado final guardado correctamente ({$this->totalScore} puntos).");
-                $this->dispatch('game-completed');
-            }
-        } catch (\Throwable $e) {
-            logger()->error('Error en completed(): ' . $e->getMessage());
-        }
-    }
-
-
-
-        public function render()
+    public function render()
     {
         return view('livewire.dragdrop')->layout('components.layouts.app.home', [
             'title' => 'Jeu de lettres - Drag and Drop',
