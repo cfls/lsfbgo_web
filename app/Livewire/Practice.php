@@ -29,6 +29,12 @@ class Practice extends Component
                 'route' => 'games',
                 'gradient' => 'from-slate-500 to-gray-500 dark:from-slate-400 dark:to-gray-400',
             ],
+            [
+                'title' => 'Jeu de lettres',
+                'icon' => 'rectangle-stack',
+                'route' => 'games.dragdrop',
+                'gradient' => 'from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400',
+            ],
 
 
         ];

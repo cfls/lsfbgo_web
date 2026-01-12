@@ -1,4 +1,4 @@
-<svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 700 800" class="w-20 h-20 mb-4">
+<svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 700 800" class="{{ $class ?? 'w-20 h-20 mb-4' }}">
 
     <defs>
         <style>

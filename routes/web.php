@@ -9,6 +9,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmail;
 use App\Livewire\Dictionary;
+use App\Livewire\Dragdrop;
 use App\Livewire\Numbers;
 use App\Livewire\Options;
 use App\Livewire\Practice;
@@ -67,6 +68,8 @@ Route::get('/syllabus-games/{ue}/{type?}', Options::class)->name('questions');
 
 Route::get('/syllabus-games/{ue}/{type}/{theme}', [SyllabusGameController::class, 'index'])
     ->name('syllabus.play');
+
+Route::get('/dragdrop', DragDrop::class)->name('games.dragdrop');
 
 Route::get('/scanner', Scanner::class)->name('scanner');
 

@@ -31,6 +31,7 @@ class SignVideoQuiz extends Component
     public $hasSubscription = false;
     public $selectedSyllabuForPayment;
     public $currentQuestion;
+    public $selectedLink;
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -106,7 +107,7 @@ class SignVideoQuiz extends Component
 
             if (!$userId || !$token) {
                 logger()->warning('Sesión no válida: usuario o token faltante.');
-                Browser::open('https://lsfgo.com/syllabus');
+
                // $this->hasSubscription = false;
                 return;
             }
@@ -138,7 +139,7 @@ class SignVideoQuiz extends Component
             }
         } catch (\Throwable $e) {
             logger()->error('Error al verificar la suscripción: ' . $e->getMessage());
-            Browser::open('https://google.com');
+
             // $this->hasSubscription = false;
         }
     }
@@ -241,6 +242,7 @@ class SignVideoQuiz extends Component
             }
 
             $this->openPaymentModal($link);
+            return;
         }
 
         // Verificar si hay más preguntas
