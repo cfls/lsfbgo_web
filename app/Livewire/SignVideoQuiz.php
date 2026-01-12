@@ -5,7 +5,10 @@ namespace App\Livewire;
 use AllowDynamicProperties;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
+use Native\Mobile\Attributes\OnNative;
+use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
+use Native\Mobile\Facades\Dialog;
 
 #[AllowDynamicProperties]
 class SignVideoQuiz extends Component
@@ -216,11 +219,28 @@ class SignVideoQuiz extends Component
     public function nextStep()
     {
 
+
         // 🆕 Verificar suscripción en la pregunta 2 (índice 1)
-        if ($this->currentIndex == 4 && !$this->hasSubscription) {
+        if ($this->currentIndex == 2 && !$this->hasSubscription) {
             // 🎯 DISPARAR EVENTO: subscription-required
-            browser::open('https://cfls.be/boutique/syllabus-1');
-            return;
+
+
+
+            switch ($this->slug) {
+                case 'ue1':
+                    $link = "https://cfls.be/boutique/syllabus-1";
+                    break;
+                case 'ue2':
+                    $link = "https://cfls.be/boutique/syllabus-2";
+                    break;
+                case 'ue3':
+                    $link = "https://cfls.be/boutique/syllabus-3";
+                    break;
+                default:
+                    $link = "https://cfls.be/boutique";
+            }
+
+            $this->openPaymentModal($link);
         }
 
         // Verificar si hay más preguntas
@@ -245,6 +265,31 @@ class SignVideoQuiz extends Component
         } else {
             // Terminar quiz
             $this->completed();
+        }
+    }
+
+    public function openPaymentModal($link)
+    {
+
+        $this->selectedLink = $link;
+
+        Dialog::alert(
+            'Accès Syllabus',
+            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
+            [
+                'Oui, ouvrir la boutique',
+                'Non, plus tard'
+            ]
+        )->id('alert-demo');;
+
+
+    }
+
+    #[OnNative(ButtonPressed::class)]
+    public function handleAlert(int $index, string $id): void
+    {
+        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
+            Browser::open($this->selectedLink);
         }
     }
 

@@ -43,9 +43,21 @@
                     @endphp
 
                     <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg">
-                        <a wire:navigate href="{{ $route }}"
-                                class="flex flex-col items-center justify-center cursor-pointer h-full"
-                        >
+                        @if(request()->routeIs('syllabus'))
+                            <a class="flex flex-col items-center justify-center cursor-pointer h-full"
+                               @if (!$userMatch || !$isActive)
+                                   wire:click.prevent="openPaymentModal('{{ $link }}')"
+                               role="button"
+                               @else
+                                   wire:navigate
+                               href="{{ $route }}"
+                                    @endif
+                            >
+                        @else
+                            <a class="flex flex-col items-center justify-center cursor-pointer h-full"
+                               href="{{ $route }}"
+                            >
+                        @endif
                             <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
                                 <div class="size-32 bg-white/30 flex items-center justify-center">
                                     <img

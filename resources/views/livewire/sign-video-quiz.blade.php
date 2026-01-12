@@ -8,7 +8,7 @@
         {{-- Modals --}}
         @include('partials.quiz.modals.success')
         @include('partials.quiz.modals.failure')
-        @include('partials.quiz.modals.subscription')
+
 
         {{-- Quiz Content --}}
         <div class=" p-5">
