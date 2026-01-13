@@ -13,12 +13,12 @@
                 url="{{ route('access.dashboard') }}"
         />
 
-        <native:top-bar-action
-                id="web"
-                icon="globe-alt"
-                label="Site"
-                url="https://cfls.be"
-        />
+{{--        <native:top-bar-action--}}
+{{--                id="web"--}}
+{{--                icon="globe-alt"--}}
+{{--                label="Site"--}}
+{{--                url="https://cfls.be"--}}
+{{--        />--}}
     </native:top-bar>
     <native:side-nav
             :gestures_enabled="false">
@@ -35,7 +35,11 @@
         <native:horizontal-divider />
         <native:side-nav-group heading="Ressources" :expanded="false">
             <native:side-nav-item id="visit-site" icon="globe-alt" url="https://cfls.be" label="Cfls.be"/>
-            <native:side-nav-item active="{{ request()->routeIs('access.logout') }}" id="logout" icon="arrow-left-start-on-rectangle" url="{{ route('access.logout') }}" label="Déconnexion"/>
+            <native:side-nav-item active="{{ request()->routeIs('numbers.practice') }}" id="logout" icon="dashboard" url="{{ route('numbers.practice') }}" label="Chiffres"/>
+            <native:side-nav-item active="{{ request()->routeIs('alphabet.practice') }}" id="logout" icon="dashboard" url="{{ route('alphabet.practice') }}" label="Épeler"/>
+            <native:side-nav-item active="{{ request()->routeIs('games') }}" id="logout" icon="dashboard" url="{{ route('games') }}" label="Jeux"/>
+            <native:side-nav-item active="{{ request()->routeIs('games.dragdrop') }}" id="logout" icon="dashboard" url="{{ route('games.dragdrop') }}" label="Jeu de lettres"/>
+            <native:side-nav-item active="{{ request()->routeIs('access.logout') }}" id="logout" icon="exit" url="{{ route('access.logout') }}" label="Déconnexion"/>
 
 
 

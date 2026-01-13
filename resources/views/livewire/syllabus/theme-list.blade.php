@@ -1,5 +1,5 @@
 {{-- resources/views/livewire/syllabus/theme-list.blade.php --}}
-<div class="space-y-4 bg-white min-h-screen">
+<div class="space-y-4  min-h-screen">
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         {{-- Tu header actual --}}
         <div class="px-4">
@@ -14,10 +14,7 @@
 
     <div class="px-4 relative w-full">
         <div class="space-y-1">
-            <div class="absolute top-0 right-0 -mt-5">
-                <flux:icon.light-bulb class="size-40 text-yellow-400/10"/>
-            </div>
-            <p class="text-base text-black leading-relaxed">
+            <p class="text-base text-black dark:text-white leading-relaxed">
                 Sélectionnez les thèmes que vous souhaitez apprendre.
             </p>
         </div>
@@ -59,7 +56,7 @@
                             >
                         @endif
                             <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
-                                <div class="size-32 bg-white/30 flex items-center justify-center">
+                                <div class="size-32  flex items-center justify-center">
                                     <img
                                             src="{{ $image }}"
                                             alt="syllabus image"
@@ -72,5 +69,30 @@
                 @endforeach
             </div>
         </div>
+
+    </div>
+    <!-- Main Content Area with Horizontal Padding -->
+    <div class="space-y-4 px-4">
+        <!-- Camera Button Card -->
+
+
+
+            <flux:card class="bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 border-2 border-amber-200 dark:border-amber-700 overflow-hidden">
+                <flux:heading icon="camera" class="text-amber-900 dark:text-amber-100 mb-4">
+                    Vous trouverez votre code unique à l'intérieur de la couverture arrière de votre syllabus. Si il ne s'y trouve pas, veuillez en faire la demande par mail à info@cfls.be en joignant la preuve de votre commande.
+                </flux:heading>
+                <div class="mb-6 text-center">
+                    <flux:button wire:click="openVideoTutorialModal(&quot;https://www.facebook.com/share/v/1BepzAgdKA&quot;)" icon="video-camera" class="py-4 px-6 bg-gradient-to-br from-blue-500 to-cyan-500 !text-white border-0 shadow-lg transition-all text-lg font-semibold [&>span]:!text-white">
+                        Voir le tutoriel vidéo
+                    </flux:button>
+{{--                    <a href="https://www.facebook.com/share/v/1BepzAgdKA/" target="_blank" class="font-medium no-underline">--}}
+{{--                        🎥 Voir le tutoriel vidéo--}}
+{{--                    </a>--}}
+                </div>
+
+            </flux:card>
+
+
+
     </div>
 </div>

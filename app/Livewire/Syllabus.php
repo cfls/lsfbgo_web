@@ -76,10 +76,9 @@ class Syllabus extends Component
     }
 
 
-    // abrir modal
-    public function openPaymentModal($link)
+// abrir modal de pago
+    public function openPaymentModal($link): void
     {
-
         $this->selectedLink = $link;
 
         Dialog::alert(
@@ -89,18 +88,52 @@ class Syllabus extends Component
                 'Oui, ouvrir la boutique',
                 'Non, plus tard'
             ]
-        )->id('alert-demo');;
+        )->id('payment-modal'); // ID único
+    }
 
+// abrir modal de video tutorial
+    public function openVideoTutorialModal($link): void
+    {
+        $this->selectedLink = $link;
 
+        Dialog::alert(
+            'Tutoriel Vidéo',
+            'Voulez-vous ouvrir le tutoriel vidéo?',
+            [
+                'Oui, ouvrir',
+                'Non, plus tard'
+            ]
+        )->id('video-modal'); // ID único diferente
     }
 
     #[OnNative(ButtonPressed::class)]
     public function handleAlert(int $index, string $id): void
     {
-        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
+        // Manejar modal de pago
+        if ($id === 'payment-modal' && $index === 0 && $this->selectedLink) {
+            Browser::open($this->selectedLink);
+        }
+
+        // Manejar modal de video
+        if ($id === 'video-modal' && $index === 0 && $this->selectedLink) {
             Browser::open($this->selectedLink);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // cerrar modal
     public function closePaymentModal()

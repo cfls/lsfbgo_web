@@ -27,7 +27,7 @@
 <body class="min-h-screen dark:bg-[var(--color-primary-foreground)] overflow-x-hidden">
 
 @if(session('data.token'))
-{{--    <livewire:native-edge  />--}}
+    <livewire:native-edge  />
 @endif
 
 @if(request()->routeIs('profile.parameters') || request()->routeIs('user-password.edit') || request()->routeIs('appearance.edit'))
