@@ -10,7 +10,7 @@ use Native\Mobile\Facades\Scanner as ScannerFacade;
 
 class Scanner extends Component
 {
-    use HasQuote;
+
     public $data;
 
     public $format;

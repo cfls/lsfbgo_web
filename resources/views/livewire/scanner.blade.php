@@ -118,7 +118,7 @@
                </flux:card>
           @endif
 
-        
+
      </div>
      <div class="pb-32"></div>
 </div>
