@@ -89,7 +89,7 @@
                             showFinal = true;
                             setTimeout(() => {
                                 console.log('🏁 Redirigiendo...');
-                                // window.location.href = '/siguiente-tema';
+                                window.location.href = '/dragdrop';
                             }, 3000);
                         } else {
                             $wire.nextWord();
@@ -210,7 +210,7 @@
              x-transition:enter-end="opacity-100 transform scale-100"
              class="bg-gradient-to-br from-green-400 to-blue-500 rounded-xl p-4 text-center text-white mt-3">
             <h1 class="text-xl font-bold mb-2">🎉 Félicitations !</h1>
-            <img src="{{ asset('img/aplause.png') }}" alt="Applaudissements" class="mx-auto w-20 h-20 mb-2" />
+            <img src="{{ asset('img/lsfgo/good.png') }}" alt="Applaudissements" class="mx-auto w-20 mb-2" />
             <p class="font-semibold text-sm">Vous avez complété tous les mots!</p>
         </div>
     </div>
