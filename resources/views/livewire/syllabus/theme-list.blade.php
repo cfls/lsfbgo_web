@@ -74,25 +74,15 @@
     <!-- Main Content Area with Horizontal Padding -->
     <div class="space-y-4 px-4">
         <!-- Camera Button Card -->
-
-
-
-            <flux:card class="bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 border-2 border-amber-200 dark:border-amber-700 overflow-hidden">
-                <flux:heading icon="camera" class="text-amber-900 dark:text-amber-100 mb-4">
+            <flux:card class="bg-gradient-to-br from-teal-500 to-purple-600   shadow-lg transition-all text-xl font-semibold border-2 border-amber-200 dark:border-amber-700 overflow-hidden">
+                <flux:heading icon="camera" class="text-white dark:text-amber-100 mb-4">
                     Vous trouverez votre code unique à l'intérieur de la couverture arrière de votre syllabus. Si il ne s'y trouve pas, veuillez en faire la demande par mail à info@cfls.be en joignant la preuve de votre commande.
                 </flux:heading>
                 <div class="mb-6 text-center">
                     <flux:button wire:click="openVideoTutorialModal(&quot;https://www.facebook.com/share/v/1BepzAgdKA&quot;)" icon="video-camera" class="py-4 px-6 bg-gradient-to-br from-blue-500 to-cyan-500 !text-white border-0 shadow-lg transition-all text-lg font-semibold [&>span]:!text-white">
                         Voir le tutoriel vidéo
                     </flux:button>
-{{--                    <a href="https://www.facebook.com/share/v/1BepzAgdKA/" target="_blank" class="font-medium no-underline">--}}
-{{--                        🎥 Voir le tutoriel vidéo--}}
-{{--                    </a>--}}
                 </div>
-
             </flux:card>
-
-
-
     </div>
 </div>
