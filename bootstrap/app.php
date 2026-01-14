@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckNetworkConnection;
 
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -15,15 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'api.token.exists' => ApiTokenExists::class,
+            'check.network' => CheckNetworkConnection::class,
         ]);
         $middleware->web(append: [
             CheckNetworkConnection::class,
         ]);
 
-        // Alias opcional
-        $middleware->alias([
-            'check.network' => CheckNetworkConnection::class,
-        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
