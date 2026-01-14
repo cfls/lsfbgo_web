@@ -14,10 +14,6 @@
 
     <div class="px-4 relative w-full">
         <div class="space-y-1 ">
-            <div class="absolute top-0 right-0 -mt-5">
-                <flux:icon.light-bulb class="size-40 text-yellow-400/10"/>
-            </div>
-
             <p class="text-base text-black dark:text-white leading-relaxed ">
                 Sélectionnez les thèmes que vous souhaitez apprendre.
             </p>
