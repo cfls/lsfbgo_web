@@ -316,4 +316,17 @@ return [
             'landscape_right' => false,
         ],
     ],
+
+    'deeplinks' => [
+        'enabled' => true,
+        'scheme' => 'lsfbgo', // Tu esquema personalizado
+        'host' => 'app',
+    ],
+
+    // Deep links que tu app debe manejar
+    'deeplink_routes' => [
+        'lsfbgo://syllabus/*',
+        'lsfbgo://scanner',
+        'https://lsfbgo.cfls.be/syllabus/*',
+    ],
 ];

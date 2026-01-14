@@ -30,20 +30,35 @@ class Scanner extends Component
     public function mount()
     {
         $this->scanHistory = session()->get('scan_history', []);
+
+        // ← AGREGAR ESTO: Verificar si hay un deep link pendiente
+        if (session()->has('deeplink_syllabus_url')) {
+            $url = session()->get('deeplink_syllabus_url');
+            session()->forget('deeplink_syllabus_url');
+
+            // Abrir el syllabus automáticamente
+            $this->dispatch('notify', [
+                'type' => 'info',
+                'message' => 'Ouverture depuis un lien direct...'
+            ]);
+
+            $this->openInApp($url);
+        }
     }
 
     public function scan(): void
     {
+        \Log::info('Scan method called');
         try {
             ScannerFacade::make()
-                ->prompt($this->streaming ? 'Escanear códigos continuamente' : 'Escanear código QR')
+                ->prompt($this->streaming ? 'Scanner en continu' : 'Scanner un code QR')
                 ->formats([$this->requestedFormat])
                 ->continuous($this->streaming);
         } catch (\Exception $e) {
             Log::error('Error al iniciar scanner: ' . $e->getMessage());
             $this->dispatch('notify', [
                 'type' => 'error',
-                'message' => 'Error al abrir el escáner'
+                'message' => 'Erreur lors de l\'ouverture du scanner'
             ]);
         }
     }
@@ -80,7 +95,7 @@ class Scanner extends Component
         $this->dispatch('vibrate', ['duration' => 100]);
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => 'Código escaneado correctamente'
+            'message' => 'Code scanné avec succès'
         ]);
     }
 
@@ -111,7 +126,7 @@ class Scanner extends Component
         }
 
         if (preg_match('/^tel:/', $data) || preg_match('/^\+?[0-9]{10,}$/', $data)) {
-            return 'Teléfono';
+            return 'Téléphone';
         }
 
         if (preg_match('/^WIFI:/', $data)) {
@@ -119,18 +134,18 @@ class Scanner extends Component
         }
 
         if (preg_match('/^BEGIN:VCARD/', $data)) {
-            return 'Contacto';
+            return 'Contact';
         }
 
         if (preg_match('/^geo:/', $data)) {
-            return 'Ubicación';
+            return 'Localisation';
         }
 
         if (is_numeric($data)) {
-            return 'Número';
+            return 'Numéro';
         }
 
-        return 'Texto';
+        return 'Texte';
     }
 
     public function openInApp($url): void
@@ -147,7 +162,7 @@ class Scanner extends Component
         // Obtener título de la URL
         $this->webViewTitle = $this->getPageTitle($url);
 
-        Log::info('Abriendo WebView', ['url' => $url]);
+        Log::info('Ouverture du WebView', ['url' => $url]);
     }
 
     private function getPageTitle($url): string
@@ -169,7 +184,7 @@ class Scanner extends Component
         }
 
         $host = parse_url($url, PHP_URL_HOST);
-        return $host ?: 'Página Web';
+        return $host ?: 'Page Web';
     }
 
     public function closeWebView(): void
@@ -226,7 +241,7 @@ class Scanner extends Component
         $this->dispatch('copyToClipboard', ['text' => $text]);
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => 'Copiado al portapapeles'
+            'message' => 'Copié dans le presse-papiers'
         ]);
     }
 
@@ -244,7 +259,7 @@ class Scanner extends Component
 
             $this->dispatch('notify', [
                 'type' => 'success',
-                'message' => 'Eliminado del historial'
+                'message' => 'Supprimé de l\'historique'
             ]);
         }
     }
@@ -264,7 +279,7 @@ class Scanner extends Component
 
         $this->dispatch('notify', [
             'type' => 'success',
-            'message' => 'Historial limpiado'
+            'message' => 'Historique effacé'
         ]);
     }
 

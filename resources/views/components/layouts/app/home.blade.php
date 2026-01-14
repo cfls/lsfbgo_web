@@ -25,7 +25,7 @@
     @livewireStyles
 </head>
 <body class="min-h-screen dark:bg-[var(--color-primary-foreground)] overflow-x-hidden">
-
+<livewire:network-status />
 @if(session('data.token'))
     <livewire:native-edge  />
 @endif
@@ -45,5 +45,18 @@
         @fluxScripts
         @livewireScripts
         @stack('scripts')
+        <script>
+            function sendNetworkStatus() {
+                const status = navigator.onLine;
+                Livewire.dispatch('setNetworkStatus', status);
+            }
+
+            window.addEventListener('online', sendNetworkStatus);
+            window.addEventListener('offline', sendNetworkStatus);
+
+            document.addEventListener('DOMContentLoaded', () => {
+                sendNetworkStatus();
+            });
+        </script>
     </body>
 </html>

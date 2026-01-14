@@ -1,6 +1,6 @@
 <div class="relative h-full bg-gray-50" x-data="scannerComponent()">
      {{-- Vue principale du scanner --}}
-     <div class="h-full overflow-y-auto" x-show="!@js($showWebView) && !@js($showHistory)">
+     <div class="h-full overflow-y-auto" x-show="!$wire.showWebView && !$wire.showHistory">
           <div class="p-4 space-y-4">
                {{-- En-tête --}}
                <div class="flex items-center justify-between">
@@ -27,21 +27,38 @@
                </button>
 
                {{-- Options --}}
-               <div class="bg-white rounded-xl p-4 shadow space-y-3">
+               {{-- Options --}}
+               <div class="bg-white rounded-xl p-4 shadow space-y-3" x-data="{
+     streaming: @entangle('streaming'),
+     autoOpenUrls: @entangle('autoOpenUrls')
+}">
                     <h3 class="font-semibold text-gray-700 mb-2">⚙️ Options</h3>
 
-                    <label class="flex items-center justify-between cursor-pointer">
+                    {{-- Scan continu --}}
+                    <label class="flex items-center justify-between cursor-pointer" @click="streaming = !streaming">
                          <span class="text-gray-700">Scan continu</span>
-                         <input type="checkbox" wire:model.live="streaming" class="sr-only peer">
-                         <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                         <div class="relative inline-flex items-center">
+                              <div class="w-11 h-6 rounded-full transition-colors duration-200 ease-in-out"
+                                   :class="streaming ? 'bg-blue-600' : 'bg-gray-200'">
+                                   <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ease-in-out"
+                                        :class="streaming ? 'translate-x-5' : 'translate-x-0'"></div>
+                              </div>
+                         </div>
                     </label>
 
-                    <label class="flex items-center justify-between cursor-pointer">
+                    {{-- Ouvrir automatiquement --}}
+                    <label class="flex items-center justify-between cursor-pointer" @click="autoOpenUrls = !autoOpenUrls">
                          <span class="text-gray-700">Ouvrir automatiquement</span>
-                         <input type="checkbox" wire:model.live="autoOpenUrls" class="sr-only peer">
-                         <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                         <div class="relative inline-flex items-center">
+                              <div class="w-11 h-6 rounded-full transition-colors duration-200 ease-in-out"
+                                   :class="autoOpenUrls ? 'bg-blue-600' : 'bg-gray-200'">
+                                   <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ease-in-out"
+                                        :class="autoOpenUrls ? 'translate-x-5' : 'translate-x-0'"></div>
+                              </div>
+                         </div>
                     </label>
 
+                    {{-- Format selector --}}
                     <select wire:model.live="requestedFormat"
                             class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                          <option value="all">📋 Tous les formats</option>
@@ -77,7 +94,7 @@
                          <div class="flex flex-wrap gap-2">
                               @if($this->isUrl($data))
                                    <button
-                                           wire:click="openInApp('{{ $data }}')"
+                                           wire:click="openInApp('{{ addslashes($data) }}')"
                                            class="flex-1 {{ $this->isSyllabusUrl($data) ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700' }} text-white py-2.5 px-4 rounded-lg transition font-medium">
                                         <svg class="inline w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -88,7 +105,7 @@
                               @endif
 
                               <button
-                                      wire:click="copyToClipboard('{{ $data }}')"
+                                      wire:click="copyToClipboard('{{ addslashes($data) }}')"
                                       class="flex-1 bg-gray-600 text-white py-2.5 px-4 rounded-lg hover:bg-gray-700 transition font-medium">
                                    <svg class="inline w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -97,7 +114,7 @@
                               </button>
 
                               <button
-                                      wire:click="shareCode('{{ $data }}')"
+                                      wire:click="shareCode('{{ addslashes($data) }}')"
                                       class="bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition">
                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
@@ -136,7 +153,7 @@
 
                                         @if($scan['is_url'])
                                              <button
-                                                     wire:click="openUrl('{{ $scan['data'] }}')"
+                                                     wire:click="openUrl('{{ addslashes($scan['data']) }}')"
                                                      class="text-xs {{ $scan['is_syllabus'] ? 'bg-purple-500 hover:bg-purple-600' : 'bg-blue-500 hover:bg-blue-600' }} text-white px-3 py-1 rounded transition">
                                                   {{ $scan['is_syllabus'] ? '📚 Voir le Syllabus' : 'Ouvrir' }}
                                              </button>
@@ -151,7 +168,7 @@
 
      {{-- Historique --}}
      @if($showHistory)
-          <div class="absolute inset-0 bg-white z-40 flex flex-col">
+          <div class="absolute inset-0 bg-white z-40 flex flex-col" x-show="$wire.showHistory">
                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex items-center justify-between shadow">
                     <div class="flex items-center space-x-3">
                          <button wire:click="toggleHistory" class="p-2 hover:bg-blue-800 rounded-full transition">
@@ -197,13 +214,13 @@
                                         <div class="flex gap-2">
                                              @if($scan['is_url'])
                                                   <button
-                                                          wire:click="openUrl('{{ $scan['data'] }}')"
+                                                          wire:click="openUrl('{{ addslashes($scan['data']) }}')"
                                                           class="flex-1 {{ $scan['is_syllabus'] ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700' }} text-white py-2 px-3 rounded-lg transition text-sm font-medium">
                                                        {{ $scan['is_syllabus'] ? '📚 Voir le Syllabus' : 'Ouvrir' }}
                                                   </button>
                                              @endif
                                              <button
-                                                     wire:click="copyToClipboard('{{ $scan['data'] }}')"
+                                                     wire:click="copyToClipboard('{{ addslashes($scan['data']) }}')"
                                                      class="flex-1 bg-gray-600 text-white py-2 px-3 rounded-lg hover:bg-gray-700 transition text-sm font-medium">
                                                   Copier
                                              </button>
@@ -225,7 +242,7 @@
 
      {{-- WebView pour Syllabus avec Vidéos --}}
      @if($showWebView && $webViewUrl)
-          <div class="absolute inset-0 bg-white z-50 flex flex-col" x-show="@js($showWebView)">
+          <div class="absolute inset-0 bg-white z-50 flex flex-col" x-show="$wire.showWebView">
                {{-- Barre de navigation améliorée --}}
                <div class="bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
                     {{-- Ligne supérieure avec contrôles --}}
@@ -240,7 +257,7 @@
 
                          <button
                                  wire:click="goBack"
-                                 @if(!$canGoBack) disabled @endif
+                                 @disabled(!$canGoBack)
                                  class="p-2 hover:bg-purple-800 rounded-full transition {{ !$canGoBack ? 'opacity-40 cursor-not-allowed' : '' }}">
                               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -249,7 +266,7 @@
 
                          <button
                                  wire:click="goForward"
-                                 @if(!$canGoForward) disabled @endif
+                                 @disabled(!$canGoForward)
                                  class="p-2 hover:bg-purple-800 rounded-full transition {{ !$canGoForward ? 'opacity-40 cursor-not-allowed' : '' }}">
                               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -309,17 +326,12 @@
                             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                             allowfullscreen
-                            @load="
-                        $wire.webViewLoaded();
-                        const iframe = document.getElementById('syllabus-iframe');
-                        try {
-                            const canGoBack = iframe.contentWindow.history.length > 1;
-                            const canGoForward = false;
-                            $wire.updateNavigationState(canGoBack, canGoForward);
-                        } catch(e) {
-                            console.log('Cannot access iframe history');
-                        }
-                    "
+                            wire:ignore
+                            onload="
+                                if (typeof Livewire !== 'undefined') {
+                                    Livewire.dispatch('webViewLoaded');
+                                }
+                            "
                     ></iframe>
                </div>
 
@@ -345,11 +357,11 @@
                return {
                     init() {
                          // Écouteur pour copier dans le presse-papiers
-                         Livewire.on('copyToClipboard', (data) => {
+                         Livewire.on('copyToClipboard', (event) => {
+                              const data = event[0] || event;
                               if (navigator.clipboard) {
                                    navigator.clipboard.writeText(data.text);
                               } else {
-                                   // Solution de secours pour les appareils plus anciens
                                    const textArea = document.createElement("textarea");
                                    textArea.value = data.text;
                                    document.body.appendChild(textArea);
@@ -360,7 +372,8 @@
                          });
 
                          // Écouteur pour partager
-                         Livewire.on('shareContent', (data) => {
+                         Livewire.on('shareContent', (event) => {
+                              const data = event[0] || event;
                               if (navigator.share) {
                                    navigator.share({
                                         title: 'Code QR',
@@ -373,7 +386,8 @@
                          });
 
                          // Écouteur pour la vibration
-                         Livewire.on('vibrate', (data) => {
+                         Livewire.on('vibrate', (event) => {
+                              const data = event[0] || event;
                               if (navigator.vibrate) {
                                    navigator.vibrate(data.duration || 100);
                               }
@@ -411,27 +425,26 @@
                          });
 
                          // Écouteur pour ouvrir dans un navigateur externe
-                         Livewire.on('openExternal', (data) => {
+                         Livewire.on('openExternal', (event) => {
+                              const data = event[0] || event;
                               window.open(data.url, '_system');
                          });
 
                          // Écouteur pour les notifications
-                         Livewire.on('notify', (data) => {
-                              // Implémenter le système de notifications
+                         Livewire.on('notify', (event) => {
+                              const data = event[0] || event;
                               console.log(`[${data.type}] ${data.message}`);
-
-                              // Optionnel : Afficher une notification toast
                               this.showToast(data.message, data.type);
                          });
                     },
 
                     showToast(message, type = 'success') {
-                         // Créer un élément de notification
                          const toast = document.createElement('div');
                          toast.className = `fixed top-4 right-4 z-[9999] px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 ${
                                  type === 'success' ? 'bg-green-600' :
                                          type === 'error' ? 'bg-red-600' :
-                                                 'bg-blue-600'
+                                                 type === 'info' ? 'bg-blue-600' :
+                                                         'bg-gray-600'
                          }`;
                          toast.textContent = message;
                          toast.style.opacity = '0';
@@ -439,13 +452,11 @@
 
                          document.body.appendChild(toast);
 
-                         // Animer l'entrée
                          setTimeout(() => {
                               toast.style.opacity = '1';
                               toast.style.transform = 'translateY(0)';
                          }, 10);
 
-                         // Supprimer après 3 secondes
                          setTimeout(() => {
                               toast.style.opacity = '0';
                               toast.style.transform = 'translateY(-20px)';
@@ -459,13 +470,11 @@
 
 @push('styles')
      <style>
-          /* Assurer que l'iframe permette les vidéos en plein écran */
           #syllabus-iframe {
                position: relative;
                z-index: 1;
           }
 
-          /* Styles pour la barre de défilement personnalisée */
           .overflow-y-auto::-webkit-scrollbar {
                width: 6px;
           }
@@ -484,7 +493,6 @@
                background: #555;
           }
 
-          /* Animation de chargement */
           @keyframes pulse {
                0%, 100% { opacity: 1; }
                50% { opacity: 0.5; }
