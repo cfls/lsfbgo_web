@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\SyllabusGameController;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
@@ -16,7 +17,6 @@ use App\Livewire\Practice;
 use App\Livewire\Scanner;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
-
 use App\Livewire\Settings\Profile;
 use App\Livewire\Spelling;
 use App\Livewire\Syllabus;
@@ -27,6 +27,26 @@ use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
 
 
+/*
+|--------------------------------------------------------------------------
+| Rutas de Red (Sin middleware de verificación de red)
+|--------------------------------------------------------------------------
+| Estas rutas NO deben verificar la conexión para evitar loops infinitos
+*/
+
+Route::get('/sin-conexion', [NetworkController::class, 'sinConexion'])
+    ->name('sin-conexion')
+    ->withoutMiddleware(['check.network']);
+
+Route::get('/api/network/status', [NetworkController::class, 'checkStatus'])
+    ->name('api.network.status')
+    ->withoutMiddleware(['check.network']);
+
+/*
+|--------------------------------------------------------------------------
+| Rutas Públicas
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     // Verificar si existe el token en la sesión
@@ -48,7 +68,13 @@ Route::middleware('guest')->group(function () {
 
 });
 
-// Rutas protegidas (requieren token)
+/*
+|--------------------------------------------------------------------------
+| Rutas Protegidas (requieren token Y conexión de red)
+|--------------------------------------------------------------------------
+| Estas rutas verificarán automáticamente la conexión de red gracias al
+| middleware global CheckNetworkConnection
+*/
 Route::middleware('api.token.exists')->group(function () {
 
 
