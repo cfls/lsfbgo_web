@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sin Conexión - {{ config('app.name') }}</title>
+    <title>Hors connexion - {{ config('app.name') }}</title>
     <style>
         * {
             margin: 0;
@@ -129,72 +129,70 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="icon">📡</div>
-        <h1>Sin Conexión</h1>
-        <p>Lo sentimos, no se puede conectar al servidor. Por favor, verifica tu conexión a internet e intenta nuevamente.</p>
-        
-        <button class="retry-button" id="retryButton" onclick="checkConnection()">
-            Intentar de Nuevo
-        </button>
+<div class="container">
+    <div class="icon">📡</div>
+    <h1>Hors connexion</h1>
+    <p>Désolé, la connexion au serveur est impossible. Veuillez vérifier votre connexion Internet et réessayer.</p>
 
-        <div class="status" id="statusMessage"></div>
-    </div>
+    <button class="retry-button" id="retryButton" onclick="checkConnection()">
+        Réessayer
+    </button>
 
-    <script>
-        let isChecking = false;
+    <div class="status" id="statusMessage"></div>
+</div>
 
-        async function checkConnection() {
-            if (isChecking) return;
-            
-            isChecking = true;
-            const button = document.getElementById('retryButton');
-            const statusMessage = document.getElementById('statusMessage');
-            
-            button.disabled = true;
-            button.innerHTML = 'Verificando<span class="spinner"></span>';
-            statusMessage.textContent = 'Comprobando conexión...';
+<script>
+    let isChecking = false;
 
-            try {
-                const response = await fetch('/api/network/status');
-                const data = await response.json();
+    async function checkConnection() {
+        if (isChecking) return;
 
-                if (data.connected) {
-                    statusMessage.textContent = '✓ Conexión restablecida. Redirigiendo...';
-                    statusMessage.style.color = '#48bb78';
-                    
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1000);
-                } else {
-                    statusMessage.textContent = 'Aún sin conexión. Intenta nuevamente.';
-                    statusMessage.style.color = '#f56565';
-                    button.disabled = false;
-                    button.innerHTML = 'Intentar de Nuevo';
-                }
-            } catch (error) {
-                statusMessage.textContent = 'No se pudo verificar la conexión.';
+        isChecking = true;
+        const button = document.getElementById('retryButton');
+        const statusMessage = document.getElementById('statusMessage');
+
+        button.disabled = true;
+        button.innerHTML = 'Vérification<span class="spinner"></span>';
+        statusMessage.textContent = 'Vérification de la connexion...';
+
+        try {
+            const response = await fetch('/api/network/status');
+            const data = await response.json();
+
+            if (data.connected) {
+                statusMessage.textContent = '✓ Connexion rétablie. Redirection...';
+                statusMessage.style.color = '#48bb78';
+
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+            } else {
+                statusMessage.textContent = 'Toujours hors connexion. Veuillez réessayer.';
                 statusMessage.style.color = '#f56565';
                 button.disabled = false;
-                button.innerHTML = 'Intentar de Nuevo';
+                button.innerHTML = 'Réessayer';
             }
-
-            isChecking = false;
+        } catch (error) {
+            statusMessage.textContent = 'Impossible de vérifier la connexion.';
+            statusMessage.style.color = '#f56565';
+            button.disabled = false;
+            button.innerHTML = 'Réessayer';
         }
 
-        // Verificar automáticamente cada 10 segundos
-        setInterval(() => {
-            if (!isChecking) {
-                checkConnection();
-            }
-        }, 10000);
+        isChecking = false;
+    }
 
-        // Verificar cuando la ventana recupera el foco
-        window.addEventListener('focus', () => {
-            if (!isChecking) {
-                checkConnection();
-            }
-        });
-    </script>
+    setInterval(() => {
+        if (!isChecking) {
+            checkConnection();
+        }
+    }, 10000);
+
+    window.addEventListener('focus', () => {
+        if (!isChecking) {
+            checkConnection();
+        }
+    });
+</script>
 </body>
 </html>
