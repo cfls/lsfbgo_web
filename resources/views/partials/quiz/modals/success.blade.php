@@ -1,29 +1,31 @@
 <div x-show="openCongrats && !showFailModal"
      x-transition
-     class="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-    <div class="bg-white rounded-2xl shadow-xl p-6 text-center w-3/6 max-w-5/6 mx-auto animate-fadeIn">
-        <h1 class="text-2xl font-bold text-white bg-sky-600 p-5 mb-4 rounded-lg">
+     class="fixed inset-0 flex items-center justify-center bg-black z-50 p-4">
+    <div class="rounded-2xl shadow-xl p-4 sm:p-6 text-center w-full max-w-md mx-auto animate-fadeIn">
+        <h1 class="text-xl sm:text-2xl font-bold text-white bg-sky-600 p-4 sm:p-5 mb-4 rounded-lg">
             Bravo !
         </h1>
 
-        @include('partials.quiz.svg.success')
+        <div class="my-4 flex justify-center">
+            @include('partials.quiz.svg.logo')
+        </div>
 
-        <p class="text-gray-700 mb-4">
+        <p class="mb-6 text-base sm:text-lg text-white">
             Score: <span class="font-bold text-green-600">{{ $score }} / {{ count($questions) * 10 }}</span>
         </p>
 
-        <div class="mt-5 flex gap-3 justify-center">
+        <div class="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
             <flux:button
                     wire:click="restartQuiz"
                     @click="openCongrats = false"
-                    class="bg-blue-600 text-white hover:bg-blue-700">
+                    class="bg-blue-600 text-white hover:bg-blue-700 w-full sm:w-auto">
                 Rejouer
             </flux:button>
 
             <flux:button
-                    wire:click="$redirect('/syllabus')"
-                    class="bg-gray-500 text-white hover:bg-gray-600">
-                Retour
+                    @click="window.location.href='{{ route('questions', ['ue' => $this->slug, 'type' => 'questions']) }}'"
+                    class="bg-gray-500 text-white hover:bg-gray-600 w-full sm:w-auto">
+                Suivant
             </flux:button>
         </div>
     </div>

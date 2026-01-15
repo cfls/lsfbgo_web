@@ -6,12 +6,12 @@
 ])
 
 @if($isCorrect && $image)
-    <div class="flex flex-col items-center justify-center animate-fade-in">
+    <div class="flex flex-col items-center justify-center animate-fade-in mt-2">
         {!! $image !!}
     </div>
 @elseif(!$isCorrect && $image)
     <div class="flex justify-center mx-auto animate-fade-in ">
-        <div class="mt-2 font-semibold text-red-600 text-center flex flex-col items-center">
+        <div class="mt-2 font-semibold text-white text-center flex flex-col items-center">
             {!! $image !!}
             @if(($currentQuestion['type'] ?? null) !== 'video-choice')
                 Réponse correcte: {{ $message }}

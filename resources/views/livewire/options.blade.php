@@ -38,6 +38,7 @@
      max-h-[65vh] overflow-y-auto no-scrollbar">
 
         @php
+
             // Normaliza lista de temas completados
             $doneThemes = collect($doneThemesData)
                 ->map(fn($item) => [
@@ -46,11 +47,15 @@
                     'type'     => $item['type'] ?? null,
                 ]);
 
+
+
+
             // Cuenta cuántos temas completados del mismo tipo / syllabus
             $completedCount = $doneThemes
                 ->filter(fn($item) => $item['type'] === ($type ?? null)
-                                   && $item['syllabus'] === $ue)
+                                   && $item['syllabus'] === $doneThemesData[0]['syllabus'])
                 ->count();
+
         @endphp
 
 
@@ -69,8 +74,11 @@
 
                              $item['theme']    === $themeSlug &&
                              $item['type']     === $type &&
-                             $item['syllabus'] === $ue
+                             $item['syllabus'] === $doneThemesData[0]['syllabus']
                          );
+
+
+
 
 
                          // Desbloqueo progresivo
@@ -79,6 +87,7 @@
                       // Siempre desbloqueados
                              $locked = false;
                              $isUnlocked = true;
+
 
 
                              // Colores: completado = rojo, normal = color UE

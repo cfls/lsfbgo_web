@@ -72,7 +72,7 @@ class SignVideoQuiz extends Component
 
                 // ✅ Mezclar y tomar 15
                 shuffle($data);
-                $this->questions = array_slice($data, 0, 15);
+                $this->questions = array_slice($data, 0, 2);
             }
         } catch (\Throwable $e) {
             logger()->error('Error cargando preguntas: ' . $e->getMessage());
@@ -88,9 +88,9 @@ class SignVideoQuiz extends Component
         // 🆕 Sumar puntos también para match
         if ($correct) {
             $this->score += 10;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
         } else {
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-12 object-cover" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
         }
     }
 
@@ -158,11 +158,11 @@ class SignVideoQuiz extends Component
 
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
-                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-12 object-cover" />';
+                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
                 $this->score += 10;
             } else {
                 $this->isCorrect = false;
-                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-12 object-cover" />';
+                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
                 $this->message = $correctAnswer;
             }
         }
@@ -349,12 +349,14 @@ class SignVideoQuiz extends Component
                 $this->type
             );
 
+
             $checkResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
                 ->withToken($token)
                 ->acceptJson()
                 ->get($checkUrl);
+
 
             if ($checkResponse->successful()) {
                 $data = $checkResponse->json('data', []);
