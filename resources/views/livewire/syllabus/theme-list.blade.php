@@ -79,7 +79,7 @@
                     Vous trouverez votre code unique à l'intérieur de la couverture arrière de votre syllabus. Si il ne s'y trouve pas, veuillez en faire la demande par mail à info@cfls.be en joignant la preuve de votre commande.
                 </flux:heading>
                 <div class="mb-6 text-center">
-                    <flux:button wire:click="openVideoTutorialModal(&quot;https://www.facebook.com/share/v/1BepzAgdKA&quot;)" icon="video-camera" class="py-4 px-6 bg-gradient-to-br from-blue-500 to-cyan-500 !text-white border-0 shadow-lg transition-all text-lg font-semibold [&>span]:!text-white">
+                    <flux:button wire:click="openInApp" icon="video-camera" class="py-4 px-6 bg-gradient-to-br from-blue-500 to-cyan-500 !text-white border-0 shadow-lg transition-all text-lg font-semibold [&>span]:!text-white">
                         Voir le tutoriel vidéo
                     </flux:button>
                 </div>

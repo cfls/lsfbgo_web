@@ -8,6 +8,7 @@ use Livewire\Component;
 use Native\Mobile\Attributes\OnNative;
 use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
+use Native\Mobile\Facades\Browser as BrowserFacade;
 use Native\Mobile\Facades\Dialog;
 
 class SyllabusGames extends Component
@@ -88,30 +89,36 @@ class SyllabusGames extends Component
 
 
     // abrir modal
-    public function openPaymentModal($link)
+//    public function openPaymentModal($link)
+//    {
+//
+//        $this->selectedLink = $link;
+//
+//        Dialog::alert(
+//            'Accès Syllabus',
+//            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
+//            [
+//                'Oui, ouvrir la boutique',
+//                'Non, plus tard'
+//            ]
+//        )->id('alert-demo');;
+//
+//
+//    }
+//
+//    #[OnNative(ButtonPressed::class)]
+//    public function handleAlert(int $index, string $id): void
+//    {
+//        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
+//            Browser::open($this->selectedLink);
+//        }
+//    }
+
+    public function openInApp()
     {
-
-        $this->selectedLink = $link;
-
-        Dialog::alert(
-            'Accès Syllabus',
-            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
-            [
-                'Oui, ouvrir la boutique',
-                'Non, plus tard'
-            ]
-        )->id('alert-demo');;
-
-
+        BrowserFacade::inApp('https://www.facebook.com/share/v/1BepzAgdKA');
     }
 
-    #[OnNative(ButtonPressed::class)]
-    public function handleAlert(int $index, string $id): void
-    {
-        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
-            Browser::open($this->selectedLink);
-        }
-    }
 
 // cerrar modal
     public function closePaymentModal()

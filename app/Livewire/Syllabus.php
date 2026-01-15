@@ -10,6 +10,7 @@ use Livewire\Component;
 use Native\Mobile\Attributes\OnNative;
 use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
+use Native\Mobile\Facades\Browser as BrowserFacade;
 use Native\Mobile\Facades\Dialog;
 use Native\Mobile\Facades\System;
 
@@ -92,46 +93,44 @@ class Syllabus extends Component
     }
 
 // abrir modal de video tutorial
-    public function openVideoTutorialModal($link): void
-    {
-        $this->selectedLink = $link;
+//    public function openVideoTutorialModal($link): void
+//    {
+//        $this->selectedLink = $link;
+//
+//        Dialog::alert(
+//            'Tutoriel Vidéo',
+//            'Voulez-vous ouvrir le tutoriel vidéo?',
+//            [
+//                'Oui, ouvrir',
+//                'Non, plus tard'
+//            ]
+//        )->id('video-modal'); // ID único diferente
+//    }
+//
+//    #[OnNative(ButtonPressed::class)]
+//    public function handleAlert(int $index, string $id): void
+//    {
+//        // Manejar modal de pago
+//        if ($id === 'payment-modal' && $index === 0 && $this->selectedLink) {
+//            Browser::open($this->selectedLink);
+//        }
+//
+//        // Manejar modal de video
+//        if ($id === 'video-modal' && $index === 0 && $this->selectedLink) {
+//            Browser::open($this->selectedLink);
+//        }
+//    }
 
-        Dialog::alert(
-            'Tutoriel Vidéo',
-            'Voulez-vous ouvrir le tutoriel vidéo?',
-            [
-                'Oui, ouvrir',
-                'Non, plus tard'
-            ]
-        )->id('video-modal'); // ID único diferente
+
+    public function openInApp()
+    {
+        BrowserFacade::inApp('https://www.facebook.com/share/v/1BepzAgdKA');
     }
 
-    #[OnNative(ButtonPressed::class)]
-    public function handleAlert(int $index, string $id): void
+    public function openSystem()
     {
-        // Manejar modal de pago
-        if ($id === 'payment-modal' && $index === 0 && $this->selectedLink) {
-            Browser::open($this->selectedLink);
-        }
-
-        // Manejar modal de video
-        if ($id === 'video-modal' && $index === 0 && $this->selectedLink) {
-            Browser::open($this->selectedLink);
-        }
+        BrowserFacade::open('https://nativephp.com');
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
