@@ -72,7 +72,7 @@ class SignVideoQuiz extends Component
 
                 // ✅ Mezclar y tomar 15
                 shuffle($data);
-                $this->questions = array_slice($data, 0, 2);
+                $this->questions = array_slice($data, 0, 15);
             }
         } catch (\Throwable $e) {
             logger()->error('Error cargando preguntas: ' . $e->getMessage());
