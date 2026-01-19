@@ -256,7 +256,7 @@ return [
 
     'permissions' => [
         'biometric' => false,
-        'camera' => false,
+        'camera' => true,
         'microphone' => false,
         'microphone_background' => false,
         'push_notifications' => false,
