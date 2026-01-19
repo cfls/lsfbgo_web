@@ -30,10 +30,13 @@
            href="{{ route('syllabus.themes', ['ue' => $ue, 'theme' => $theme]) }}"
            class="flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300"
         >
-            <img src="{{ $image }}"
-                 alt="{{ $title }}"
-                 class="size-32 h-auto object-cover rounded-xl shadow-md bg-blue-600"
-            />
+            <div class="size-32 relative bg-gray-300 rounded-xl animate-pulse overflow-hidden">
+                <img src="{{ $image }}"
+                     alt="{{ $title }}"
+                     class="size-32 object-cover rounded-xl shadow-md opacity-0 transition-opacity duration-500"
+                     onload="this.style.opacity='1'; this.parentElement.classList.remove('animate-pulse', 'bg-gray-300')"
+                />
+            </div>
             <flux:text size="lg" class="text-center font-semibold text-gray-800 dark:text-white">
                 {{ $title }}
             </flux:text>

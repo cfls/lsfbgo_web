@@ -33,7 +33,7 @@
         <native:side-nav-item active="{{ request()->routeIs('scanner') }}" id="scanner-demo" icon="qrcode" url="{{ route('scanner') }}" label="Scanner" badge="New!" badge-color="blue"/>
 
         <native:horizontal-divider />
-        <native:side-nav-group heading="Ressources" :expanded="false">
+
             <native:side-nav-item id="visit-site" icon="globe-alt" url="https://cfls.be" label="Cfls.be"/>
             <native:side-nav-item active="{{ request()->routeIs('numbers.practice') }}" id="logout" icon="dashboard" url="{{ route('numbers.practice') }}" label="Chiffres"/>
             <native:side-nav-item active="{{ request()->routeIs('alphabet.practice') }}" id="logout" icon="dashboard" url="{{ route('alphabet.practice') }}" label="Épeler"/>
@@ -43,7 +43,7 @@
 
 
 
-        </native:side-nav-group>
+
     </native:side-nav>
 
 

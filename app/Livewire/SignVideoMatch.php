@@ -9,8 +9,8 @@ class SignVideoMatch extends Component
 {
     public $pairs = [];
 
-    public $pairsWords = [];
-    public $pairsVideos = [];
+    public $pairsWords = [];   // ← FALTABA
+    public $pairsVideos = [];  // ← FALTABA
 
     public $tableRows = [];
 
@@ -53,23 +53,15 @@ class SignVideoMatch extends Component
     public function selectWord($word)
     {
         if ($this->answered) return;
-
         $this->selectedWord = $word;
         $this->tryValidate();
-
-        // NO re-renderizar, solo actualizar estado
-        $this->skipRender();
     }
 
     public function selectVideo($videoWord)
     {
         if ($this->answered) return;
-
         $this->selectedVideo = $videoWord;
         $this->tryValidate();
-
-        // NO re-renderizar, solo actualizar estado
-        $this->skipRender();
     }
 
     public function tryValidate()
@@ -87,16 +79,12 @@ class SignVideoMatch extends Component
 
         if ($isCorrectPair) {
             $this->selectedMatches[$word] = $video;
-
-            // Enviar evento para actualizar Alpine sin re-render
-            $this->dispatch('match-updated', matches: $this->selectedMatches);
         } else {
             $this->wrongWord = $word;
             $this->wrongVideo = $video;
             $this->dispatch('wrong-match');
         }
 
-        // Resetear selecciones
         $this->selectedWord = null;
         $this->selectedVideo = null;
 
@@ -134,9 +122,6 @@ class SignVideoMatch extends Component
         $this->isCorrect = ($this->correctCount === count($this->pairs));
 
         $this->dispatch('match-answered', correct: $this->isCorrect);
-
-        // Aquí SÍ necesitas re-renderizar para mostrar resultados
-        // pero los videos ya no estarán en pantalla
     }
 
     public function resetQuiz()

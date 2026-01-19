@@ -1,6 +1,6 @@
 <div class="space-y-4 min-h-screen">
     {{-- Header Section --}}
-    @include('partials.quiz.header', ['slug' => $slug])
+{{--    @include('partials.quiz.header', ['slug' => $slug])--}}
 
     {{-- Main Quiz Container --}}
     <div class="rounded-xl w-full mx-auto" x-data="quizData()">

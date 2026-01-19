@@ -30,10 +30,15 @@ class VideoModal extends Component
             return;
         }
 
+        $videoId = pathinfo($data['url'], PATHINFO_FILENAME);
+        $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto:low,w_400,f_auto/{$videoId}.mp4";
+        $posterUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/so_0,w_400,q_auto:low/{$videoId}.jpg";
+
         $this->video = [
             'id' => $data['id'],
             'title' => $data['title'],
-            'url' => $data['url'],
+            'url' => $optimizedUrl,
+            'poster' => $posterUrl,
         ];
 
         $this->open = true;

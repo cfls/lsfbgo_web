@@ -1,4 +1,4 @@
-<div class="flex justify-center mx-auto mb-5 font-medium text-sm bg-blue-950 p-5 text-white rounded-lg text-center">
+<div class="flex justify-center mx-auto mb-5 font-medium text-sm   text-black dark:text-white rounded-lg text-center">
     Question {{ $currentIndex + 1 }} à {{ $this->totalQuestions }}
 </div>
 

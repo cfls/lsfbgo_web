@@ -20,14 +20,11 @@
 
     $bgClass = $tailwindColors[strtolower($this->ue)] ?? 'bg-gray-200';
     @endphp
-    <div
-            class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none ">
-        <div class="px-4">
-            <div class="p-2 inline-block">
-
+    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
+        <div class="px-3 py-2">
+            <div class="flex items-center gap-2">
                 @include('partials.quiz.svg.logo')
-
-                <flux:subheading class="text-white text-xl pb-4">
+                <flux:subheading class="text-white text-base">
                     Maîtrisez la LSFB grâce à LSFBGo — une application pensée pour l’accessibilité et l’inclusion.
                 </flux:subheading>
             </div>
@@ -35,7 +32,7 @@
     </div>
     {{-- Lista de temas --}}
     <div class="bg-gray-300 p-5 w-full rounded-lg space-y-5 flex flex-col items-center justify-start
-     max-h-[65vh] overflow-y-auto no-scrollbar">
+     max-h-[85vh] md:max-h-[65vh] overflow-y-auto no-scrollbar">
 
         @php
 
