@@ -13,7 +13,7 @@
             $videoId = pathinfo($video, PATHINFO_FILENAME);
 
             // URL optimizada de Cloudinary
-            $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto:low,w_200,f_auto/{$videoId}.mp4";
+            $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto,w_1280,f_auto,c_limit/{$videoId}.mp4";
             $posterUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/so_0,w_200,q_auto:low/{$videoId}.jpg";
         @endphp
 

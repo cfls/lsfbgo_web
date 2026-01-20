@@ -2,11 +2,10 @@
 
 namespace App\Livewire;
 
-use Illuminate\Support\Facades\Log;
+
 use Livewire\Component;
 use Native\Mobile\Attributes\OnNative;
 use Native\Mobile\Events\Scanner\CodeScanned;
-use Native\Mobile\Facades\Dialog;
 use Native\Mobile\Facades\Scanner as ScannerFacade;
 
 class Scanner extends Component
@@ -22,18 +21,29 @@ class Scanner extends Component
 
     public $scanned = [];
 
-    public function scanQRCode(): void
+    public function scan(): void
     {
-        ScannerFacade::scan()
-            ->prompt(__('Scan the QR code, this can be found in you profile settings on the web app.'))
-            ->id('auth-qr-scan');
+        ScannerFacade::make()
+            ->prompt($this->streaming ? 'Scan codes continuously' : 'Scan a code')
+            ->formats([$this->requestedFormat])
+            ->continuous($this->streaming);
     }
 
     #[OnNative(CodeScanned::class)]
-    public function handleScan($data, $format, $id = null): void
+    public function handleScanned($data, $format): void
     {
-        Log::info('Scan QR code: ' . $data);
+        if ($this->streaming) {
+            $this->scanned[] = [
+                'data' => $data,
+                'format' => $format,
+                'timestamp' => now()->format('H:i:s'),
+            ];
+        } else {
+            $this->data = $data;
+            $this->format = $format;
+        }
     }
+
     public function clearScans(): void
     {
         $this->scanned = [];

@@ -6,7 +6,7 @@
 @if($video && $type !== 'video-choice')
     @php
         $videoId = pathinfo($video, PATHINFO_FILENAME);
-        $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto:low,w_400,f_auto/{$videoId}.mp4";
+        $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto,w_1280,f_auto,c_limit/{$videoId}.mp4";
         $posterUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/so_0,w_400,q_auto:low/{$videoId}.jpg";
 
     @endphp

@@ -8,7 +8,7 @@
                               Scanner
                          </h1>
                          <p class="text-lg text-white">
-                              Scan QR codes and barcodes with lightning speed and precision!
+                              Scan QR codes and barcodes with lightning speed and precision!dfads
                          </p>
                     </div>
                </div>
@@ -50,11 +50,11 @@
                     </div>
 
                     <flux:button
-                            wire:click="scanQRCode"
+                            wire:click="scan"
                             icon="qr-code"
                             class="py-6 w-full bg-gradient-to-br from-indigo-500 to-blue-500 !text-white border-0 shadow-lg transition-all text-xl font-semibold [&>span]:!text-white"
                     >
-                         {{ $streaming ? 'Start Continuous Scan' : 'Scan Codevczx' }}
+                         {{ $streaming ? 'Start Continuous Scan' : 'Scan Code' }}
                     </flux:button>
                </div>
           </flux:card>
