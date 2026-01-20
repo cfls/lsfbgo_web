@@ -261,7 +261,7 @@ return [
         'microphone_background' => false,
         'push_notifications' => false,
         'location' => false,
-        'vibrate' => false,
+        'vibrate' => true,
         'storage_read' => false,
         'storage_write' => false,
         'scanner' => true,
