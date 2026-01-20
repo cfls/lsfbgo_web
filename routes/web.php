@@ -27,6 +27,8 @@ use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
 
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Rutas de Red (Sin middleware de verificación de red)
@@ -86,6 +88,46 @@ Route::get('/dictionary', Dictionary::class)->name('dictionary');
 Route::get('/practice', Practice::class)->name('practice');
 Route::get('/numbers-practice', Numbers::class)->name('numbers.practice');
 Route::get('/alphabet-practice', Spelling::class)->name('alphabet.practice');
+
+// ============================================
+// REDIRECCIONES DE URLs ANTIGUAS WIX
+// ============================================
+
+// Caso 1a: ue1-themes (sin número)
+    Route::get('ue1-themes', fn() => redirect()->route('syllabus', ['ue' => 'ue1-themes']));
+
+// Caso 1b: ue1-themes-{número} (libros antiguos con numeración específica)
+    Route::get('ue1-themes-1', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'je-me-presente']));
+    Route::get('ue1-themes-3', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'ma-famille']));
+    Route::get('ue1-themes-4', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'jhabite']));
+    Route::get('ue1-themes-5', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'je-me-deplace']));
+    Route::get('ue1-themes-6', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'quel-jour-sommes-nous']));
+    Route::get('ue1-themes-7', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'ma-routine']));
+    Route::get('ue1-themes-8', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'quel-temps-fait-il']));
+    Route::get('ue1-themes-9', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'chez-le-medecin']));
+    Route::get('ue1-themes-10', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'je-decouvre-mes-sentiments']));
+    Route::get('ue1-themes-11', fn() => redirect()->route('syllabus.themes', ['ue' => 'ue1-themes', 'theme' => 'au-restaurant']));
+
+// Caso 2a y 2b: Rutas dinámicas para ue2, ue3, etc. (libros nuevos)
+    Route::get('ue{ue}-themes/{theme}', function ($ue, $theme) {
+        return redirect()->route('syllabus.themes', [
+            'ue' => "ue{$ue}-themes",
+            'theme' => $theme
+        ]);
+    })->where(['ue' => '[0-9]+']);
+
+    Route::get('ue{ue}-themes', function ($ue) {
+        return redirect()->route('syllabus', ['ue' => "ue{$ue}-themes"]);
+    })->where('ue', '[0-9]+');
+
+// ============================================
+// RUTAS PRINCIPALES DE SYLLABUS
+// ============================================
+    Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
+    Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
+    Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
+
+
 Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
 Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
 Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');

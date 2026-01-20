@@ -8,7 +8,7 @@
                             wire:model.live="streaming"
                             class="rounded"
                     >
-                    <span>Continuous Scanning hh</span>
+                    <span>Continuous Scanning</span>
                </label>
           </div>
 
@@ -28,7 +28,7 @@
           >
                Start Scanning
           </button>
-
+x
           @if($data)
                <div class="p-4 bg-gray-100 rounded-lg">
                     <h3 class="font-semibold mb-2">Last Scanned:</h3>
