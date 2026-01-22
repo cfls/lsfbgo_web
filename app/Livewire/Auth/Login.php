@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Native\Mobile\Edge\Edge;
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
@@ -25,6 +26,7 @@ class Login extends Component
 
     public function mount(): void
     {
+          Edge::clear();
 
         // Si ya hay sesión activa, redirigir
         if (session()->has('data')) {

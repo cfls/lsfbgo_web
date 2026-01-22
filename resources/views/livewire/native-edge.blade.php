@@ -13,12 +13,6 @@
                 url="{{ route('access.dashboard') }}"
         />
 
-{{--        <native:top-bar-action--}}
-{{--                id="web"--}}
-{{--                icon="globe-alt"--}}
-{{--                label="Site"--}}
-{{--                url="https://cfls.be"--}}
-{{--        />--}}
     </native:top-bar>
     <native:side-nav
             :gestures_enabled="false">
@@ -30,7 +24,7 @@
         />
 
 
-        <native:side-nav-item active="{{ request()->routeIs('scanner') }}" id="scanner-demo" icon="qrcode" url="{{ route('scanner') }}" label="Scanner" badge="New!" badge-color="blue"/>
+        <native:side-nav-item active="{{ request()->routeIs('scanner') }}" id="scanner-demo" icon="qrcode" url="{{ route('scanner') }}" label="Scanner" />
 
         <native:horizontal-divider />
 
@@ -55,7 +49,7 @@
                 url="{{ route('scanner') }}"
                 icon="qrcode"
                 :active="request()->routeIs('scanner')"
-                news="true"
+
         />
         <native:bottom-nav-item
                 id="syllabus"

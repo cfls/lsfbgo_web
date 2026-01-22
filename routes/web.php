@@ -25,8 +25,7 @@ use App\Livewire\TableuBord;
 use App\Livewire\Theme;
 use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
-
-
+use Native\Mobile\Edge\Edge;
 
 
 /*
@@ -51,13 +50,16 @@ Route::get('/api/network/status', [NetworkController::class, 'checkStatus'])
 */
 
 Route::get('/', function () {
+    // Limpiar EDGE en la página de bienvenida/login
+    Edge::clear();
+
     // Verificar si existe el token en la sesión
     if (session()->has('data') && !empty(session('data.token'))) {
         return redirect()->route('access.dashboard');
     }
+
     return view('welcome');
 })->name('home');
-
 
 
 
