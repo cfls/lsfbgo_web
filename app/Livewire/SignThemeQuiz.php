@@ -11,7 +11,7 @@ use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Dialog;
 
 #[AllowDynamicProperties]
-class SignVideoQuiz extends Component
+class SignThemeQuiz extends Component
 {
     public $questions = [];
     public $currentIndex = 0;
@@ -55,15 +55,19 @@ class SignVideoQuiz extends Component
             ])
                 ->withToken(session('data.token'))
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '-themes/' . $this->slug_theme);
+                ->get(config('services.api.url') . '/v1/questions/' . $this->slug);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
 
+
+
                 // Mezclar TODOS los tipos
                 shuffle($data);
 
-               $this->questions = $data;
+
+
+                $this->questions =  $data;
 
             }
         } catch (\Throwable $e) {
@@ -399,7 +403,7 @@ class SignVideoQuiz extends Component
     {
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
-        return view('livewire.sign-video-quiz', [
+        return view('livewire.sign-theme-quiz', [
             'currentQuestion' => $this->currentQuestion,
             'score' => $this->score,
             'currentIndex' => $this->currentIndex,

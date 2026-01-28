@@ -59,6 +59,7 @@ class Syllabus extends Component
 
         // Usa el mismo token
         $response = $api->MemberSyllabus($token);
+
         $this->results = $response->json('data', []);
     }
 

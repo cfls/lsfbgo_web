@@ -1,3 +1,23 @@
+@php
+    // ✅ Definir la función UNA SOLA VEZ al inicio
+    if (!function_exists('encode_cloudinary_url')) {
+        function encode_cloudinary_url($url) {
+            if (empty($url)) return $url;
+
+            $search = ['à', 'è', 'é', 'ê', 'î', 'ô', 'û', 'ù', 'ë', 'ï', 'ü', 'ç', 'À', 'È', 'É', 'Ê', 'Î', 'Ô', 'Û', 'Ù', 'Ë', 'Ï', 'Ü', 'Ç'];
+            $replace = array_map('rawurlencode', $search);
+            $url = str_replace($search, $replace, $url);
+
+            if (strpos($url, '?_a=') === false && strpos($url, '&_a=') === false) {
+                $separator = strpos($url, '?') !== false ? '&' : '?';
+                $url .= $separator . '_a=BAAAV6GY';
+            }
+
+            return $url;
+        }
+    }
+@endphp
+
 @push('styles')
     <style>
         @keyframes shake {
@@ -20,7 +40,6 @@
         }
     </style>
 @endpush
-
 
 <div class="w-full max-w-4xl mx-auto mt-6">
 
@@ -66,7 +85,6 @@
                     $video = $pv['video'];
                     $videoId = pathinfo($video, PATHINFO_FILENAME);
 
-
                     $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto,w_1280,f_auto,c_limit/{$videoId}.mp4";
                     $posterUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/so_0,w_400,q_auto:low/{$videoId}.jpg";
                     $videoWord = $pv['word'];
@@ -78,7 +96,6 @@
                 <div
                         wire:click="selectVideo(@js($videoWord))"
                         class="rounded-xl overflow-hidden cursor-pointer shadow transition
-
                         @if($isCorrect)
                             ring-4 ring-green-500 opacity-70 pointer-events-none
                         @elseif($isWrong)
@@ -90,13 +107,12 @@
                 >
                     <video
                             preload="metadata"
-                            src="{{ $optimizedUrl }}"
-                            poster="{{ $posterUrl }}"
+                            src="{{ encode_cloudinary_url($optimizedUrl) }}"
+                            poster="{{ encode_cloudinary_url($posterUrl) }}"
                             class="w-full h-auto max-h-[220px] object-cover"
                             muted autoplay loop playsinline>
                     </video>
                 </div>
-
             @endforeach
 
         </div>
@@ -104,7 +120,6 @@
     </div>
 
 </div>
-
 
 @push('scripts')
     <script>

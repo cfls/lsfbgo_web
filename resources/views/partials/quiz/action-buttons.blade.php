@@ -1,11 +1,12 @@
 {{-- Validate Button --}}
 @if(!$answered && $currentQuestion['type'] !== 'video-choice' && $currentQuestion['type'] !== 'match')
-    <div class="flex justify-center mt-4">
+    <div class="flex justify-center mt-4" x-data="{ input: @entangle('userInput').live }">
         <flux:button
                 variant="primary"
                 color="sky"
-                class="w-32 cursor-pointer {{ $answered || (!$selectedAnswer && empty($userInput)) ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}"
-                wire:click="checkAnswer">
+                class="w-32 cursor-pointer"
+                ::class="{ 'opacity-50 cursor-not-allowed pointer-events-none': !input || input.trim() === '' }"
+                @click="if(input && input.trim() !== '') { $wire.checkAnswer() }">
             Valider
         </flux:button>
     </div>

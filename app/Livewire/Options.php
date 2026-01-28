@@ -15,16 +15,28 @@ class Options extends Component
     public ?string $ue = null;
     public function mount(?string $ue = null)
     {
-
-
         $this->ue = $ue;
-        $response = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-        ])
-            ->withToken(session('data.token'))
-            ->acceptJson()
-            ->get(config('services.api.url') . '/v1/sections/' . $ue . '-themes');
 
+
+
+        if($this->type == 'tous') {
+
+            $response = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url').'/v1/questions/'.$ue);
+        }
+        else {
+
+            $response = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url').'/v1/sections/'.$ue.'-themes');
+        }
         // Guardar la respuesta
 
 
@@ -39,30 +51,55 @@ class Options extends Component
     public function render()
     {
 
-        $response = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-        ])
-            ->withToken(session('data.token'))
-            ->acceptJson()
-            ->get(config('services.api.url') . '/v1/themes/' . $this->ue . '-themes');
-        // save in public property
-        $this->themes = $response->json('data', []);
+        if($this->type == 'tous') {
+
+            $response = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/questions/' . $this->ue);
+            // save in public property
+            $this->themes = $response->json('data', []);
 
 
 
 
-        // pedir lista de themes ya resueltos
-        $doneThemesResponse = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-        ])
-            ->withToken(session('data.token'))
-            ->acceptJson()
-            ->get(config('services.api.url') . '/v1/quiz-results/' . session('data.user.id'));
+            return view('syllabus.theme_all')->layout('components.layouts.app.home', [
+                'title' => 'Questions Options',
+            ]);
 
-        $this->doneThemesData = $doneThemesResponse->json('data', []);
+        } else {
+            $response = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/themes/' . $this->ue . '-themes');
+            // save in public property
+            $this->themes = $response->json('data', []);
 
-        return view('livewire.options')->layout('components.layouts.app.home', [
-            'title' => 'Questions Options',
-        ]);
+            // pedir lista de themes ya resueltos
+            $doneThemesResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/quiz-results/' . session('data.user.id'));
+
+            $this->doneThemesData = $doneThemesResponse->json('data', []);
+
+            return view('livewire.options')->layout('components.layouts.app.home', [
+                'title' => 'Questions Options',
+            ]);
+
+
+        }
+
+
+
+
+
+
     }
 }

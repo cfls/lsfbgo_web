@@ -133,15 +133,15 @@
         });
 
         // Custom events
-        const customEvents = [
-            'quiz-video-update',
-            'quiz-video-refresh',
-            'next-step'
-        ];
-
-        customEvents.forEach(eventName => {
-            window.addEventListener(eventName, safeInit);
-        });
+        // const customEvents = [
+        //     'quiz-video-update',
+        //     'quiz-video-refresh',
+        //     'next-step'
+        // ];
+        //
+        // customEvents.forEach(eventName => {
+        //     window.addEventListener(eventName, safeInit);
+        // });
     }
 
     /**

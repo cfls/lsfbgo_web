@@ -1,4 +1,5 @@
-<div x-show="openCongrats && !showFailModal"
+<div x-cloak
+     x-show="openCongrats && !showFailModal"
      x-transition
      class="fixed inset-0 flex items-center justify-center bg-black z-50 p-4">
     <div class="rounded-2xl shadow-xl p-4 sm:p-6 text-center w-full max-w-md mx-auto animate-fadeIn">
@@ -10,8 +11,9 @@
             @include('partials.quiz.svg.logo')
         </div>
 
+        {{-- ✅ Usar Alpine.js con @entangle --}}
         <p class="mb-6 text-base sm:text-lg text-white">
-            Score: <span class="font-bold text-green-600">{{ $score }} / {{ count($questions) * 10 }}</span>
+            Score: <span class="font-bold text-green-600" x-text="`${liveScore} / ${totalPoints}`"></span>
         </p>
 
         <div class="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
@@ -23,7 +25,7 @@
             </flux:button>
 
             <flux:button
-                    @click="window.location.href='{{ route('questions', ['ue' => $this->slug, 'type' => 'questions']) }}'"
+                    @click="window.location.href='{{ route('questions', ['ue' => $slug, 'type' => $type]) }}'"
                     class="bg-gray-500 text-white hover:bg-gray-600 w-full sm:w-auto">
                 Suivant
             </flux:button>

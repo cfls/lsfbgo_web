@@ -11,7 +11,7 @@ use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Dialog;
 
 #[AllowDynamicProperties]
-class SignVideoQuiz extends Component
+class SignTypeQuiz extends Component
 {
     public $questions = [];
     public $currentIndex = 0;
@@ -32,7 +32,6 @@ class SignVideoQuiz extends Component
     public $selectedLink;
     public $totalQuestions;
 
-
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
     ];
@@ -45,26 +44,33 @@ class SignVideoQuiz extends Component
         if (empty($this->questions)) {
             $this->loadQuestions();
         }
+
+        // ✅ Inicializar currentQuestion
+        if (!empty($this->questions)) {
+            $this->currentQuestion = $this->questions[0];
+        }
     }
 
     protected function loadQuestions()
     {
+
         try {
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
                 ->withToken(session('data.token'))
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '-themes/' . $this->slug_theme);
+                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '-themes/' . $this->slug_theme .'?type='. $this->type);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
 
+                // Filtrar solo text
+                $data = $response->json('data', []);
+
                 // Mezclar TODOS los tipos
                 shuffle($data);
-
-               $this->questions = $data;
-
+                $this->questions = $data;
             }
         } catch (\Throwable $e) {
             logger()->error('Error cargando preguntas: ' . $e->getMessage());
@@ -72,6 +78,7 @@ class SignVideoQuiz extends Component
         }
     }
 
+    // ✅ Este método recibe la respuesta del componente SignVideoMatch
     public function onMatchAnswered($correct)
     {
         $this->answered = true;
@@ -152,26 +159,26 @@ class SignVideoQuiz extends Component
 
     public function checkAnswer()
     {
+
+        if(empty($this->userInput)) {
+            return;
+        }
+
+
         $this->answered = true;
 
         $current = $this->questions[$this->currentIndex];
 
+        // Obtener todas las respuestas válidas
         $validAnswers = array_map(
             fn($a) => strtolower($this->normalizeAnswer(trim($a))),
             explode('/', $current['answer'])
         );
 
-        $givenAnswer = strtolower(
-            $this->normalizeAnswer(
-                $current['type'] === 'text'
-                    ? $this->userInput
-                    : $this->selectedAnswer
-            )
-        );
-
+        // Usuario puede escribir varias opciones
         $userAnswers = array_map(
             fn($a) => strtolower($this->normalizeAnswer(trim($a))),
-            explode('/', $givenAnswer)
+            explode('/', $this->userInput)
         );
 
         $isValid = false;
@@ -216,18 +223,18 @@ class SignVideoQuiz extends Component
         }
 
         if ($this->currentIndex < count($this->questions) - 1) {
-            $this->dispatch('next-step');
-
             $this->currentIndex++;
             $this->currentQuestion = $this->questions[$this->currentIndex];
-
             $this->resetQuestionState();
+
+            $this->dispatch('next-step');
 
             if (!empty($this->currentQuestion['video'])) {
                 $this->dispatch('quiz-video-update', publicId: $this->currentQuestion['video']);
-            } else {
-                $this->dispatch('quiz-video-refresh');
             }
+//            else {
+//                $this->dispatch('quiz-video-refresh');
+//            }
         } else {
             $this->completed();
         }
@@ -261,9 +268,7 @@ class SignVideoQuiz extends Component
         $this->image = null;
         $this->answered = false;
         $this->isCorrect = false;
-        $this->selectedAnswer = '';
         $this->userInput = '';
-        $this->userAnswer = '';
     }
 
     public function completed()
@@ -280,10 +285,7 @@ class SignVideoQuiz extends Component
             $this->saveQuizResult();
         }
 
-        $this->dispatch('quiz-finished', [
-            'score' => $this->score,
-            'total' => $total
-        ]);
+        $this->dispatch('quiz-finished');
     }
 
     protected function saveQuizResult()
@@ -336,17 +338,7 @@ class SignVideoQuiz extends Component
 
     public function getCanValidateProperty(): bool
     {
-        $current = $this->questions[$this->currentIndex] ?? null;
-
-        if (!$current) {
-            return false;
-        }
-
-        if ($current['type'] === 'text') {
-            return !empty(trim($this->userInput));
-        }
-
-        return !empty($this->selectedAnswer);
+        return !empty(trim($this->userInput));
     }
 
     private function normalizeAnswer($text)
@@ -399,7 +391,7 @@ class SignVideoQuiz extends Component
     {
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
-        return view('livewire.sign-video-quiz', [
+        return view('livewire.sign-type-quiz', [
             'currentQuestion' => $this->currentQuestion,
             'score' => $this->score,
             'currentIndex' => $this->currentIndex,

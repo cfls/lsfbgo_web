@@ -39,7 +39,7 @@
                         $link      = $syllabu['attributes']['link'];
                     @endphp
 
-                    <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg">
+                    <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg {{ $isActive === 0 ? 'hidden' : '' }}">
                         @if(request()->routeIs('syllabus'))
                             <a class="flex flex-col items-center justify-center cursor-pointer h-full"
                                @if (!$userMatch || !$isActive)
@@ -57,6 +57,7 @@
                         @endif
                             <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
                                 <div class="size-32  flex items-center justify-center">
+
                                     <img
                                             src="{{ $image }}"
                                             alt="syllabus image"

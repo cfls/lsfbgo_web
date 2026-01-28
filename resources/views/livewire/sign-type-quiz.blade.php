@@ -1,9 +1,10 @@
 <div class="space-y-4 min-h-screen">
     {{-- Header Section --}}
-{{--    @include('partials.quiz.header', ['slug' => $slug])--}}
+    {{--    @include('partials.quiz.header', ['slug' => $slug])--}}
 
     {{-- Main Quiz Container --}}
     <div class="rounded-xl w-full mx-auto" x-data="quizData()">
+
 
         {{-- Modals --}}
         @include('partials.quiz.modals.success')
@@ -25,19 +26,15 @@
 
 
 
-                    @if($currentQuestion['video'])
-                        {{-- Video Display --}}
-                        <x-video-display
-                                :video="$currentQuestion['video']"
-                                :type="$currentQuestion['type']"
-                                :currentIndex="$currentIndex"
-                        />
-                    @endif
+                    {{-- Video Display --}}
+                    <x-video-display
+                            :video="$currentQuestion['video']"
+                            :type="$currentQuestion['type']"
+                            :currentIndex="$currentIndex"
+                    />
 
                     {{-- Question Type Components --}}
-                    @if($currentQuestion['type'])
-                     @include('partials.quiz.question-types.' . $currentQuestion['type'])
-                    @endif
+                    @include('partials.quiz.question-types.' . $currentQuestion['type'])
 
                     {{-- Action Buttons --}}
                     @include('partials.quiz.action-buttons')
@@ -65,7 +62,6 @@
                 liveScore: @entangle('score'),
                 totalPoints: {{ count($questions) * 10 }},
                 failPercentage: 0, // ✅ Agregar esta línea
-
                 toggleSpeed() {
                     this.slow = !this.slow;
                     document.querySelectorAll('video').forEach(v => {
@@ -78,20 +74,15 @@
                         if (value) this.showFailModal = false;
                     });
 
-                    // ✅ Capturar el porcentaje del evento
                     window.addEventListener('quiz-failed', (event) => {
                         this.openCongrats = false;
                         this.showFailModal = true;
-                        this.failPercentage = event.detail.percentage || 0; // ✅ Guardar el porcentaje
+                        this.score = event.detail.percentage;
                     });
 
-                    window.addEventListener('quiz-finished', (event) => {
+                    window.addEventListener('quiz-finished', () => {
                         this.showFailModal = false;
                         this.openCongrats = true;
-                        if (event.detail) {
-                            this.liveScore = event.detail.score || this.liveScore;
-                            this.totalPoints = event.detail.total || this.totalPoints;
-                        }
                     });
 
                     window.addEventListener('subscription-required', () => {

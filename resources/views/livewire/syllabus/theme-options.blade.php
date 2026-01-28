@@ -26,7 +26,7 @@
             <div class="flex items-center gap-2">
                 @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
                 <flux:subheading class="text-white text-base">
-                    Jeu interactif
+                    Choisissez le bon signe
                 </flux:subheading>
             </div>
         </div>
@@ -63,12 +63,150 @@
                 </svg>
             </a>
         @endforeach
+            <a wire:navigate
+               href="{{ route('questions', ['ue' => $ue, 'type' => 'text']) }}"
+               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
+                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+                    Traduire la LSFB
+                </flux:label>
+                <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                            .st0 {
+                                fill: #2c333e;
+                            }
+
+                            .st1 {
+                                fill: #fff;
+                            }
+                        </style>
+                    </defs>
+                    <circle class="st1" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon class="st0" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
+            <a wire:navigate
+               href="{{ route('questions', ['ue' => $ue, 'type' => 'video-choice']) }}"
+               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
+                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+                    Choix vidéo
+                </flux:label>
+                <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                            .st0 {
+                                fill: #2c333e;
+                            }
+
+                            .st1 {
+                                fill: #fff;
+                            }
+                        </style>
+                    </defs>
+                    <circle class="st1" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon class="st0" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
+            <a wire:navigate
+               href="{{ route('questions', ['ue' => $ue, 'type' => 'yes-no']) }}"
+               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
+                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+                    Oui / Non
+                </flux:label>
+                <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                            .st0 {
+                                fill: #2c333e;
+                            }
+
+                            .st1 {
+                                fill: #fff;
+                            }
+                        </style>
+                    </defs>
+                    <circle class="st1" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon class="st0" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
+            <a wire:navigate
+               href="{{ route('questions', ['ue' => $ue, 'type' => 'choice']) }}"
+               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
+                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+                    Choix
+                </flux:label>
+                <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                            .st0 {
+                                fill: #2c333e;
+                            }
+
+                            .st1 {
+                                fill: #fff;
+                            }
+                        </style>
+                    </defs>
+                    <circle class="st1" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon class="st0" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
+            <a wire:navigate
+               href="{{ route('questions', ['ue' => $ue, 'type' => 'match']) }}"
+               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
+                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+                    Associer les paires
+                </flux:label>
+                <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                            .st0 {
+                                fill: #2c333e;
+                            }
+
+                            .st1 {
+                                fill: #fff;
+                            }
+                        </style>
+                    </defs>
+                    <circle class="st1" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon class="st0" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
+            <a wire:navigate
+               href="{{ route('questions', ['ue' => $ue, 'type' => 'tous']) }}"
+               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
+                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+                    Révision complète du Syllabus {{strtoupper($ue) }}
+                </flux:label>
+                <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                            .st0 {
+                                fill: #2c333e;
+                            }
+
+                            .st1 {
+                                fill: #fff;
+                            }
+                        </style>
+                    </defs>
+                    <circle class="st1" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon class="st0" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
 
         <a wire:navigate
            href=""
            class="hidden  items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
             <flux:label class="text-lg font-semibold text-gray-900 dark:text-white">
-                Vidéo interactif
+                Vidéo interactive
             </flux:label>
             <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  class="w-5 h-5">
                 <defs>

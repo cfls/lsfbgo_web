@@ -2,14 +2,11 @@
 <div class="space-y-4  min-h-screen">
     @php
         use Illuminate\Support\Str;
-
         // prend uniquement la première partie avant le "-"
 
 
         // met en majuscules "ue1" => "UE 1"
         $ue = strtoupper(Str::replace('ue', 'UE ', $ue));
-
-
         // couleurs par unité
         // Mapeo a colores Tailwind más cercanos
     $tailwindColors = [
@@ -17,7 +14,6 @@
         'ue2' => 'bg-rose-400',     // #f46070 ≈ rose-400
         'ue3' => 'bg-amber-400',    // #f3c543 ≈ amber-400
     ];
-
     $bgClass = $tailwindColors[strtolower($this->ue)] ?? 'bg-gray-200';
     @endphp
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
@@ -35,7 +31,6 @@
      max-h-[85vh] md:max-h-[65vh] overflow-y-auto no-scrollbar">
 
         @php
-
             // Normaliza lista de temas completados
             $doneThemes = collect($doneThemesData)
                 ->map(fn($item) => [
@@ -43,18 +38,12 @@
                     'theme'    => $item['theme'] ?? null,
                     'type'     => $item['type'] ?? null,
                 ]);
-
-
-
-
             // Cuenta cuántos temas completados del mismo tipo / syllabus
             $completedCount = $doneThemes
                 ->filter(fn($item) => $item['type'] === ($type ?? null)
                                    && $item['syllabus'] === $doneThemesData[0]['syllabus'])
                 ->count();
-
         @endphp
-
 
         @foreach($this->themes as $index => $theme)
 
@@ -63,20 +52,12 @@
                 $attributes = $theme['attributes'];
                          $themeSlug  = $attributes['slug'];
 
-
-
                          // Verifica si ya fue completado
                          $alreadyDone = $doneThemes->contains(fn($item) =>
-
-
                              $item['theme']    === $themeSlug &&
                              $item['type']     === $type &&
                              $item['syllabus'] === $doneThemesData[0]['syllabus']
                          );
-
-
-
-
 
                          // Desbloqueo progresivo
                          $isUnlocked = $index === 0 || $index <= $completedCount;
@@ -85,12 +66,8 @@
                              $locked = false;
                              $isUnlocked = true;
 
-
-
                              // Colores: completado = rojo, normal = color UE
                              $colorClass = $alreadyDone ?  'bg-red-400': $bgClass;
-
-
                              // Siempre se puede acceder
                              $link = route('syllabus.play', [
                                  'ue'  => $this->ue,

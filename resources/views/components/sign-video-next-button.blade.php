@@ -3,7 +3,7 @@
     <flux:button
             variant="primary"
             color="green"
-            wire:click="nextStep"
+            wire:click.prevent="nextStep"
     >
         Suivant →
     </flux:button>

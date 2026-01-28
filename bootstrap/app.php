@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.network' => CheckNetworkConnection::class,
         ]);
         $middleware->web(append: [
-            CheckNetworkConnection::class,
+           CheckNetworkConnection::class,
         ]);
 
 
