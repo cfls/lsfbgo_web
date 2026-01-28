@@ -82,6 +82,7 @@ class Syllabus extends Component
     public function openPaymentModal($link): void
     {
         $this->selectedLink = $link;
+     //   $this->showPaymentModal = true;
 
         Dialog::alert(
             'Accès Syllabus',
@@ -93,34 +94,17 @@ class Syllabus extends Component
         )->id('payment-modal'); // ID único
     }
 
-// abrir modal de video tutorial
-//    public function openVideoTutorialModal($link): void
-//    {
-//        $this->selectedLink = $link;
-//
-//        Dialog::alert(
-//            'Tutoriel Vidéo',
-//            'Voulez-vous ouvrir le tutoriel vidéo?',
-//            [
-//                'Oui, ouvrir',
-//                'Non, plus tard'
-//            ]
-//        )->id('video-modal'); // ID único diferente
-//    }
-//
-//    #[OnNative(ButtonPressed::class)]
-//    public function handleAlert(int $index, string $id): void
-//    {
-//        // Manejar modal de pago
-//        if ($id === 'payment-modal' && $index === 0 && $this->selectedLink) {
-//            Browser::open($this->selectedLink);
-//        }
-//
-//        // Manejar modal de video
-//        if ($id === 'video-modal' && $index === 0 && $this->selectedLink) {
-//            Browser::open($this->selectedLink);
-//        }
-//    }
+
+    #[OnNative(ButtonPressed::class)]
+    public function handleAlert(int $index, string $id): void
+    {
+        // Manejar modal de pago
+        if ($id === 'payment-modal' && $index === 0 && $this->selectedLink) {
+            Browser::open($this->selectedLink);
+        }
+
+
+    }
 
 
     public function openInApp()

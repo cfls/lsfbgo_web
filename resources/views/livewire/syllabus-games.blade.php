@@ -4,6 +4,6 @@
         @include('livewire.syllabus.theme-options')
     @else
         {{-- Vista de listado de todos los temas --}}
-        @include('livewire.syllabus.theme-list')
+        @include('livewire.syllabus.theme-list', ['optionGame' => $this->optionGame])
     @endif
 </div>

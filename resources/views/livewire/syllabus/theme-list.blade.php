@@ -20,52 +20,50 @@
         </div>
 
         {{-- Modal de pago --}}
-        @if ($showPaymentModal)
-            @include('livewire.syllabus.payment-modal')
-        @endif
+{{--        @if ($showPaymentModal)--}}
+{{--            @include('livewire.syllabus.payment-modal')--}}
+{{--        @endif--}}
 
         {{-- Lista de syllabus --}}
         <div class="space-y-4 -mx-4">
             <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide pl-4 pr-4 my-10 snap-x snap-mandatory scroll-smooth">
+
 
                 @foreach ($results as $syllabu)
 
                     @php
                         $nameRoute = $this->optionGame ? 'games' : 'syllabus';
                         $userMatch = $verifyUser->firstWhere('attributes.theme', $syllabu['attributes']['slug']);
+                        $isStatus  = $syllabu['attributes']['status'];
                         $isActive  = $userMatch['attributes']['active'] ?? null;
                         $route     = route($nameRoute , ['ue' => $syllabu['attributes']['slug']]);
                         $image     = $syllabu['attributes']['image'];
                         $link      = $syllabu['attributes']['link'];
                     @endphp
 
-                    <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg {{ $isActive === 0 ? 'hidden' : '' }}">
-                        @if(request()->routeIs('syllabus'))
-                            <a class="flex flex-col items-center justify-center cursor-pointer h-full"
-                               @if (!$userMatch || !$isActive)
-                                   wire:click.prevent="openPaymentModal('{{ $link }}')"
-                               role="button"
-                               @else
-                                   wire:navigate
-                               href="{{ $route }}"
-                                    @endif
-                            >
-                        @else
-                            <a class="flex flex-col items-center justify-center cursor-pointer h-full"
-                               href="{{ $route }}"
-                            >
-                        @endif
-                            <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
-                                <div class="size-32  flex items-center justify-center">
+                    <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg {{ $isStatus === 0 ? 'hidden' : '' }}">
 
-                                    <img
-                                            src="{{ $image }}"
-                                            alt="syllabus image"
-                                            class="rounded-full"
-                                    >
-                                </div>
-                            </div>
-                        </a>
+                        @if($this->optionGame == 0)
+                            @if ($userMatch || $isActive)
+                                <a wire:navigate href="{{ $route }}" class="flex flex-col items-center justify-center cursor-pointer h-full">
+                                    @else
+                                 <a class="flex flex-col items-center justify-center cursor-pointer h-full"  wire:click.prevent="openPaymentModal('{{ $link }}')"  role="button">
+                                     @endif
+                                     <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
+                                        <div class="size-32  flex items-center justify-center">
+                                            <img src="{{ $image }}"  alt="syllabus image" class="rounded-full">
+                                        </div>
+                                    </div>
+                                 </a>
+                            @else
+                                <a wire:navigate href="{{ $route }}" class="flex flex-col items-center justify-center cursor-pointer h-full">
+                                    <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
+                                        <div class="size-32  flex items-center justify-center">
+                                            <img src="{{ $image }}"  alt="syllabus image" class="rounded-full">
+                                        </div>
+                                    </div>
+                                </a>
+                            @endif
                     </flux:card>
                 @endforeach
             </div>
