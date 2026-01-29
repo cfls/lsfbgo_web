@@ -114,7 +114,7 @@ class SignVideoQuiz extends Component
                 $subscriptionData = $response->json('data', []);
 
                 foreach ($subscriptionData as $sub) {
-                    if ($sub['attributes']['theme'] === $this->slug . '-themes') {
+                    if ($sub['attributes']['theme'] === $this->slug) {
                         if ($sub['attributes']['active'] === 1) {
                             $this->hasSubscription = true;
                             return;

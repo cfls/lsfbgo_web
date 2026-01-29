@@ -13,7 +13,7 @@
                     <span class="text-sm font-medium">
                         Question {{ $currentIndex + 1 }} a {{ count($questions) }}
                     </span>
-                    <span class="text-sm text-white">
+                    <span class="text-sm font-medium">
                         Points : {{ $score }} / {{ count($questions) * 10 }}
                     </span>
                 </div>
