@@ -198,22 +198,21 @@ class SignVideoQuiz extends Component
     public function nextStep()
     {
         if ($this->currentIndex == 2 && !$this->hasSubscription) {
-            switch ($this->slug) {
-                case 'ue1':
-                    $link = "https://cfls.be/boutique/syllabus-1";
-                    break;
-                case 'ue2':
-                    $link = "https://cfls.be/boutique/syllabus-2";
-                    break;
-                case 'ue3':
-                    $link = "https://cfls.be/boutique/syllabus-3";
-                    break;
-                default:
-                    $link = "https://cfls.be/boutique";
-            }
+            $syllabusResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
+
+
+            $this->syllabusData = $syllabusResponse->json('data', []);
+
+            $link =  $this->syllabusData['attributes']['link'] ?? env('API_SITE');
 
             $this->openPaymentModal($link);
             return;
+
         }
 
         if ($this->currentIndex < count($this->questions) - 1) {

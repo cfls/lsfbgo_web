@@ -30,6 +30,7 @@ class SignThemeQuiz extends Component
     public $hasSubscription = false;
     public $currentQuestion;
     public $selectedLink;
+    public $totalQuestions;
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',

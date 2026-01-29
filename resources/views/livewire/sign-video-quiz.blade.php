@@ -12,38 +12,53 @@
 
         {{-- Quiz Content --}}
         <div class=" p-5">
+            {{-- ✅ Progreso mejorado --}}
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">
+                        Question {{ $currentIndex + 1 }} a {{ count($questions) }}
+                    </span>
+                    <span class="text-sm text-white">
+                        Points : {{ $score }} / {{ count($questions) * 10 }}
+                    </span>
+                </div>
+
+                {{-- Barra de progreso --}}
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                         style="width: {{ count($questions) > 0 ? (($currentIndex + 1) / count($questions)) * 100 : 0 }}%">
+                    </div>
+                </div>
+            </div>
             {{-- Question Header --}}
             @include('partials.quiz.question-header')
             @if($currentQuestion)
-                <div x-show="!isTransitioning"
-                     x-transition:enter="transition ease-out duration-700"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
+                <div class="overflow-hidden relative">
+                    <div x-show="!isTransitioning"
+                         {{-- ✅ Efecto SLIDE desde la derecha --}}
+                         x-transition:enter="transition ease-out duration-500 transform"
+                         x-transition:enter-start="translate-x-full opacity-0"
+                         x-transition:enter-end="translate-x-0 opacity-100"
+                         {{-- ✅ Efecto SLIDE hacia la izquierda al salir --}}
+                         x-transition:leave="transition ease-in duration-300 transform"
+                         x-transition:leave-start="translate-x-0 opacity-100"
+                         x-transition:leave-end="-translate-x-full opacity-0">
 
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-90">
+                        @if($currentQuestion['video'])
+                            <x-video-display
+                                    :video="$currentQuestion['video']"
+                                    :type="$currentQuestion['type']"
+                                    :currentIndex="$currentIndex"
+                            />
+                        @endif
 
+                        @if($currentQuestion['type'])
+                            @include('partials.quiz.question-types.' . $currentQuestion['type'])
+                        @endif
 
-
-                    @if($currentQuestion['video'])
-                        {{-- Video Display --}}
-                        <x-video-display
-                                :video="$currentQuestion['video']"
-                                :type="$currentQuestion['type']"
-                                :currentIndex="$currentIndex"
-                        />
-                    @endif
-
-                    {{-- Question Type Components --}}
-                    @if($currentQuestion['type'])
-                     @include('partials.quiz.question-types.' . $currentQuestion['type'])
-                    @endif
-
-                    {{-- Action Buttons --}}
-                    @include('partials.quiz.action-buttons')
-
-                    {{-- Feedback Message --}}
-                    @include('partials.quiz.feedback')
+                        @include('partials.quiz.action-buttons')
+                        @include('partials.quiz.feedback')
+                    </div>
                 </div>
             @else
                 <div class="flex justify-center">Aucun thème disponible</div>

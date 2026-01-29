@@ -63,7 +63,6 @@
         </div>
     </div>
 </div>
-
 @push('scripts')
     <script>
         function quizData() {
@@ -76,7 +75,7 @@
                 isTransitioning: false,
                 liveScore: @entangle('score'),
                 totalPoints: {{ count($questions) * 10 }},
-                failPercentage: 0,
+                failPercentage: 0, // ✅ Agregar esta línea
 
                 toggleSpeed() {
                     this.slow = !this.slow;
@@ -86,16 +85,15 @@
                 },
 
                 init() {
-                    console.log('Total preguntas cargadas:', {{ count($questions) }});
-
                     this.$watch('openCongrats', value => {
                         if (value) this.showFailModal = false;
                     });
 
+                    // ✅ Capturar el porcentaje del evento
                     window.addEventListener('quiz-failed', (event) => {
                         this.openCongrats = false;
                         this.showFailModal = true;
-                        this.failPercentage = event.detail.percentage || 0;
+                        this.failPercentage = event.detail.percentage || 0; // ✅ Guardar el porcentaje
                     });
 
                     window.addEventListener('quiz-finished', (event) => {
@@ -118,10 +116,9 @@
 
                 handleNextStep() {
                     this.isTransitioning = true;
-                    // ✅ Reducir el timeout para que sea más rápido
                     setTimeout(() => {
                         this.isTransitioning = false;
-                    }, 350); // Reducido de 500 a 350ms
+                    }, 500);
                 }
             };
         }
