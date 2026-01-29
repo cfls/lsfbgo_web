@@ -1,26 +1,18 @@
 @php
     use Illuminate\Support\Str;
 
-    // prend uniquement la première partie avant le "-"
-    $ue = Str::before($this->ue, '-');
+    // Usar datos de la API si existen
+    if ($syllabusData && isset($syllabusData['attributes'])) {
+        $attributes = $syllabusData['attributes'];
 
+        $bgClass = $attributes['hex_color'] ?? 'bg-gray-200';
 
-
-
-    // couleurs par unité
-    $colors = [
-        'ue1' => '#027374',
-        'ue2' => '#f46070',
-        'ue3' => '#f3c543',
-    ];
-
-    // couleur par défaut si non définie
-    $bgColor = $colors[$ue] ?? '#e5e7eb';
+    }
 @endphp
 
 
 
-<div  class="space-y-4 min-h-screen">  
+<div  class="space-y-4 min-h-screen">
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-3 py-2">
             <div class="flex items-center gap-2">
@@ -41,8 +33,8 @@
 
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => $attributes['type']]) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     {{ ucfirst($attributes['name']) }}
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -65,8 +57,8 @@
         @endforeach
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => 'text']) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     Traduire la LSFB
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -88,8 +80,8 @@
             </a>
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => 'video-choice']) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     Choix vidéo
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -111,8 +103,8 @@
             </a>
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => 'yes-no']) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     Oui / Non
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -134,8 +126,8 @@
             </a>
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => 'choice']) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     Choix
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -157,8 +149,8 @@
             </a>
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => 'match']) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     Associer les paires
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -180,8 +172,8 @@
             </a>
             <a wire:navigate
                href="{{ route('questions', ['ue' => $ue, 'type' => 'tous']) }}"
-               class="flex items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-                <flux:label class="text-lg font-semibold text-white dark:text-gray-900">
+               class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
+                <flux:label class="text-lg font-semibold text-white">
                     Révision complète du Syllabus {{strtoupper($ue) }}
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
@@ -204,8 +196,8 @@
 
         <a wire:navigate
            href=""
-           class="hidden  items-center justify-between w-full max-w-sm p-5 bg-orange-500 rounded-lg hover:bg-red-700">
-            <flux:label class="text-lg font-semibold text-gray-900 dark:text-white">
+           class="hidden  items-center justify-between w-full max-w-sm p-5" style="background-color: {{$bgClass}}">
+            <flux:label class="text-lg font-semibold text-white">
                 Vidéo interactive
             </flux:label>
             <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  class="w-5 h-5">

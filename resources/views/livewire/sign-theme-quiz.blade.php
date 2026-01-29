@@ -1,50 +1,61 @@
-
 <div class="space-y-4 min-h-screen">
-    {{-- Header Section --}}
-    {{--    @include('partials.quiz.header', ['slug' => $slug])--}}
-
-    {{-- Main Quiz Container --}}
     <div class="rounded-xl w-full mx-auto" x-data="quizData()">
 
         {{-- Modals --}}
         @include('partials.quiz.modals.success')
         @include('partials.quiz.modals.failure')
 
-
         {{-- Quiz Content --}}
-        <div class=" p-5">
-            {{-- Question Header --}}
+        <div class="p-5">
+            {{-- ✅ Progreso mejorado --}}
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">
+                        Question {{ $currentIndex + 1 }} a {{ count($questions) }}
+                    </span>
+                    <span class="text-sm text-white">
+                        Points : {{ $score }} / {{ count($questions) * 10 }}
+                    </span>
+                </div>
+
+                {{-- Barra de progreso --}}
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                         style="width: {{ count($questions) > 0 ? (($currentIndex + 1) / count($questions)) * 100 : 0 }}%">
+                    </div>
+                </div>
+            </div>
+
             @include('partials.quiz.question-header')
+
             @if($currentQuestion)
-                <div x-show="!isTransitioning"
-                     x-transition:enter="transition ease-out duration-700"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
+                {{-- ✅ Container con overflow hidden para el slide --}}
+                <div class="overflow-hidden relative">
+                    <div x-show="!isTransitioning"
+                         {{-- ✅ Efecto SLIDE desde la derecha --}}
+                         x-transition:enter="transition ease-out duration-500 transform"
+                         x-transition:enter-start="translate-x-full opacity-0"
+                         x-transition:enter-end="translate-x-0 opacity-100"
+                         {{-- ✅ Efecto SLIDE hacia la izquierda al salir --}}
+                         x-transition:leave="transition ease-in duration-300 transform"
+                         x-transition:leave-start="translate-x-0 opacity-100"
+                         x-transition:leave-end="-translate-x-full opacity-0">
 
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-90">
+                        @if($currentQuestion['video'])
+                            <x-video-display
+                                    :video="$currentQuestion['video']"
+                                    :type="$currentQuestion['type']"
+                                    :currentIndex="$currentIndex"
+                            />
+                        @endif
 
+                        @if($currentQuestion['type'])
+                            @include('partials.quiz.question-types.' . $currentQuestion['type'])
+                        @endif
 
-
-                    @if($currentQuestion['video'])
-                        {{-- Video Display --}}
-                        <x-video-display
-                                :video="$currentQuestion['video']"
-                                :type="$currentQuestion['type']"
-                                :currentIndex="$currentIndex"
-                        />
-                    @endif
-
-                    {{-- Question Type Components --}}
-                    @if($currentQuestion['type'])
-                        @include('partials.quiz.question-types.' . $currentQuestion['type'])
-                    @endif
-
-                    {{-- Action Buttons --}}
-                    @include('partials.quiz.action-buttons')
-
-                    {{-- Feedback Message --}}
-                    @include('partials.quiz.feedback')
+                        @include('partials.quiz.action-buttons')
+                        @include('partials.quiz.feedback')
+                    </div>
                 </div>
             @else
                 <div class="flex justify-center">Aucun thème disponible</div>
@@ -65,7 +76,7 @@
                 isTransitioning: false,
                 liveScore: @entangle('score'),
                 totalPoints: {{ count($questions) * 10 }},
-                failPercentage: 0, // ✅ Agregar esta línea
+                failPercentage: 0,
 
                 toggleSpeed() {
                     this.slow = !this.slow;
@@ -75,15 +86,16 @@
                 },
 
                 init() {
+                    console.log('Total preguntas cargadas:', {{ count($questions) }});
+
                     this.$watch('openCongrats', value => {
                         if (value) this.showFailModal = false;
                     });
 
-                    // ✅ Capturar el porcentaje del evento
                     window.addEventListener('quiz-failed', (event) => {
                         this.openCongrats = false;
                         this.showFailModal = true;
-                        this.failPercentage = event.detail.percentage || 0; // ✅ Guardar el porcentaje
+                        this.failPercentage = event.detail.percentage || 0;
                     });
 
                     window.addEventListener('quiz-finished', (event) => {
@@ -106,9 +118,10 @@
 
                 handleNextStep() {
                     this.isTransitioning = true;
+                    // ✅ Reducir el timeout para que sea más rápido
                     setTimeout(() => {
                         this.isTransitioning = false;
-                    }, 500);
+                    }, 350); // Reducido de 500 a 350ms
                 }
             };
         }

@@ -13,35 +13,51 @@ class Options extends Component
     public $doneThemesData = [];
     public $type;
     public ?string $ue = null;
+    public $syllabusData; // Datos del syllabus desde API
+
+
     public function mount(?string $ue = null)
     {
         $this->ue = $ue;
 
+        // Cargar datos del syllabus desde la API
+        $syllabusResponse = Http::withOptions([
+            'verify' => env('API_VERIFY_SSL', true),
+        ])
+            ->withToken(session('data.token'))
+            ->acceptJson()
+            ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->ue);
 
 
-        if($this->type == 'tous') {
-
-            $response = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken(session('data.token'))
-                ->acceptJson()
-                ->get(config('services.api.url').'/v1/questions/'.$ue);
-        }
-        else {
-
-            $response = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken(session('data.token'))
-                ->acceptJson()
-                ->get(config('services.api.url').'/v1/sections/'.$ue.'-themes');
-        }
-        // Guardar la respuesta
+        $this->syllabusData = $syllabusResponse->json('data', []);
 
 
 
-        $this->results = $response->json('data', []);
+
+//        if($this->type == 'tous') {
+//
+//            $response = Http::withOptions([
+//                'verify' => env('API_VERIFY_SSL', true),
+//            ])
+//                ->withToken(session('data.token'))
+//                ->acceptJson()
+//                ->get(config('services.api.url').'/v1/questions/'.$this->ue);
+//        }
+//        else {
+//
+//            $response = Http::withOptions([
+//                'verify' => env('API_VERIFY_SSL', true),
+//            ])
+//                ->withToken(session('data.token'))
+//                ->acceptJson()
+//                ->get(config('services.api.url').'/v1/sections/'.$this->ue);
+//        }
+//        // Guardar la respuesta
+//
+//
+//
+//
+//        $this->results = $response->json('data', []);
     }
 
 
@@ -51,20 +67,9 @@ class Options extends Component
     public function render()
     {
 
+
+
         if($this->type == 'tous') {
-
-            $response = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken(session('data.token'))
-                ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->ue);
-            // save in public property
-            $this->themes = $response->json('data', []);
-
-
-
-
             return view('syllabus.theme_all')->layout('components.layouts.app.home', [
                 'title' => 'Questions Options',
             ]);
@@ -75,7 +80,7 @@ class Options extends Component
             ])
                 ->withToken(session('data.token'))
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/themes/' . $this->ue . '-themes');
+                ->get(config('services.api.url') . '/v1/themes/' . $this->ue);
             // save in public property
             $this->themes = $response->json('data', []);
 

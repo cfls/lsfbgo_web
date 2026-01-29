@@ -27,6 +27,7 @@ class SyllabusGames extends Component
     public $selectedLink = null;
     public ?string $ue = null;
     public $sections = [];
+    public $syllabusData; // Datos del syllabus desde API
 
 
 
@@ -35,9 +36,20 @@ class SyllabusGames extends Component
 
 
 
-
         if ($this->ue) {
             // Lógica cuando hay un UE específico
+            // Cargar datos del syllabus desde la API
+            $syllabusResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->ue);
+
+
+
+            $this->syllabusData = $syllabusResponse->json('data', []);
+
 
             $this->loadTheme($this->ue);
 

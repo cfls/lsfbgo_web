@@ -49,13 +49,14 @@ class SignVideoQuiz extends Component
 
     protected function loadQuestions()
     {
+
         try {
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
                 ->withToken(session('data.token'))
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '-themes/' . $this->slug_theme);
+                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);

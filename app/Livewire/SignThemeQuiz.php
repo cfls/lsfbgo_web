@@ -13,8 +13,8 @@ use Native\Mobile\Facades\Dialog;
 #[AllowDynamicProperties]
 class SignThemeQuiz extends Component
 {
-    public $questions = [];
-    public $currentIndex = 0;
+    public $questions = []; // ✅ TODAS las preguntas (25)
+    public $currentIndex = 0; // ✅ Índice actual en el array completo
     public $message = '';
     public $image;
     public $answered = false;
@@ -30,8 +30,6 @@ class SignThemeQuiz extends Component
     public $hasSubscription = false;
     public $currentQuestion;
     public $selectedLink;
-    public $totalQuestions;
-
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -42,6 +40,7 @@ class SignThemeQuiz extends Component
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
+        // ✅ Cargar preguntas UNA SOLA VEZ
         if (empty($this->questions)) {
             $this->loadQuestions();
         }
@@ -60,15 +59,12 @@ class SignThemeQuiz extends Component
             if ($response->successful()) {
                 $data = $response->json('data', []);
 
-
-
-                // Mezclar TODOS los tipos
+                // ✅ Mezclar y guardar TODAS las preguntas
                 shuffle($data);
+                $this->questions = $data;
 
-
-
-                $this->questions =  $data;
-
+                // ✅ Log para verificar
+                logger()->info('Preguntas cargadas: ' . count($this->questions));
             }
         } catch (\Throwable $e) {
             logger()->error('Error cargando preguntas: ' . $e->getMessage());
@@ -117,7 +113,7 @@ class SignThemeQuiz extends Component
                 $subscriptionData = $response->json('data', []);
 
                 foreach ($subscriptionData as $sub) {
-                    if ($sub['attributes']['theme'] === $this->slug . '-themes') {
+                    if ($sub['attributes']['theme'] === $this->slug) {
                         if ($sub['attributes']['active'] === 1) {
                             $this->hasSubscription = true;
                             return;
@@ -200,39 +196,47 @@ class SignThemeQuiz extends Component
 
     public function nextStep()
     {
+        // ✅ Verificar suscripción en la pregunta 3 (índice 2)
         if ($this->currentIndex == 2 && !$this->hasSubscription) {
-            switch ($this->slug) {
-                case 'ue1':
-                    $link = "https://cfls.be/boutique/syllabus-1";
-                    break;
-                case 'ue2':
-                    $link = "https://cfls.be/boutique/syllabus-2";
-                    break;
-                case 'ue3':
-                    $link = "https://cfls.be/boutique/syllabus-3";
-                    break;
-                default:
-                    $link = "https://cfls.be/boutique";
-            }
+            $syllabusResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
+
+
+            $this->syllabusData = $syllabusResponse->json('data', []);
+
+            $link =  $this->syllabusData['attributes']['link'] ?? env('API_SITE');
 
             $this->openPaymentModal($link);
             return;
         }
 
+        // ✅ Avanzar a la siguiente pregunta (SIN CARGAR MÁS DATOS)
         if ($this->currentIndex < count($this->questions) - 1) {
             $this->dispatch('next-step');
 
+            // ✅ Simplemente incrementar el índice
             $this->currentIndex++;
+
+            // ✅ Obtener la pregunta actual del array existente
             $this->currentQuestion = $this->questions[$this->currentIndex];
 
             $this->resetQuestionState();
 
+            // ✅ Actualizar video si existe
             if (!empty($this->currentQuestion['video'])) {
                 $this->dispatch('quiz-video-update', publicId: $this->currentQuestion['video']);
             } else {
                 $this->dispatch('quiz-video-refresh');
             }
+
+            // ✅ Log para depuración
+            //logger()->info("Pregunta {$this->currentIndex} de " . count($this->questions));
         } else {
+            // ✅ Completar el quiz
             $this->completed();
         }
     }
@@ -334,7 +338,8 @@ class SignThemeQuiz extends Component
                 ]);
 
         } catch (\Throwable $e) {
-            logger()->error('Error guardando resultado del quiz: ' . $e->getMessage());
+            logger()->error('Erreur lors de l’enregistrement du résultat du quiz : ' . $e->getMessage());
+
         }
     }
 
@@ -391,6 +396,7 @@ class SignThemeQuiz extends Component
         $this->score = 0;
         $this->completed = false;
 
+        // ✅ Volver a cargar y mezclar las preguntas
         $this->loadQuestions();
         $this->resetQuestionState();
 
@@ -401,6 +407,7 @@ class SignThemeQuiz extends Component
 
     public function render()
     {
+        // ✅ Obtener la pregunta actual del array
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
         return view('livewire.sign-theme-quiz', [
@@ -408,7 +415,7 @@ class SignThemeQuiz extends Component
             'score' => $this->score,
             'currentIndex' => $this->currentIndex,
             'questions' => $this->questions,
-            'totalQuestions' => $this->totalQuestions, // ✅ Añadir esta línea
+            'totalQuestions' => $this->totalQuestions,
         ]);
     }
 }

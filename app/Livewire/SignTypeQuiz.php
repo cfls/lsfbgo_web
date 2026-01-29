@@ -13,7 +13,7 @@ use Native\Mobile\Facades\Dialog;
 #[AllowDynamicProperties]
 class SignTypeQuiz extends Component
 {
-    public $questions = [];
+    public $questions = []; // ✅ TODAS las preguntas cargadas UNA SOLA VEZ
     public $currentIndex = 0;
     public $message = '';
     public $image;
@@ -41,6 +41,7 @@ class SignTypeQuiz extends Component
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
+        // ✅ Cargar preguntas UNA SOLA VEZ
         if (empty($this->questions)) {
             $this->loadQuestions();
         }
@@ -53,24 +54,23 @@ class SignTypeQuiz extends Component
 
     protected function loadQuestions()
     {
-
         try {
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
                 ->withToken(session('data.token'))
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '-themes/' . $this->slug_theme .'?type='. $this->type);
+                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
 
-                // Filtrar solo text
-                $data = $response->json('data', []);
-
-                // Mezclar TODOS los tipos
+                // ✅ Mezclar y guardar TODAS las preguntas
                 shuffle($data);
                 $this->questions = $data;
+
+                // ✅ Log para verificar
+                logger()->info('Preguntas tipo cargadas: ' . count($this->questions));
             }
         } catch (\Throwable $e) {
             logger()->error('Error cargando preguntas: ' . $e->getMessage());
@@ -78,7 +78,6 @@ class SignTypeQuiz extends Component
         }
     }
 
-    // ✅ Este método recibe la respuesta del componente SignVideoMatch
     public function onMatchAnswered($correct)
     {
         $this->answered = true;
@@ -120,7 +119,7 @@ class SignTypeQuiz extends Component
                 $subscriptionData = $response->json('data', []);
 
                 foreach ($subscriptionData as $sub) {
-                    if ($sub['attributes']['theme'] === $this->slug . '-themes') {
+                    if ($sub['attributes']['theme'] === $this->slug) {
                         if ($sub['attributes']['active'] === 1) {
                             $this->hasSubscription = true;
                             return;
@@ -159,23 +158,19 @@ class SignTypeQuiz extends Component
 
     public function checkAnswer()
     {
-
-        if(empty($this->userInput)) {
+        if (empty($this->userInput)) {
             return;
         }
-
 
         $this->answered = true;
 
         $current = $this->questions[$this->currentIndex];
 
-        // Obtener todas las respuestas válidas
         $validAnswers = array_map(
             fn($a) => strtolower($this->normalizeAnswer(trim($a))),
             explode('/', $current['answer'])
         );
 
-        // Usuario puede escribir varias opciones
         $userAnswers = array_map(
             fn($a) => strtolower($this->normalizeAnswer(trim($a))),
             explode('/', $this->userInput)
@@ -203,39 +198,47 @@ class SignTypeQuiz extends Component
 
     public function nextStep()
     {
+
+
+        // ✅ Verificar suscripción
         if ($this->currentIndex == 2 && !$this->hasSubscription) {
-            switch ($this->slug) {
-                case 'ue1':
-                    $link = "https://cfls.be/boutique/syllabus-1";
-                    break;
-                case 'ue2':
-                    $link = "https://cfls.be/boutique/syllabus-2";
-                    break;
-                case 'ue3':
-                    $link = "https://cfls.be/boutique/syllabus-3";
-                    break;
-                default:
-                    $link = "https://cfls.be/boutique";
-            }
+            $syllabusResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+            ])
+                ->withToken(session('data.token'))
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
+
+
+            $this->syllabusData = $syllabusResponse->json('data', []);
+
+            $link =  $this->syllabusData['attributes']['link'] ?? env('API_SITE');
 
             $this->openPaymentModal($link);
             return;
         }
 
+        // ✅ Avanzar a la siguiente pregunta (SIN CARGAR MÁS DATOS)
         if ($this->currentIndex < count($this->questions) - 1) {
-            $this->currentIndex++;
-            $this->currentQuestion = $this->questions[$this->currentIndex];
-            $this->resetQuestionState();
-
             $this->dispatch('next-step');
 
+            // ✅ Simplemente incrementar el índice
+            $this->currentIndex++;
+
+            // ✅ Obtener la pregunta actual del array existente
+            $this->currentQuestion = $this->questions[$this->currentIndex];
+
+            $this->resetQuestionState();
+
+            // ✅ Actualizar video si existe
             if (!empty($this->currentQuestion['video'])) {
                 $this->dispatch('quiz-video-update', publicId: $this->currentQuestion['video']);
             }
-//            else {
-//                $this->dispatch('quiz-video-refresh');
-//            }
+
+            // ✅ Log para depuración
+            logger()->info("Pregunta tipo {$this->currentIndex} de " . count($this->questions));
         } else {
+            // ✅ Completar el quiz
             $this->completed();
         }
     }
@@ -269,6 +272,7 @@ class SignTypeQuiz extends Component
         $this->answered = false;
         $this->isCorrect = false;
         $this->userInput = '';
+        $this->selectedAnswer = ''; // ✅ Añadir esto también
     }
 
     public function completed()
@@ -285,7 +289,10 @@ class SignTypeQuiz extends Component
             $this->saveQuizResult();
         }
 
-        $this->dispatch('quiz-finished');
+        $this->dispatch('quiz-finished', [
+            'score' => $this->score,
+            'total' => $total
+        ]);
     }
 
     protected function saveQuizResult()
@@ -379,6 +386,7 @@ class SignTypeQuiz extends Component
         $this->score = 0;
         $this->completed = false;
 
+        // ✅ Volver a cargar y mezclar las preguntas
         $this->loadQuestions();
         $this->resetQuestionState();
 
@@ -389,6 +397,7 @@ class SignTypeQuiz extends Component
 
     public function render()
     {
+        // ✅ Obtener la pregunta actual del array existente
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
         return view('livewire.sign-type-quiz', [
@@ -396,7 +405,7 @@ class SignTypeQuiz extends Component
             'score' => $this->score,
             'currentIndex' => $this->currentIndex,
             'questions' => $this->questions,
-            'totalQuestions' => $this->totalQuestions, // ✅ Añadir esta línea
+            'totalQuestions' => $this->totalQuestions,
         ]);
     }
 }
