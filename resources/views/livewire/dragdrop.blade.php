@@ -144,7 +144,7 @@
 
         {{-- 🧩 Slots --}}
         <div class="flex flex-wrap justify-center gap-1.5 mb-3">
-            @foreach ($slots as $i => $slot)
+            @foreach ($wordSlots as $i => $slot)
                 <div
                         @click="
                         if (selectedLetter && !completed) {

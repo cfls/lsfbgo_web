@@ -11,7 +11,7 @@ class Dragdrop extends Component
     public $words = [];
     public $letters = [];
     public $currentWord = null;
-    public $slots = [];
+    public $wordSlots = [];
     public $completed = false;
     public $slug;
     public $type;
@@ -90,12 +90,12 @@ class Dragdrop extends Component
 
         $wordName = $this->currentWord['name'] ?? '';
         if ($wordName === '') {
-            $this->slots = [];
+            $this->wordSlots = [];
             return;
         }
 
         $normalized = $this->normalize($wordName);
-        $this->slots = array_fill(0, strlen($normalized), null);
+        $this->wordSlots = array_fill(0, strlen($normalized), null);
 
         foreach ($this->letters as &$l) {
             $l['used'] = false;
@@ -120,7 +120,7 @@ class Dragdrop extends Component
         $correct = $symbol === $expected;
 
         $expectedCount = substr_count($wordName, $symbol);
-        $usedCount = collect($this->slots)
+        $usedCount = collect($this->wordSlots)
             ->where('symbol', $symbol)
             ->where('correct', true)
             ->count();
@@ -133,7 +133,7 @@ class Dragdrop extends Component
         if ($correct) {
             $letter = collect($this->letters)->first(fn($l) => strtolower($l['symbol']) === $symbol);
 
-            $this->slots[$slotIndex] = [
+            $this->wordSlots[$slotIndex] = [
                 'symbol' => $symbol,
                 'image' => $letter['image'] ?? asset('img/default-letter.png'),
                 'correct' => true,
@@ -150,7 +150,7 @@ class Dragdrop extends Component
 
             $this->checkComplete();
         } else {
-            $this->slots[$slotIndex] = ['symbol' => $symbol, 'correct' => false];
+            $this->wordSlots[$slotIndex] = ['symbol' => $symbol, 'correct' => false];
             $this->dispatch('shake-slot', slot: $slotIndex);
         }
     }
@@ -162,7 +162,7 @@ class Dragdrop extends Component
         }
 
         usleep(150000);
-        $allCorrect = collect($this->slots)->every(fn($s) => $s && ($s['correct'] ?? false));
+        $allCorrect = collect($this->wordSlots)->every(fn($s) => $s && ($s['correct'] ?? false));
 
         if ($allCorrect) {
             $this->completed = true;
