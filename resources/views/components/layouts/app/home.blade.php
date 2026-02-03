@@ -27,16 +27,11 @@
 </head>
 <body class="min-h-screen dark:bg-[var(--color-primary-foreground)] overflow-x-hidden">
     <livewire:native-edge  />
-@if(request()->routeIs('profile.parameters') || request()->routeIs('user-password.edit') || request()->routeIs('appearance.edit'))
-    <main>
-        {{ $slot }}
-    </main>
 
-@else
     <flux:main class="!p-0 overflow-x-hidden">
         {{ $slot }}
     </flux:main>
-@endif
+
 
         @vite('resources/js/app.js')
         @fluxScripts

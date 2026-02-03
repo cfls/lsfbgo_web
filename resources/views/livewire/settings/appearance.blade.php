@@ -1,4 +1,4 @@
-<section class="w-full flex items-center justify-center">
+<section class="w-full flex items-center justify-center mx-auto px-4 py-8">
     <div class="w-full max-w-2xl">
         @include('partials.settings-heading')
 

@@ -92,6 +92,6 @@ class Profile extends Component
     }
 
     public function render() {
-        return view('livewire.settings.profile');
+        return view('livewire.settings.profile')->layout('components.layouts.app.home');
     }
 }

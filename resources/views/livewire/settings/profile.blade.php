@@ -1,7 +1,10 @@
-<section class="w-full">
-    @include('partials.settings-heading')
+<section class="w-full items-center justify-center mx-auto px-4 py-8">
+
+      @include('partials.settings-heading')
+
 
     <x-settings.layout :heading="__('Profil')" :subheading="__('Mettez à jour votre nom et votre adresse e-mail')">
+
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
             <flux:input wire:model="name" :label="__('Nom')" type="text" required autofocus autocomplete="name" />
 

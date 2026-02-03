@@ -1,4 +1,4 @@
-<section class="w-full">
+<section class="w-full items-center justify-center mx-auto px-4 py-8">
     @include('partials.settings-heading')
 
     <x-settings.layout :heading="__('Update password')" :subheading="__('Ensure your account is using a long, random password to stay secure')">
