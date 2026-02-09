@@ -10,8 +10,6 @@
     }
 @endphp
 
-
-
 <div  class="space-y-4 min-h-screen">
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-3 py-2">

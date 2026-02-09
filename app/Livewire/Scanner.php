@@ -26,6 +26,7 @@ class Scanner extends Component  // Cambié el nombre de ScannerCopy a Scanner
     #[OnNative(CodeScanned::class)]
     public function handleScanned($data, $format): void
     {
+
         if ($this->streaming) {
             $this->scanned[] = [
                 'data' => $data,
@@ -38,6 +39,8 @@ class Scanner extends Component  // Cambié el nombre de ScannerCopy a Scanner
 
             // Auto-navigate if it's a URL
             if (filter_var($data, FILTER_VALIDATE_URL)) {
+
+
                 $this->navigateToUrl($data);
             }
         }
@@ -45,6 +48,8 @@ class Scanner extends Component  // Cambié el nombre de ScannerCopy a Scanner
 
     public function navigateToUrl($url): void
     {
+
+
         $parsedUrl = parse_url($url);
         $path = $parsedUrl['path'] ?? '';
 

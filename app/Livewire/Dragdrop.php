@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
+use Native\Mobile\Facades\SecureStorage;
 
 class Dragdrop extends Component
 {
@@ -24,13 +25,19 @@ class Dragdrop extends Component
     public function mount()
     {
 
+
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
+
         // Cargar palabras
         $response = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
-            ->withToken(session('data.token'))
+            ->withToken($data['token'])
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/spell/');
+
+
 
         $wordsData = $response->json('data', $response->json());
 
@@ -51,7 +58,7 @@ class Dragdrop extends Component
         $responseLetters = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
-            ->withToken(session('data.token'))
+            ->withToken($data['token'])
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/letters/');
 

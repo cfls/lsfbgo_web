@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Native\Mobile\Facades\Dialog;
-
+use Native\Mobile\Facades\SecureStorage;
 
 
 class Spelling extends Component
@@ -30,9 +30,10 @@ class Spelling extends Component
     public function mount(ApiService $api): void
     {
 
-        $token = session('data.token');
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
 
-        $response = $api->getSpellings($token);
+        $response = $api->getSpellings($data['token']);
 
 
 

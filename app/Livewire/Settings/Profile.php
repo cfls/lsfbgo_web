@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Native\Mobile\Facades\SecureStorage;
 
 class Profile extends Component
 {
@@ -20,7 +21,9 @@ class Profile extends Component
      */
     public function mount(): void
     {
-        $data = session('data');
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
+
 
         if (!$data) {
             $this->redirect(route('home')); // si no hay sesión, fuera
@@ -35,9 +38,10 @@ class Profile extends Component
      */
     public function updateProfileInformation(): void
     {
-        $session = session('data');
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
 
-        if (!isset($session['token'])) {
+        if (!isset($data['token'])) {
             $this->addError('email', 'Debe iniciar sesión nuevamente.');
             return;
         }
@@ -52,7 +56,7 @@ class Profile extends Component
         ])
             ->asJson()
             ->acceptJson()
-            ->withToken($session['token'])
+            ->withToken($data['token'])
             ->put(config('services.api.url') . '/auth/profile', $validated);
 
         if ($response->successful()) {
@@ -61,7 +65,7 @@ class Profile extends Component
             // conservar el token
             session([
                 'data' => [
-                    'token' => $session['token'],
+                    'token' => $data['token'],
                     'user'  => $userData,
                 ],
             ]);

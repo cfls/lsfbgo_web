@@ -11,8 +11,7 @@
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col items-center justify-start px-3 py-6 gap-4
-               ">
+    <div class="flex-1 flex flex-col items-center justify-start px-3 py-6 gap-4">
 
         {{-- Título --}}
 
@@ -39,7 +38,7 @@
             <div class="flex flex-col">
                 <flux:heading class="font-bold text-black">Nom:</flux:heading>
                 <flux:text class="text-gray-800">
-                    {{ $this->profile['attributes']['name'] }}
+                    {{ $profile['name'] }}
                 </flux:text>
             </div>
 
@@ -47,7 +46,7 @@
             <div class="flex flex-col">
                 <flux:heading class="font-bold text-black">Email:</flux:heading>
                 <flux:text class="text-gray-800">
-                    {{ $this->profile['attributes']['email'] }}
+                    {{ $profile['email'] }}
                 </flux:text>
             </div>
 

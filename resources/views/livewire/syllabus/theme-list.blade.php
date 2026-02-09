@@ -31,12 +31,12 @@
 
                 @foreach ($results as $syllabu)
 
+
                     @php
                         $nameRoute = $this->optionGame ? 'games' : 'syllabus';
-                        $userMatch = $verifyUser->firstWhere('attributes.theme', $syllabu['attributes']['slug']);
+                        $isActive  = $syllabu['isActive'] ?? false;
                         $isStatus  = $syllabu['attributes']['status'];
-                        $isActive  = $userMatch['attributes']['active'] ?? null;
-                        $route     = route($nameRoute , ['ue' => $syllabu['attributes']['slug']]);
+                        $route     = route($nameRoute, ['ue' => $syllabu['attributes']['slug']]);
                         $image     = $syllabu['attributes']['image'];
                         $link      = $syllabu['attributes']['link'];
                     @endphp
@@ -44,17 +44,34 @@
                     <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg {{ $isStatus === 0 ? 'hidden' : '' }}">
 
                         @if($this->optionGame == 0)
-                            @if ($userMatch || $isActive)
+                            @if ($isActive)
                                 <a wire:navigate href="{{ $route }}" class="flex flex-col items-center justify-center cursor-pointer h-full">
-                                    @else
-                                 <a class="flex flex-col items-center justify-center cursor-pointer h-full"  wire:click.prevent="openPaymentModal('{{ $link }}')"  role="button">
-                                     @endif
+                                    <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
+                                        <div class="size-32  flex items-center justify-center">
+                                            <img src="{{ $image }}"  alt="syllabus image" class="rounded-full">
+                                        </div>
+                                    </div>
+                                </a>
+                            @else
+                                <a class="flex flex-col items-center justify-center cursor-pointer h-full"  wire:click.prevent="openPaymentModal('{{ $link }}')"  role="button">
                                      <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
                                         <div class="size-32  flex items-center justify-center">
                                             <img src="{{ $image }}"  alt="syllabus image" class="rounded-full">
                                         </div>
                                     </div>
                                  </a>
+                            @endif
+{{--                            @if ($isActive)--}}
+{{--                                <a wire:navigate href="{{ $route }}" class="flex flex-col items-center justify-center cursor-pointer h-full">--}}
+{{--                                    @else--}}
+{{--                                 <a class="flex flex-col items-center justify-center cursor-pointer h-full"  wire:click.prevent="openPaymentModal('{{ $link }}')"  role="button">--}}
+{{--                                     @endif--}}
+{{--                                     <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">--}}
+{{--                                        <div class="size-32  flex items-center justify-center">--}}
+{{--                                            <img src="{{ $image }}"  alt="syllabus image" class="rounded-full">--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                 </a>--}}
                             @else
                                 <a wire:navigate href="{{ $route }}" class="flex flex-col items-center justify-center cursor-pointer h-full">
                                     <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">

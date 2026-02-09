@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Auth;
 
-
-use Illuminate\Support\Facades\Http;
+use App\Services\ApiService;
 use Illuminate\Support\Facades\Session;
+use Native\Mobile\Facades\SecureStorage;
 
 class Logout
 {
@@ -13,33 +13,53 @@ class Logout
      */
     public function __invoke()
     {
-        $token = Session::get('data.token');
+        try {
+            $apiService = app(ApiService::class);
 
-
-        if ($token) {
+            // Intentar hacer logout en la API
             try {
-                Http::withOptions([
-                    'verify' => env('API_VERIFY_SSL', true),
-                ])
-                    ->withToken($token)
-                    ->timeout(5)
-                    ->post(config('services.api.url') . '/auth/logout');
+                $response = $apiService->logout();
+
+                \Log::info('Logout API response', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
             } catch (\Exception $e) {
-                // Opcional: loguear el error
-                \Log::warning('Error al hacer logout en API: ' . $e->getMessage());
+                // Si falla el logout en la API, continuar con la limpieza local
+                \Log::warning('Error al hacer logout en API', [
+                    'error' => $e->getMessage()
+                ]);
             }
+
+            // Limpiar almacenamiento local (siempre se ejecuta)
+            SecureStorage::delete('data');
+            SecureStorage::delete('token');
+
+            // Limpiar sesión
+            Session::flush();
+            Session::regenerate();
+
+            return redirect()->route('home')->with('success', 'Déconnexion réussie');
+
+        } catch (\Exception $e) {
+            \Log::error('Error durante logout', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Aún así, intentar limpiar localmente
+            try {
+                SecureStorage::delete('data');
+                SecureStorage::delete('token');
+                Session::flush();
+                Session::regenerate();
+            } catch (\Exception $cleanupError) {
+                \Log::error('Error al limpiar datos locales', [
+                    'error' => $cleanupError->getMessage()
+                ]);
+            }
+
+            return redirect()->route('home')->with('error', 'Erreur lors de la déconnexion');
         }
-
-        Session::forget('data');
-        Session::flush();
-        Session::invalidate();
-        Session::regenerateToken();
-
-        // Limpiar caché
-        \Artisan::call('view:clear');
-        \Artisan::call('cache:clear');
-
-
-        return redirect()->route('home');
     }
 }

@@ -6,6 +6,7 @@ use App\Services\ApiService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Native\Mobile\Facades\SecureStorage;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiTokenExists
@@ -17,7 +18,17 @@ class ApiTokenExists
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!session()->has('data.token')) {
+        // Check if data exists in SecureStorage
+        $storedData = SecureStorage::get('data');
+
+        if (!$storedData) {
+            return redirect()->route('home');
+        }
+
+        // Decode and check for token
+        $data = json_decode($storedData, true);
+
+        if (!isset($data['token']) || empty($data['token'])) {
             return redirect()->route('home');
         }
 

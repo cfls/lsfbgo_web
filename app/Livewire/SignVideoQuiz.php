@@ -9,6 +9,7 @@ use Native\Mobile\Attributes\OnNative;
 use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Dialog;
+use Native\Mobile\Facades\SecureStorage;
 
 #[AllowDynamicProperties]
 class SignVideoQuiz extends Component
@@ -39,6 +40,7 @@ class SignVideoQuiz extends Component
 
     public function mount()
     {
+
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
@@ -54,7 +56,7 @@ class SignVideoQuiz extends Component
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken(session('data.token'))
+                ->withToken(SecureStorage::get('data'))
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme);
 
@@ -94,19 +96,19 @@ class SignVideoQuiz extends Component
     protected function checkUserSubscription(): void
     {
         try {
-            $userId = session('data.user.id');
-            $token = session('data.token');
+            $storedData = SecureStorage::get('data');
+            $data = json_decode($storedData, true);
 
-            if (!$userId || !$token) {
+            if (!$data['user']['id'] || !$data['token']) {
                 return;
             }
 
-            $url = config('services.api.url') . '/v1/verify-codes/' . $userId;
+            $url = config('services.api.url') . '/v1/verify-codes/' . $data['user']['id'];
 
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken($token)
+                ->withToken($data['token'])
                 ->acceptJson()
                 ->get($url);
 
@@ -201,7 +203,7 @@ class SignVideoQuiz extends Component
             $syllabusResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken(session('data.token'))
+                ->withToken(SecureStorage::get('data.token'))
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
 
@@ -276,7 +278,7 @@ class SignVideoQuiz extends Component
             return;
         }
 
-        if (session('data.token')) {
+        if (SecureStorage::get('data.token')) {
             $this->saveQuizResult();
         }
 
@@ -289,8 +291,8 @@ class SignVideoQuiz extends Component
     protected function saveQuizResult()
     {
         try {
-            $token = session('data.token');
-            $userId = session('data.user.id');
+            $token = SecureStorage::get('data.token');
+            $userId = SecureStorage::get('data.user.id');
 
             $checkUrl = sprintf(
                 '%s/v1/quiz-results/check/%s/%s/%s/%s',

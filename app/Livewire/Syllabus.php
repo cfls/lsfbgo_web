@@ -12,6 +12,7 @@ use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Browser as BrowserFacade;
 use Native\Mobile\Facades\Dialog;
+use Native\Mobile\Facades\SecureStorage;
 use Native\Mobile\Facades\System;
 
 class Syllabus extends Component
@@ -34,6 +35,9 @@ class Syllabus extends Component
 
     public function mount(?string $ue = null)
     {
+
+
+
         $this->ue = $ue;
 
         if ($this->ue) {
@@ -48,28 +52,43 @@ class Syllabus extends Component
     public function loadAllThemes()
     {
         $api = app(ApiService::class);
+        $dataUser = SecureStorage::get('data');
+        $user = json_decode($dataUser, true)['user'];
 
-        // Asegúrate de que el token sea consistente
-        $token = session('data.token') ?? session('token');
+        // Obtener códigos verificados del usuario
+        $verifyUser = $api->verifycodeStatus($user['id']);
+        $this->verifyUser = collect($verifyUser->json('data', []));
 
-        // Si allThemes() requiere autenticación, pasa el token
-        $responseUser = $api->allThemes($token);
-        $verifyUser = $responseUser->json('data', []);
-        $this->verifyUser = collect($verifyUser);
+        // Obtener los NOMBRES de los temas activos (ue1-themes, ue2-themes)
+        $activeThemes = $this->verifyUser
+            ->where('attributes.active', 1)
+            ->pluck('attributes.theme');
 
-        // Usa el mismo token
-        $response = $api->MemberSyllabus($token);
+        // Obtener todos los temas disponibles
+        $responseUser = $api->allThemes();
+        $allThemes = collect($responseUser->json('data', []));
 
-        $this->results = $response->json('data', []);
+        // MOSTRAR TODOS los temas, pero marcar cuáles están activos
+        $this->results = $allThemes
+            ->map(function($theme) use ($activeThemes) {
+                // Verificar si este tema está en los temas activos del usuario
+                $theme['isActive'] = $activeThemes->contains($theme['attributes']['slug']);
+
+                return $theme;
+            })
+            ->values()
+            ->all();
     }
-
 
     public function loadTheme($ue)
     {
+
+        $data = SecureStorage::get('data');
+        $token = json_decode($data, true)['token'];
         $response = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
-            ->withToken(session('data.token'))
+            ->withToken($token)
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/themes/' . $ue);
         // save in public property
@@ -81,6 +100,8 @@ class Syllabus extends Component
 // abrir modal de pago
     public function openPaymentModal($link): void
     {
+
+
         $this->selectedLink = $link;
      //   $this->showPaymentModal = true;
 

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use AllowDynamicProperties;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
+use Native\Mobile\Facades\SecureStorage;
 
 #[AllowDynamicProperties]
 class SignVideoQuizOld extends Component
@@ -47,7 +48,7 @@ class SignVideoQuizOld extends Component
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken(session('data.token'))
+                ->withToken(SecureStorage::get('data.token'))
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/questions/'.  $this->slug .'-themes' .'/'. $this->slug_theme);
 
@@ -87,8 +88,8 @@ class SignVideoQuizOld extends Component
     protected function checkUserSubscription(): void
     {
         try {
-            $userId = session('data.user.id');
-            $token = session('data.token');
+            $userId = SecureStorage::get('data.user.id');
+            $token = SecureStorage::get('data.token');
 
             if (!$userId || !$token) {
                 logger()->warning('Sesión no válida: usuario o token faltante.');
@@ -271,9 +272,9 @@ class SignVideoQuizOld extends Component
         }
 
         // ✅ Evitar guardar si ya se completó antes
-        if (session('data.token')) {
-            $token = session('data.token');
-            $userId = session('data.user.id');
+        if (SecureStorage::get('data.token')) {
+            $token = SecureStorage::get('data.token');
+            $userId = SecureStorage::get('data.user.id');
 
 
             // Verificar si ya existe un registro de ese quiz

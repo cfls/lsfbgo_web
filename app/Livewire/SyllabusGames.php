@@ -10,6 +10,7 @@ use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Browser as BrowserFacade;
 use Native\Mobile\Facades\Dialog;
+use Native\Mobile\Facades\SecureStorage;
 
 class SyllabusGames extends Component
 {
@@ -33,7 +34,8 @@ class SyllabusGames extends Component
 
     public function mount(?string $ue = null)
     {
-
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
 
 
         if ($this->ue) {
@@ -41,8 +43,10 @@ class SyllabusGames extends Component
             // Cargar datos del syllabus desde la API
             $syllabusResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 60, // Increase to 60 seconds
+                'connect_timeout' => 10, // Connection timeout
             ])
-                ->withToken(session('data.token'))
+                ->withToken($data['token'])
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->ue);
 
@@ -73,10 +77,11 @@ class SyllabusGames extends Component
         $this->verifyUser = collect($verifyUser);
 
         // Asegúrate de que el token sea consistente
-        $token = session('data.token') ?? session('token');
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
 
         // Usa el mismo token
-        $response = $api->MemberSyllabus($token);
+        $response = $api->MemberSyllabus($data['token']);
 
         $this->results = $response->json('data', []);
     }
@@ -85,11 +90,13 @@ class SyllabusGames extends Component
     public function loadTheme($ue)
     {
 
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
 
         $response = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
-            ->withToken(session('data.token'))
+            ->withToken($data['token'])
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/sections/' . $ue);
         // save in public property

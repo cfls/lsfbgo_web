@@ -4,10 +4,13 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
+
 class TableuBord extends Component
 {
     public function render()
     {
+
+
         $featuredDemos = [
 
 //            [

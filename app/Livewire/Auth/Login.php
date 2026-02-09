@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Native\Mobile\Edge\Edge;
+use Native\Mobile\Facades\SecureStorage;
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
@@ -55,7 +56,9 @@ class Login extends Component
                 return;
             }
 
-            session(['data' => $data]);
+
+
+            SecureStorage::set('data', json_encode($data));
 
             $this->redirect(route('access.dashboard'), navigate: true);
             return;

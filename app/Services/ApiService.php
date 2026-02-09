@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Native\Mobile\Facades\SecureStorage;
 
 class ApiService
 {
@@ -16,16 +17,16 @@ class ApiService
         $this->verifySsl = env('API_VERIFY_SSL', true);
     }
 
-    public function getAuthenticatedUser(): Response
-    {
-        return Http::withOptions([
-            'verify' => $this->verifySsl,
-        ])
-            ->asJson()
-            ->acceptJson()
-            ->withToken(session('token'))
-            ->get($this->baseUrl . 'auth/user');
-    }
+//    public function getAuthenticatedUser(): Response
+//    {
+//        return Http::withOptions([
+//            'verify' => $this->verifySsl,
+//        ])
+//            ->asJson()
+//            ->acceptJson()
+//            ->withToken(SecureStorage::get('token'))
+//            ->get($this->baseUrl . 'auth/user');
+//    }
 
 
 
@@ -45,13 +46,33 @@ class ApiService
      */
     public function get(string $endpoint, array $params = [], ?string $token = null): Response
     {
-        $token = $token ?? session('data.token') ?? session('token');
+        // Si no se proporciona token, intentar obtenerlo
+        if (!$token) {
+            // Opción 1: Token directo
+            $token = SecureStorage::get('token');
+
+            // Opción 2: Token dentro de 'data'
+            if (!$token) {
+                $storedData = SecureStorage::get('data');
+                if ($storedData) {
+                    $data = json_decode($storedData, true);
+                    $token = $data['token'] ?? null;
+                }
+            }
+        }
+
+        // Si aún no hay token, lanzar excepción
+        if (!$token) {
+            throw new \Exception('No authentication token found');
+        }
+
+
 
         return Http::withOptions(['verify' => $this->verifySsl])
             ->asJson()
             ->acceptJson()
             ->withToken($token)
-            ->get($this->baseUrl.$endpoint, $params);
+            ->get($this->baseUrl . $endpoint, $params);
     }
 
     /**
@@ -120,12 +141,26 @@ class ApiService
 
     public function allThemes()
     {
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
+        return $this->get('/v1/syllabus', [], $data['token'] ?? null);
+    }
 
-        return $this->get('/v1/verify-codes/' . session('data.user.id'));
+    public function verifycodeSyllabu($userId, $ue)
+    {
+
+        return $this->get('/v1/verify-codes/' . $userId . '/'. $ue);
+    }
+
+    public function verifycodeStatus($userId)
+    {
+
+        return $this->get('/v1/verify-codes/' . $userId);
     }
 
     public function MemberSyllabus(?string $token = null)
     {
+
 
         return $this->get('/v1/syllabus', [ 'token' => $token ]);
     }
@@ -143,11 +178,58 @@ class ApiService
         return $this->get('/v1/themes/' . $ue . '/' . $theme);
     }
 
-    public function ProfilUser()
+    public function ProfilUser(?string $token = null)
     {
+        // Obtener token directamente
+        $storedData = SecureStorage::get('data');
 
-        return $this->get('/user/'. session('data.user.id'));
+        if (!$storedData) {
+            throw new \Exception('No stored authentication data');
+        }
+
+        $data = json_decode($storedData, true);
+        $token = $data['token'] ?? null;
+
+        if (!$token) {
+            throw new \Exception('Token not found in stored data');
+        }
+
+
+
+        // Pasar el token explícitamente
+        return $this->get('/user', [], $token);
     }
+
+
+    public function logout(?string $token = null): Response
+    {
+        // Si no se proporciona token, intentar obtenerlo
+        if (!$token) {
+            // Opción 1: Token directo
+            $token = SecureStorage::get('token');
+
+            // Opción 2: Token dentro de 'data'
+            if (!$token) {
+                $storedData = SecureStorage::get('data');
+                if ($storedData) {
+                    $data = json_decode($storedData, true);
+                    $token = $data['token'] ?? null;
+                }
+            }
+        }
+
+        // Si aún no hay token, lanzar excepción
+        if (!$token) {
+            throw new \Exception('No authentication token found for logout');
+        }
+
+        return Http::withOptions(['verify' => $this->verifySsl])
+            ->asJson()
+            ->acceptJson()
+            ->withToken($token)
+            ->post($this->baseUrl . '/auth/logout');
+    }
+
 
 
 

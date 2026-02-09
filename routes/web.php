@@ -26,6 +26,7 @@ use App\Livewire\Theme;
 use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
 use Native\Mobile\Edge\Edge;
+use Native\Mobile\Facades\SecureStorage;
 
 
 /*
@@ -53,8 +54,11 @@ Route::get('/', function () {
     // Limpiar EDGE en la página de bienvenida/login
     Edge::clear();
 
+    $storedData = SecureStorage::get('data');
+    $data = json_decode($storedData, true);
+
     // Verificar si existe el token en la sesión
-    if (session()->has('data') && !empty(session('data.token'))) {
+    if (!empty($data['token'])) {
         return redirect()->route('access.dashboard');
     }
 
@@ -125,10 +129,6 @@ Route::get('/alphabet-practice', Spelling::class)->name('alphabet.practice');
 // ============================================
 // RUTAS PRINCIPALES DE SYLLABUS
 // ============================================
-    Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
-    Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
-    Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
-
 
 Route::get('/syllabus/{ue?}', Syllabus::class)->name('syllabus');
 Route::get('/syllabus/{ue}/{theme}', Themes::class)->name('syllabus.themes');
@@ -150,6 +150,4 @@ Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
 
     Route::match(['get', 'post'], '/logout', [Logout::class, '__invoke'])
         ->name('access.logout');
-
-
 });

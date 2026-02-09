@@ -33,11 +33,17 @@
                     'theme'    => $item['theme'] ?? null,
                     'type'     => $item['type'] ?? null,
                 ]);
+
+            // Obtén el syllabus actual de forma segura
+            $currentSyllabus = $this->ue ?? ($doneThemes->first()['syllabus'] ?? null);
+
             // Cuenta cuántos temas completados del mismo tipo / syllabus
             $completedCount = $doneThemes
                 ->filter(fn($item) => $item['type'] === ($type ?? null)
-                                   && $item['syllabus'] === $doneThemesData[0]['syllabus'])
+                                   && $item['syllabus'] === $currentSyllabus)
                 ->count();
+
+
         @endphp
 
         @foreach($this->themes as $index => $theme)
@@ -45,11 +51,13 @@
                 $attributes = $theme['attributes'];
                 $themeSlug  = $attributes['slug'];
 
+
+
                 // Verifica si ya fue completado
                 $alreadyDone = $doneThemes->contains(fn($item) =>
                     $item['theme']    === $themeSlug &&
                     $item['type']     === $type &&
-                    $item['syllabus'] === $doneThemesData[0]['syllabus']
+                    $item['syllabus'] === $currentSyllabus
                 );
 
                 // Desbloqueo progresivo
@@ -59,15 +67,12 @@
                 $locked = false;
                 $isUnlocked = true;
 
-
-                // Colores: completado = rojo, normal = color UE
+                // Colores: completado = verde, normal = color UE
                 $colorClass = $alreadyDone ? '#34eb40' : $bgClass;
-
-
 
                 // Siempre se puede acceder
                 $link = route('syllabus.play', [
-                    'ue'  => $this->ue,
+                    'ue'    => $this->ue,
                     'type'  => $type,
                     'theme' => $themeSlug,
                 ]);
