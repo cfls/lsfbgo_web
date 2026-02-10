@@ -41,6 +41,7 @@ class SignVideoQuiz extends Component
     public function mount()
     {
 
+
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
@@ -199,19 +200,19 @@ class SignVideoQuiz extends Component
 
     public function nextStep()
     {
+        $data = json_decode(SecureStorage::get('data'), true);
         if ($this->currentIndex == 2 && !$this->hasSubscription) {
             $syllabusResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken(SecureStorage::get('data.token'))
+                ->withToken(SecureStorage::get($data['token']))
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
 
 
             $this->syllabusData = $syllabusResponse->json('data', []);
 
-            $link =  $this->syllabusData['attributes']['link'] ?? env('API_SITE');
-
+            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');
             $this->openPaymentModal($link);
             return;
 
@@ -278,9 +279,9 @@ class SignVideoQuiz extends Component
             return;
         }
 
-        if (SecureStorage::get('data.token')) {
+
             $this->saveQuizResult();
-        }
+
 
         $this->dispatch('quiz-finished', [
             'score' => $this->score,
@@ -291,14 +292,15 @@ class SignVideoQuiz extends Component
     protected function saveQuizResult()
     {
         try {
-            $token = SecureStorage::get('data.token');
-            $userId = SecureStorage::get('data.user.id');
+            $data = json_decode(SecureStorage::get('data'), true);
+
+
 
             $checkUrl = sprintf(
                 '%s/v1/quiz-results/check/%s/%s/%s/%s',
                 config('services.api.url'),
-                $userId,
-                $this->slug . '-themes',
+                $data['user']['id'],
+                $this->slug,
                 $this->slug_theme,
                 $this->type
             );
@@ -306,7 +308,7 @@ class SignVideoQuiz extends Component
             $checkResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken($token)
+                ->withToken($data['token'])
                 ->acceptJson()
                 ->get($checkUrl);
 
@@ -316,15 +318,17 @@ class SignVideoQuiz extends Component
                     return;
                 }
             }
+            $secure = SecureStorage::get('data');
+            $data = json_decode($secure, true);
 
             Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken($token)
+                ->withToken($data['token'])
                 ->acceptJson()
                 ->post(config('services.api.url') . '/v1/quiz-results', [
-                    'user_id'   => $userId,
-                    'syllabus'  => $this->slug . '-themes',
+                    'user_id'   => $data['user']['id'],
+                    'syllabus'  => $this->slug,
                     'theme'     => $this->slug_theme,
                     'type'      => $this->type,
                     'score'     => $this->score,

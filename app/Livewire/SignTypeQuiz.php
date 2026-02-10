@@ -32,6 +32,7 @@ class SignTypeQuiz extends Component
     public $currentQuestion;
     public $selectedLink;
     public $totalQuestions;
+    public $storedData;
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -39,6 +40,8 @@ class SignTypeQuiz extends Component
 
     public function mount()
     {
+
+
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
@@ -55,11 +58,12 @@ class SignTypeQuiz extends Component
 
     protected function loadQuestions()
     {
+
         try {
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken(SecureStorage::get('data.token'))
+               // ->withToken(SecureStorage::get('data.token'))
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type);
 
@@ -200,20 +204,23 @@ class SignTypeQuiz extends Component
     public function nextStep()
     {
 
+        $data = json_decode(SecureStorage::get('data'), true);
 
         // ✅ Verificar suscripción
         if ($this->currentIndex == 2 && !$this->hasSubscription) {
             $syllabusResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken(SecureStorage::get('data.token'))
+                ->withToken(SecureStorage::get($data['token']))
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
 
 
+
+
             $this->syllabusData = $syllabusResponse->json('data', []);
 
-            $link =  $this->syllabusData['attributes']['link'] ?? env('API_SITE');
+            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');
 
             $this->openPaymentModal($link);
             return;
@@ -286,9 +293,9 @@ class SignTypeQuiz extends Component
             return;
         }
 
-        if (SecureStorage::get('data.token')) {
+
             $this->saveQuizResult();
-        }
+
 
         $this->dispatch('quiz-finished', [
             'score' => $this->score,
@@ -299,10 +306,8 @@ class SignTypeQuiz extends Component
     protected function saveQuizResult()
     {
         try {
-            $storedData = SecureStorage::get('data');
-            $data = json_decode($storedData, true);
 
-
+            $data = json_decode(SecureStorage::get('data'), true);
 
             $checkUrl = sprintf(
                 '%s/v1/quiz-results/check/%s/%s/%s/%s',
@@ -326,6 +331,8 @@ class SignTypeQuiz extends Component
                     return;
                 }
             }
+            $secure = SecureStorage::get('data');
+            $data = json_decode($secure, true);
 
             Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
