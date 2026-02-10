@@ -100,19 +100,19 @@ class SignTypeQuiz extends Component
     protected function checkUserSubscription(): void
     {
         try {
-            $userId = SecureStorage::get('data.user.id');
-            $token = SecureStorage::get('data.token');
+            $storedData = SecureStorage::get('data');
+            $data = json_decode($storedData, true);
 
-            if (!$userId || !$token) {
+            if (!$data['user']['id'] || !$data['token']) {
                 return;
             }
 
-            $url = config('services.api.url') . '/v1/verify-codes/' . $userId;
+            $url = config('services.api.url') . '/v1/verify-codes/' . $data['user']['id'];
 
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
             ])
-                ->withToken($token)
+                ->withToken($data['token'])
                 ->acceptJson()
                 ->get($url);
 
