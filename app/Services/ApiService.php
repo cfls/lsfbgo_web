@@ -178,8 +178,9 @@ class ApiService
         return $this->get('/v1/themes/' . $ue . '/' . $theme);
     }
 
-    public function FeedeBack(array $data)
+    public function FeedBack(array $data)
     {
+        logger()->info('api_data: ' . print_r($data, true));
         return $this->post('/v1/feedback', [
             'user_id' => $data['user_id'] ?? null,
             'type' => $data['type'],

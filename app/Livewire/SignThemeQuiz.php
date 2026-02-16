@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use AllowDynamicProperties;
+use App\Services\ApiService;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
 use Native\Mobile\Attributes\OnNative;
@@ -270,6 +271,9 @@ class SignThemeQuiz extends Component
 
     public function submitFeedback($feedbackData)  // ✅ Recibe array, no Request
     {
+
+        $api = app(ApiService::class);
+
         logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
 
         try {
@@ -281,31 +285,33 @@ class SignThemeQuiz extends Component
 
             ])->validate();
 
-           logger()->info('✅ Feedback validation passed:', $validatedFeedback);
+            logger()->info('✅ Feedback validation passed:', $validatedFeedback);
 
             // Obtener datos del usuario de SecureStorage
             $storedData = SecureStorage::get('data');
             $userData = json_decode($storedData, true);
 
-//            logger()->info('👤 User data loaded:', [
-//                'user_id' => $userData['user']['id'] ?? 'null'
-//            ]);
 
-            // Combinar todo para guardar
+            logger()->info('👤 User data loaded:', [
+                'user_id' => $userData['user']['id'] ?? 'null'
+            ]);
+
             $completeData = [
                 'user_id' => $userData['user']['id'] ?? null,
                 'type' => $validatedFeedback['type'],
                 'message' => $validatedFeedback['message'],
                 'question_id' => $validatedFeedback['question_id'] ?? null,
-                'timestamp' => now()
+                'status' => 'pending',
             ];
 
-            logger()->info('💾 Complete feedback data:', $completeData);
+            logger()->info('📦 Sending to API:', $completeData);
 
-            // Aquí guardar en BD o enviar email
-            // Feedback::create($completeData);
+            // ✅ Llamar a la API con el array completo
+            $result = $api->FeedBack($completeData);
 
-          //  logger()->info('🎉 Feedback saved successfully!');
+            logger()->info('✅ API response:', ['result' => $result]);
+
+            logger()->info('🎉 Feedback saved successfully!');
 
             return [
                 'success' => true,

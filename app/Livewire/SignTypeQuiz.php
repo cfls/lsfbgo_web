@@ -407,8 +407,10 @@ class SignTypeQuiz extends Component
         }
     }
 
-    public function submitFeedback(ApiService $api, $feedbackData)  // ✅ Recibe array, no Request
+    public function submitFeedback($feedbackData)  // ✅ Recibe array, no Request
     {
+
+        $api = app(ApiService::class);
 
         logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
 
@@ -427,6 +429,7 @@ class SignTypeQuiz extends Component
             $storedData = SecureStorage::get('data');
             $userData = json_decode($storedData, true);
 
+
             logger()->info('👤 User data loaded:', [
                 'user_id' => $userData['user']['id'] ?? 'null'
             ]);
@@ -442,7 +445,7 @@ class SignTypeQuiz extends Component
             logger()->info('📦 Sending to API:', $completeData);
 
             // ✅ Llamar a la API con el array completo
-            $result = $api->FeedeBack($completeData);
+            $result = $api->FeedBack($completeData);
 
             logger()->info('✅ API response:', ['result' => $result]);
 
