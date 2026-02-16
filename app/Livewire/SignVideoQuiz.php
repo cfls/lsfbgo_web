@@ -401,6 +401,66 @@ class SignVideoQuiz extends Component
         }
     }
 
+    public function submitFeedback($feedbackData)  // ✅ Recibe array, no Request
+    {
+        logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
+
+        try {
+            // Validar los datos del feedback que vienen del frontend
+            $validatedFeedback = validator($feedbackData, [
+                'type' => 'required|in:bug,suggestion,question',
+                'message' => 'required|string|max:1000',
+                'question_id' => 'nullable|integer',
+
+            ])->validate();
+
+            logger()->info('✅ Feedback validation passed:', $validatedFeedback);
+
+            // Obtener datos del usuario de SecureStorage
+            $storedData = SecureStorage::get('data');
+            $userData = json_decode($storedData, true);
+
+//            logger()->info('👤 User data loaded:', [
+//                'user_id' => $userData['user']['id'] ?? 'null'
+//            ]);
+
+            // Combinar todo para guardar
+            $completeData = [
+                'user_id' => $userData['user']['id'] ?? null,
+                'type' => $validatedFeedback['type'],
+                'message' => $validatedFeedback['message'],
+                'question_id' => $validatedFeedback['question_id'] ?? null,
+                'timestamp' => now()
+            ];
+
+            logger()->info('💾 Complete feedback data:', $completeData);
+
+            // Aquí guardar en BD o enviar email
+            // Feedback::create($completeData);
+
+            //  logger()->info('🎉 Feedback saved successfully!');
+
+            return [
+                'success' => true,
+                'message' => 'Feedback received successfully'
+            ];
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            logger()->error('❌ Validation failed:', [
+                'errors' => $e->errors()
+            ]);
+            throw $e;
+
+        } catch (\Exception $e) {
+            logger()->error('❌ Exception:', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            throw $e;
+        }
+    }
+
     public function render()
     {
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;

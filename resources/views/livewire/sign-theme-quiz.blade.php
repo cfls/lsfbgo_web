@@ -4,6 +4,7 @@
         {{-- Modals --}}
         @include('partials.quiz.modals.success')
         @include('partials.quiz.modals.failure')
+        @include('partials.quiz.modals.feedback')
 
         {{-- Quiz Content --}}
         <div class="p-5">
@@ -13,7 +14,17 @@
                     <span class="text-sm font-medium">
                         Question {{ $currentIndex + 1 }} a {{ count($questions) }}
                     </span>
-                    <span class="text-sm text-white">
+                    <button
+                            @click="openFeedback = true"
+                            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700 transition"
+                            title="Envoyer un commentaire"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                        <span>Feedback</span>
+                    </button>
+                    <span class="text-sm text-black dark:text-white">
                         Points : {{ $score }} / {{ count($questions) * 10 }}
                     </span>
                 </div>
@@ -65,17 +76,88 @@
 </div>
 @push('scripts')
     <script>
+        // 🐛 Helper function para debug visual
+        window.debugLog = function(message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            let logMessage = `<span class="text-yellow-400">[${timestamp}]</span> ${message}`;
+
+            if (data !== null) {
+                logMessage += `<br><span class="text-blue-400 ml-4">↳ ${JSON.stringify(data, null, 2)}</span>`;
+            }
+
+            // Log to browser console
+            console.log(`[${timestamp}] ${message}`, data || '');
+
+            // Dispatch event for visual console
+            window.dispatchEvent(new CustomEvent('debug-log', {
+                detail: logMessage
+            }));
+        };
         function quizData() {
             return {
                 slow: false,
                 openCongrats: false,
                 showFailModal: false,
                 score: 0,
+                openFeedback: false,
+                feedbackType: 'bug',
+                feedbackMessage: '',
+                feedbackSending: false,
                 openSubscription: false,
                 isTransitioning: false,
                 liveScore: @entangle('score'),
                 totalPoints: {{ count($questions) * 10 }},
                 failPercentage: 0, // ✅ Agregar esta línea
+
+                async submitFeedback() {
+                    if (!this.feedbackMessage.trim()) {
+                        alert('Veuillez écrire un message');
+                        return;
+                    }
+
+                    this.feedbackSending = true;
+
+                    try {
+                        const payload = {
+                            type: this.feedbackType,
+                            message: this.feedbackMessage,
+                            question_id: {{ $currentQuestion['id'] ?? 'null' }},
+
+                        };
+
+                        debugLog('📦 Payload prepared', payload);
+                        debugLog('🚀 Calling Livewire submitFeedback...');
+
+                        const response = await @this.call('submitFeedback', payload);
+
+                        debugLog('✅ Response received', response);
+
+                        // Mostrar notificación de éxito
+                        this.$dispatch('notify', {
+                            type: 'success',
+                            message: 'Merci pour votre retour !'
+                        });
+
+                        // Limpiar y cerrar
+                        this.feedbackMessage = '';
+                        this.feedbackType = 'bug';
+                        this.openFeedback = false;
+
+                    } catch (error) {
+                        debugLog('❌ ERROR', {
+                            message: error.message,
+                            stack: error.stack
+                        });
+
+                        this.$dispatch('notify', {
+                            type: 'error',
+                            message: 'Erreur lors de l\'envoi'
+                        });
+
+                    } finally {
+                        this.feedbackSending = false;
+                    }
+                },
 
                 toggleSpeed() {
                     this.slow = !this.slow;
