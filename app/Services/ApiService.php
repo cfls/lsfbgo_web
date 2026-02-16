@@ -178,6 +178,16 @@ class ApiService
         return $this->get('/v1/themes/' . $ue . '/' . $theme);
     }
 
+    public function FeedeBack(array $data)
+    {
+        return $this->post('/v1/feedback', [
+            'user_id' => $data['user_id'] ?? null,
+            'type' => $data['type'],
+            'question_id' => $data['question_id'] ?? null,
+            'message' => $data['message'],
+            'status' => $data['status'] ?? 'pending',
+        ]);
+    }
     public function ProfilUser(?string $token = null)
     {
         // Obtener token directamente

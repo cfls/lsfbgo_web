@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use AllowDynamicProperties;
+use App\Services\ApiService;
 use Illuminate\Http\Request;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
@@ -406,8 +407,9 @@ class SignTypeQuiz extends Component
         }
     }
 
-    public function submitFeedback($feedbackData)  // ✅ Recibe array, no Request
+    public function submitFeedback(ApiService $api, $feedbackData)  // ✅ Recibe array, no Request
     {
+
         logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
 
         try {
@@ -429,20 +431,20 @@ class SignTypeQuiz extends Component
                 'user_id' => $userData['user']['id'] ?? 'null'
             ]);
 
-            // Combinar todo para guardar
             $completeData = [
-                'user_id' => $userData['user']['id'] ?? null,
-                'type' => $validatedFeedback['type'],
-                'message' => $validatedFeedback['message'],
-                'question_id' => $validatedFeedback['question_id'] ?? null,
-                'timestamp' => now(),
+                    'user_id' => $userData['user']['id'] ?? null,
+                    'type' => $validatedFeedback['type'],
+                    'message' => $validatedFeedback['message'],
+                    'question_id' => $validatedFeedback['question_id'] ?? null,
+                    'status' => 'pending',
+                ];
 
-            ];
+            logger()->info('📦 Sending to API:', $completeData);
 
-            logger()->info('💾 Complete feedback data:', $completeData);
+            // ✅ Llamar a la API con el array completo
+            $result = $api->FeedeBack($completeData);
 
-            // Aquí guardar en BD o enviar email
-            // Feedback::create($completeData);
+            logger()->info('✅ API response:', ['result' => $result]);
 
             logger()->info('🎉 Feedback saved successfully!');
 
