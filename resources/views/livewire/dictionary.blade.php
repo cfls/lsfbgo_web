@@ -27,7 +27,7 @@
                                 variant="subtle"
                                 icon="x-mark"
                                 class="-mr-1"
-                                wire:click="$set('search',''); $set('page', 1)"
+                                wire:click="$set('search',''); $set('currentPage', 1)"
                         />
                     </x-slot>
                 </flux:input>
@@ -35,7 +35,6 @@
         </div>
 
         {{-- 🔠 TABS A–Z (FR-BE) --}}
-        {{-- 🔠 Barre A–Z avec scroll + drag + auto-center (SC-3) --}}
         @php
             $letters = array_merge(['tous'], range('A', 'Z'));
         @endphp
@@ -101,8 +100,33 @@
         </div>
 
 
-        {{-- ⏳ SKELETON OU LISTE --}}
-        <div class="w-full max-w-2xl min-h-[200px] max-h-[60vh] overflow-y-auto overscroll-contain scroll-smooth p-6 no-scrollbar">
+        {{-- ⏳ SKELETON OU LISTE CON SCROLL INFINITO --}}
+        <div
+                x-data="{
+                init() {
+                    const container = this.$refs.container;
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !@json($isLoading) && @json($hasMorePages)) {
+                                @this.loadMore();
+                            }
+                        });
+                    }, {
+                        root: container,
+                        threshold: 0.1
+                    });
+
+                    this.$nextTick(() => {
+                        const trigger = this.$refs.trigger;
+                        if (trigger) {
+                            observer.observe(trigger);
+                        }
+                    });
+                }
+            }"
+                x-ref="container"
+                class="w-full max-w-2xl min-h-[200px] max-h-[60vh] overflow-y-auto overscroll-contain scroll-smooth p-6 no-scrollbar"
+        >
             @if ($isLoading)
                 {{-- Skeleton: 8 lignes --}}
                 <div class="space-y-3 animate-pulse">
@@ -134,13 +158,29 @@
                                 </svg>
                             </div>
                         @endforeach
+
+                        {{-- Trigger para scroll infinito --}}
+                        @if($hasMorePages)
+                            <div x-ref="trigger" class="py-4">
+                                @if($isLoadingMore)
+                                    <div class="flex justify-center">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+                                    </div>
+                                @else
+                                    {{-- Espacio invisible para activar el observer --}}
+                                    <div class="h-1"></div>
+                                @endif
+                            </div>
+                        @else
+                            <div class="text-center text-gray-400 py-4 text-sm">
+                                Fin de la liste
+                            </div>
+                        @endif
                     </div>
                 @endif
             @endif
         </div>
 
-
         @livewire('video-modal')
     </div>
-
 </div>
