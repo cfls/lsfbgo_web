@@ -41,7 +41,7 @@
     </native:side-nav>
 
 
-
+    @if (!request()->routeIs(['dictionary', 'syllabus.themes','profile.parameters','syllabus.play']))
     <native:bottom-nav>
         <native:bottom-nav-item
                 id="scanner"
@@ -76,5 +76,5 @@
                 />
 
     </native:bottom-nav>
-
+    @endif
 </div>
