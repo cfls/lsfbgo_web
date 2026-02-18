@@ -31,6 +31,12 @@ class Dictionary extends Component
         $this->fetch();
     }
 
+    public function clearSearch(): void
+    {
+        $this->search = '';
+        $this->currentPage = 1;
+    }
+
     /** Cuando cambia la búsqueda */
     public function updatedSearch(): void
     {

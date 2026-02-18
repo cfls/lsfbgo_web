@@ -13,7 +13,7 @@
     <div class="flex flex-col items-center justify-center py-6">
 
         {{-- 🔍 RECHERCHE --}}
-        <div class="mb-6 w-full max-w-md">
+        <div class="mb-6 w-xl max-w-md">
             <flux:field>
                 <flux:label>Rechercher un mot</flux:label>
                 <flux:input
@@ -22,13 +22,17 @@
                         wire:keydown="$set('letter', 'tous')"
                 >
                     <x-slot name="iconTrailing">
-                        <flux:button
-                                size="sm"
-                                variant="subtle"
-                                icon="x-mark"
-                                class="-mr-1"
-                                wire:click="$set('search',''); $set('currentPage', 1)"
-                        />
+                        @if($search)
+                            <flux:button
+                                    size="sm"
+                                    variant="subtle"
+                                    icon="x-mark"
+                                    class="-mr-1"
+                                    wire:click="clearSearch"
+                            />
+                        @else
+                            <flux:icon icon="magnifying-glass" class="text-gray-400" />
+                        @endif
                     </x-slot>
                 </flux:input>
             </flux:field>

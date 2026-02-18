@@ -1,7 +1,7 @@
 <div class="p-4">
      <!-- Header with Logo -->
      <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl shadow-lg mb-4">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br dark:from-blue-600 dark:to-blue-800 rounded-2xl shadow-lg mb-4">
                @include('partials.quiz.svg.logo')
           </div>
           <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Scanner QR</h1>
