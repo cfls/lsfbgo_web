@@ -41,7 +41,7 @@
     </native:side-nav>
 
 
-    @if (!request()->routeIs(['dictionary', 'syllabus.themes','profile.parameters','syllabus.play']))
+    @if (!request()->routeIs(['dictionary', 'syllabus.themes','profile.parameters','syllabus.play','alphabet.practice']))
     <native:bottom-nav>
         <native:bottom-nav-item
                 id="scanner"
