@@ -1,4 +1,5 @@
 <div class="space-y-4 min-h-screen">
+
     {{-- Main Quiz Container --}}
     <div class="rounded-xl w-full mx-auto" x-data="quizData()">
 
@@ -10,6 +11,8 @@
         {{-- Quiz Content --}}
         <div class="p-5">
             {{-- ✅ Progreso mejorado con botón de feedback --}}
+
+            <livewire:back />
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <div class="flex items-center gap-3">
@@ -33,6 +36,8 @@
                     <span class="text-sm text-white">
                         Points : {{ $score }} / {{ count($questions) * 10 }}
                     </span>
+
+
                 </div>
 
                 {{-- Barra de progreso --}}

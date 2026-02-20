@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackController;
 use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\SyllabusGameController;
 use App\Livewire\Auth\ForgotPassword;
@@ -138,6 +139,7 @@ Route::get('/syllabus-games/{ue}/{type?}', Options::class)->name('questions');
 
 Route::get('/syllabus-games/{ue}/{type}/{theme}', [SyllabusGameController::class, 'index'])
     ->name('syllabus.play');
+
 
 Route::get('/dragdrop', DragDrop::class)->name('games.dragdrop');
 

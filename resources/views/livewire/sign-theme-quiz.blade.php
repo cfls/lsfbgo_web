@@ -9,6 +9,7 @@
         {{-- Quiz Content --}}
         <div class="p-5">
             {{-- ✅ Progreso mejorado --}}
+            <livewire:back />
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium">
@@ -27,6 +28,9 @@
                     <span class="text-sm text-black dark:text-white">
                         Points : {{ $score }} / {{ count($questions) * 10 }}
                     </span>
+
+
+
                 </div>
 
                 {{-- Barra de progreso --}}

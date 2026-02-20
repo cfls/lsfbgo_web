@@ -467,6 +467,7 @@ class SignVideoQuiz extends Component
         }
     }
 
+
     public function render()
     {
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
