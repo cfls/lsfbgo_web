@@ -13,9 +13,23 @@
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-3 py-2">
             <div class="flex items-center gap-2">
-                @include('partials.quiz.svg.logo')
+                <a wire:navigate href="{{ route('games',['ue' => $this->ue]) }}" class="text-white inline-flex items-center gap-2">
+                    <flux:icon.arrow-left-circle class="size-5"/>
+                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
+                </a>
                 <flux:subheading class="text-white text-base">
-                    Maîtrisez la LSFB grâce à LSFBGo — une application pensée pour l'accessibilité et l'inclusion.
+                    @php
+                        switch($this->type):
+                            case 'text':         $title = 'Traduire la LSFB'; break;
+                            case 'video-choice': $title = 'Choix vidéo';      break;
+                            case 'choice':       $title = 'Choix';            break;
+                            case 'yes-no':       $title = 'Oui / Non';        break;
+                            case 'match':        $title = 'Associer les paires'; break;
+                            default:             $title = ucfirst($this->type); break;
+                        endswitch;
+                    @endphp
+
+                    {{$title}}
                 </flux:subheading>
             </div>
         </div>

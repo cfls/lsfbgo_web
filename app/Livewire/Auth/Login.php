@@ -57,7 +57,7 @@ class Login extends Component
             }
 
 
-
+            $data['expires_at'] = now()->addDays(365)->timestamp;
             SecureStorage::set('data', json_encode($data));
 
             $this->redirect(route('access.dashboard'), navigate: true);

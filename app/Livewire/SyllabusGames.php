@@ -149,8 +149,6 @@ class SyllabusGames extends Component
 
     public function render()
     {
-        return view('livewire.syllabus-games')->layout('components.layouts.app.home', [
-            'title' => 'Jeux LSFB',
-        ]);
+        return view('livewire.syllabus-games')->layout('components.layouts.app.home');
     }
 }

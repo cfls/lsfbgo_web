@@ -2,12 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\ApiService;
+
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Native\Mobile\Facades\SecureStorage;
-use Symfony\Component\HttpFoundation\Response;
+
 
 class ApiTokenExists
 {
@@ -29,6 +28,12 @@ class ApiTokenExists
         $data = json_decode($storedData, true);
 
         if (!isset($data['token']) || empty($data['token'])) {
+            return redirect()->route('home');
+        }
+
+        // Verificar expiración de 365 días
+        if (!isset($data['expires_at']) || now()->timestamp > $data['expires_at']) {
+            SecureStorage::forget('data');
             return redirect()->route('home');
         }
 

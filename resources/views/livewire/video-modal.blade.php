@@ -2,16 +2,33 @@
 <flux:modal
         wire:model="open"
         x-data="{
-            videoUrl: null,
-            posterUrl: null,
-            videoLoaded: false
-        }"
+        videoUrl: null,
+        posterUrl: null,
+        videoLoaded: false
+    }"
         x-init="
-        $watch('$wire.video', value => {
-            if (value && value.url) {
-                videoUrl = value.url;
-                posterUrl = value.poster;
-                videoLoaded = false; // Reset cuando cambia el video
+        $watch('$wire.open', isOpen => {
+            if (isOpen && $wire.video && $wire.video.url) {
+                videoLoaded = false;
+                videoUrl = null;
+                posterUrl = null;
+
+                // Pequeño delay para que el modal esté visible antes de cargar
+                setTimeout(() => {
+                    // Usar resolución más baja para mobile
+                    videoUrl = $wire.video.url.replace('w_1280', 'w_640');
+                    posterUrl = $wire.video.poster;
+                }, 100);
+            }
+
+            if (!isOpen) {
+                // Pausar y limpiar cuando se cierra
+                if ($refs.myVideo) {
+                    $refs.myVideo.pause();
+                    $refs.myVideo.src = '';
+                }
+                videoUrl = null;
+                videoLoaded = false;
             }
         })
     "
@@ -28,10 +45,16 @@
 
             {{-- Skeleton mientras carga --}}
             <div x-show="!videoLoaded"
-                 class="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg animate-pulse flex items-center justify-center">
-                <svg class="w-20 h-20 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
-                </svg>
+                 class="absolute inset-0 bg-gray-900 rounded-lg flex items-center justify-center">
+
+                {{-- Spinner --}}
+                <div class="flex flex-col items-center gap-3">
+                    <svg class="w-12 h-12 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span class="text-white text-sm font-medium">Chargement...</span>
+                </div>
             </div>
 
             {{-- Video --}}
