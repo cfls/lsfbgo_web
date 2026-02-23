@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\BackController;
 use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\SyllabusGameController;
 use App\Livewire\Auth\ForgotPassword;
@@ -70,7 +69,9 @@ Route::get('/', function () {
 
 Route::get('/verify-code', VerifyEmail::class)->name('verify.email');
 Route::middleware('guest')->group(function () {
-    Route::get('login', Login::class)->name('access.login');
+    Route::get('login', Login::class)
+        ->middleware('guest')
+        ->name('access.login');
     Route::get('register', Register::class)->name('access.register');
     Route::get('forgot-password', ForgotPassword::class)->name('pass.request');
     Route::get('reset-password/{token}', ResetPassword::class)->name('pass.reset');

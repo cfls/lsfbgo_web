@@ -1,13 +1,12 @@
-<div class="space-y-4 min-h-screen">
+<div class="space-y-4">
+
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
-        <div class="px-4">
-            <div class="p-2 inline-block">
-                <a wire:navigate href="{{ route('syllabus.themes', ['ue' => $this->ue, 'theme' => $this->theme]) }}" class="text-white mb-4 inline-flex items-center gap-2">
+        <div class="px-3 py-2">
+            <div class="flex items-center gap-2">
+                <a wire:navigate href="{{ route('syllabus.themes', ['ue' => $this->ue, 'theme' => $this->theme]) }}" class="text-white inline-flex items-center gap-2">
                     <flux:icon.arrow-left-circle class="size-5"/>
-                    @include('partials.quiz.svg.logo', ['class' => 'w-12 h-12'])
+                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
                 </a>
-                <flux:subheading class="text-white text-xl pb-4">
-                </flux:subheading>
             </div>
         </div>
     </div>
@@ -103,15 +102,36 @@
                 ></p>
 
                 <!-- Reproductor de video con transición -->
-                <div class="relative">
+                <div class="relative w-full max-w-5xl mx-auto aspect-video"
+                     x-data="{ videoLoaded: false }"
+                     x-init="$watch('current', () => { videoLoaded = false })">
+
+                    {{-- Skeleton mientras carga --}}
+                    <div x-show="!videoLoaded"
+                         class="absolute inset-0 bg-gray-900 rounded-lg flex items-center justify-center z-10">
+                        <div class="flex flex-col items-center gap-3">
+                            <svg class="w-10 h-10 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span class="text-white text-sm">Chargement...</span>
+                        </div>
+                    </div>
+
                     <video
                             x-ref="player"
-                            class="w-full max-w-5xl h-auto mx-auto rounded-lg shadow-lg transition-all duration-500"
-                            :class="isTransitioning ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100 blur-0'"
+                            class="w-full h-full rounded-lg shadow-lg transition-all duration-500"
+                            :class="{
+                                    'opacity-0': !videoLoaded,
+                                    'opacity-100': videoLoaded,
+                                    'scale-95 blur-sm': isTransitioning,
+                                    'scale-100 blur-0': !isTransitioning
+                                }"
                             :src="currentVideo?.url"
                             autoplay
                             muted
                             playsinline
+                            @loadeddata="videoLoaded = true"
                     >
                         Votre navigateur ne supporte pas la vidéo.
                     </video>

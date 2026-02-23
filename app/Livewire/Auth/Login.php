@@ -27,12 +27,8 @@ class Login extends Component
 
     public function mount(): void
     {
-          Edge::clear();
 
-        // Si ya hay sesión activa, redirigir
-        if (session()->has('data')) {
-            $this->redirect(route('access.dashboard'), navigate: true);
-        }
+        Edge::clear();
     }
 
     public function render()

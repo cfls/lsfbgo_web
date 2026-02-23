@@ -7,7 +7,7 @@ use Livewire\Component;
 
 class NativeEdge extends Component
 {
-    public string $title = 'Tableux de bord';
+    public string $title = 'Tableu de bord';
 
 
     public function render()

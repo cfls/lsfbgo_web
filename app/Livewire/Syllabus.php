@@ -30,6 +30,7 @@ class Syllabus extends Component
     public $selectedSyllabuForPayment = null;
     public $selectedLink = null;
     public ?string $ue = null;
+    public $userExcept;
 
 
 
@@ -54,6 +55,8 @@ class Syllabus extends Component
         $api = app(ApiService::class);
         $dataUser = SecureStorage::get('data');
         $user = json_decode($dataUser, true)['user'];
+
+        $this->userExcept = $user['id'];
 
         // Obtener códigos verificados del usuario
         $verifyUser = $api->verifycodeStatus($user['id']);
@@ -82,6 +85,7 @@ class Syllabus extends Component
 
     public function loadTheme($ue)
     {
+
 
         $data = SecureStorage::get('data');
         $token = json_decode($data, true)['token'];

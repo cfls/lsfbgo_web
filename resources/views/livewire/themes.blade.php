@@ -1,14 +1,12 @@
-<div class="space-y-4 min-h-screen">
+<div class="space-y-4">
 
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-4">
             <div class="p-2 inline-block">
-                <a wire:navigate href="{{ route('syllabus') }}" class="text-white mb-4 inline-flex items-center gap-2">
+                <a wire:navigate href="{{ route('syllabus') }}" class="text-white inline-flex items-center gap-2">
                     <flux:icon.arrow-left-circle class="size-5"/>
-                    @include('partials.quiz.svg.logo', ['class' => 'w-12 h-12'])
+                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
                 </a>
-                <flux:subheading class="text-white text-xl pb-4">
-                </flux:subheading>
             </div>
         </div>
     </div>

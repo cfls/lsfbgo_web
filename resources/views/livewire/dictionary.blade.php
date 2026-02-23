@@ -16,7 +16,7 @@
     <div class="flex flex-col items-center justify-center py-6">
 
         {{-- 🔍 RECHERCHE --}}
-        <div class="mb-6 w-xl max-w-md">
+        <div class="mb-6 max-w-md">
             <flux:field>
                 <flux:label>Rechercher un mot</flux:label>
                 <flux:input
