@@ -45,7 +45,7 @@
 {{--                    <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg {{ $isStatus === 0 ? 'hidden' : '' }}">--}}
                     <flux:card class="bg-gradient-to-br hover:shadow-lg snap-center snap-always transition-shadow cursor-pointer size-40 rounded-lg">
                         @if($this->optionGame == 0)
-                            @if ($isActive || $this->userExcept == 16 || $this->userExcept == 23)
+                            @if ($isActive || $this->userExcept == 16 || $this->userExcept == 23 || $this->userExcept == 48)
                                 <a wire:navigate href="{{ $route }}" class="flex flex-col items-center justify-center cursor-pointer h-full">
                                     <div class="flex flex-col items-center justify-center text-center gap-1.5 p-2">
                                         <div class="size-32  flex items-center justify-center">

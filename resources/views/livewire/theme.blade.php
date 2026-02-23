@@ -14,85 +14,88 @@
     <div class="container mx-auto px-4 py-6">
         @if(count($videos) > 0)
             <div x-data="{
-                videos: @js($videos),
-                current: {{ $currentIndex }},
-                isPaused: true,
-                isSlow: false,
-                repeatCount: 0,
-                isTransitioning: false,
-                get currentVideo() {
-                    return this.videos[this.current] || null;
-                },
-                prev() {
-                    if (this.current > 0) {
-                        this.isTransitioning = true;
-                        this.current--;
-                        setTimeout(() => {
-                            this.resetVideo();
-                            this.isTransitioning = false;
-                        }, 300);
-                    }
-                },
-                next() {
-                    if (this.current < this.videos.length - 1) {
-                        this.isTransitioning = true;
-                        this.current++;
-                        setTimeout(() => {
-                            this.resetVideo();
-                            this.isTransitioning = false;
-                        }, 300);
-                    }
-                },
-                togglePlay() {
-                    const video = this.$refs.player;
-                    if (video.paused) {
-                        video.play();
-                        this.isPaused = false;
-                    } else {
-                        video.pause();
-                        this.isPaused = true;
-                    }
-                },
-                toggleSpeed() {
-                    const video = this.$refs.player;
-                    if (this.isSlow) {
-                        video.playbackRate = 1;
-                        this.isSlow = false;
-                    } else {
-                        video.playbackRate = 0.5;
-                        this.isSlow = true;
-                    }
-                },
-                resetVideo() {
-                    const video = this.$refs.player;
-                    if (!video) return;
-
-                    video.pause();
-                    video.currentTime = 0;
-                    this.isPaused = true;
-                    this.isSlow = false;
-                    this.repeatCount = 0;
-                    video.playbackRate = 1;
-
-                    video.play().then(() => {
-                        this.isPaused = false;
-                    }).catch(err => {
-                        console.log('Autoplay prevented:', err);
-                    });
-
-                    video.onended = () => {
-                        if (this.repeatCount < 1) {
-                            this.repeatCount++;
-                            video.currentTime = 0;
+                    videos: @js($videos),
+                    current: {{ $currentIndex }},
+                    isPaused: true,
+                    isSlow: false,
+                    repeatCount: 0,
+                    isTransitioning: false,
+                    videoLoaded: false,          {{-- ← moved here --}}
+                    get currentVideo() {
+                        return this.videos[this.current] || null;
+                    },
+                    prev() {
+                        if (this.current > 0) {
+                            this.isTransitioning = true;
+                            this.videoLoaded = false;  {{-- ← reset here too --}}
+                            this.current--;
+                            setTimeout(() => {
+                                this.resetVideo();
+                                this.isTransitioning = false;
+                            }, 300);
+                        }
+                    },
+                    next() {
+                        if (this.current < this.videos.length - 1) {
+                            this.isTransitioning = true;
+                            this.videoLoaded = false;  {{-- ← reset here too --}}
+                            this.current++;
+                            setTimeout(() => {
+                                this.resetVideo();
+                                this.isTransitioning = false;
+                            }, 300);
+                        }
+                    },
+                    togglePlay() {
+                        const video = this.$refs.player;
+                        if (!video) return;
+                        if (video.paused) {
                             video.play();
+                            this.isPaused = false;
                         } else {
+                            video.pause();
                             this.isPaused = true;
                         }
-                    };
-                }
-            }"
-                    x-init="$nextTick(() => { if (currentVideo) resetVideo(); })"
-                    class="space-y-5 mt-5 text-center"
+                    },
+                    toggleSpeed() {
+                        const video = this.$refs.player;
+                        if (!video) return;
+                        if (this.isSlow) {
+                            video.playbackRate = 1;
+                            this.isSlow = false;
+                        } else {
+                            video.playbackRate = 0.5;
+                            this.isSlow = true;
+                        }
+                    },
+                    resetVideo() {
+                        const video = this.$refs.player;
+                        if (!video) return;
+                        video.pause();
+                        video.currentTime = 0;
+                        this.isPaused = true;
+                        this.isSlow = false;
+                        this.repeatCount = 0;
+                        this.videoLoaded = false;  {{-- ← reset here --}}
+                        video.playbackRate = 1;
+                        video.play().then(() => {
+                            this.isPaused = false;
+                        }).catch(err => {
+                            console.log('Autoplay prevented:', err);
+                        });
+                        video.onended = () => {
+                            if (this.repeatCount < 1) {
+                                this.repeatCount++;
+                                video.currentTime = 0;
+                                video.play();
+                            } else {
+                                this.isPaused = true;
+                            }
+                        };
+                    }
+                }"
+                 x-init="$nextTick(() => { if (currentVideo) resetVideo(); })"
+                 class="space-y-5 mt-5 text-center"
             >
                 <!-- Título del video con transición -->
                 <p
@@ -102,11 +105,9 @@
                 ></p>
 
                 <!-- Reproductor de video con transición -->
-                <div class="relative w-full max-w-5xl mx-auto aspect-video"
-                     x-data="{ videoLoaded: false }"
-                     x-init="$watch('current', () => { videoLoaded = false })">
+                <div class="relative w-full max-w-5xl mx-auto aspect-video">
 
-                    {{-- Skeleton mientras carga --}}
+                    {{-- Skeleton --}}
                     <div x-show="!videoLoaded"
                          class="absolute inset-0 bg-gray-900 rounded-lg flex items-center justify-center z-10">
                         <div class="flex flex-col items-center gap-3">
@@ -122,11 +123,11 @@
                             x-ref="player"
                             class="w-full h-full rounded-lg shadow-lg transition-all duration-500"
                             :class="{
-                                    'opacity-0': !videoLoaded,
-                                    'opacity-100': videoLoaded,
-                                    'scale-95 blur-sm': isTransitioning,
-                                    'scale-100 blur-0': !isTransitioning
-                                }"
+                'opacity-0': !videoLoaded,
+                'opacity-100': videoLoaded,
+                'scale-95 blur-sm': isTransitioning,
+                'scale-100 blur-0': !isTransitioning
+            }"
                             :src="currentVideo?.url"
                             autoplay
                             muted
@@ -193,6 +194,7 @@
                     <!-- Play / Pause -->
                     <button
                             @click="togglePlay"
+                            :disabled="isTransitioning"
                             class="group relative overflow-hidden px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
                             :class="isPaused
                         ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
@@ -209,6 +211,7 @@
                     <!-- Velocidad -->
                     <button
                             @click="toggleSpeed"
+                            :disabled="isTransitioning"
                             class="group relative overflow-hidden px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
                             :class="isSlow
                         ? 'bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-white'
