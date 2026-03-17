@@ -6,7 +6,7 @@ use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Native\Mobile\Facades\Dialog;
+
 use Native\Mobile\Facades\SecureStorage;
 
 
@@ -19,8 +19,8 @@ class Spelling extends Component
     public ?bool $isCorrect = null;
 
     public int $score = 0;          // aciertos de la ronda actual
-    public int $roundTotal = 5;
-    public int $total = 5; // alias
+    public int $roundTotal = 10;
+    public int $total = 10; // alias
     public bool $finished = false;  // fin de ronda
 
     protected array $bag = [];      // bolsa de índices para evitar repeticiones inmediatas
@@ -67,29 +67,22 @@ class Spelling extends Component
     }
 
 
-    public function checkAnswer(): void
-    {
+        public function checkAnswer(): void
+        {
+            if (!$this->currentWord) return;
 
+            $expected = $this->normalize($this->currentWord);
+            $given    = $this->normalize($this->answer);
 
+            $this->isCorrect = ($expected === $given);
 
-
-        if (!$this->currentWord) return;
-
-        $expected = $this->normalize($this->currentWord);
-        $given    = $this->normalize($this->answer);
-
-        $this->isCorrect = ($expected === $given);
-
-        if ($this->isCorrect) {
-            $this->score++;
-            Dialog::alert('Réponse Correcte !', 'Bien joué !');
-            // on ajoute le point du round
-            // NOTE: l'avancement est géré par Alpine avec $wire.next() ou tu peux décommenter:
-            // $this->next();
-        } else {
-            Dialog::alert('Réponse Incorrecte', "L'orthographe correcte est : {$this->currentWord}");
+            if ($this->isCorrect) {
+                $this->score++;
+                // Dialog::alert('Réponse Correcte !', 'Bien joué !');  ← eliminar
+            } else {
+                // Dialog::alert('Réponse Incorrecte', "L'orthographe correcte est : {$this->currentWord}"); ← eliminar
+            }
         }
-    }
 
     public function next(): void
     {
@@ -167,13 +160,19 @@ class Spelling extends Component
         // Generar letras del string normalizado
         $this->letters = preg_split('//u', (string)$normalized, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     }
+ 
     private function normalize(string $text): string
-    {
-        $text = Str::of($text)->lower()->trim()->squish();
-        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string)$text);
-        $text = preg_replace('/[^a-z0-9 ]/i', '', $text);
-        return trim((string)$text);
-    }
+        {
+            $text = mb_strtolower(trim($text));
+
+            $text = str_replace(
+                ['é','è','ê','ë','à','â','ä','î','ï','ô','ö','ù','û','ü','ç','æ','œ','É','È','Ê','Ë','À','Â','Î','Ï','Ô','Ù','Û','Ü','Ç'],
+                ['e','e','e','e','a','a','a','i','i','o','o','u','u','u','c','ae','oe','e','e','e','e','a','a','i','i','o','u','u','u','c'],
+                $text
+            );
+
+            return preg_replace('/[^a-z0-9]/', '', $text);
+        }
 
     public function render()
     {

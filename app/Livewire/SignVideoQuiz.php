@@ -51,31 +51,28 @@ class SignVideoQuiz extends Component
         }
     }
 
-    protected function loadQuestions()
-    {
+   protected function loadQuestions()
+{
+    try {
+        $response = Http::withOptions([
+            'verify' => env('API_VERIFY_SSL', true),
+        ])
+            ->withToken(SecureStorage::get('data'))
+            ->acceptJson()
+            ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme);
 
-        try {
-            $response = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken(SecureStorage::get('data'))
-                ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme);
+    if ($response->successful()) {
+            $data = $response->json('data', []);
 
-            if ($response->successful()) {
-                $data = $response->json('data', []);
+            shuffle($data); // Mezcla las 15 aleatoriamente
 
-                // Mezclar TODOS los tipos
-                shuffle($data);
-
-               $this->questions = $data;
-
-            }
-        } catch (\Throwable $e) {
-            logger()->error('Error cargando preguntas: ' . $e->getMessage());
-            $this->questions = [];
+            $this->questions = array_slice($data, 0, 10); // Muestra solo 10 cada vez
         }
+    } catch (\Throwable $e) {
+        logger()->error('Error cargando preguntas: ' . $e->getMessage());
+        $this->questions = [];
     }
+}
 
     public function onMatchAnswered($correct)
     {

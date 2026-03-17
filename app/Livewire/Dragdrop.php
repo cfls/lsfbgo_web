@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Native\Mobile\Facades\SecureStorage;
 
@@ -21,6 +22,7 @@ class Dragdrop extends Component
     public int $completedGames = 0;
     public int $totalScore = 0;
     public bool $isComplete = false;
+    public array $usedWordIndexes = []; //
 
     public function mount()
     {
@@ -44,9 +46,13 @@ class Dragdrop extends Component
         // 🔍 Agrega este log para ver qué datos llegan
         //  \Log::info('📦 Datos de API:', ['words' => $wordsData]);
 
-        $this->words = collect($wordsData)
+            $this->words = collect($wordsData)
             ->map(fn($w) => $w['attributes'] ?? $w)
-           // ->filter(fn($word) => strlen($word['name'] ?? '') <= 6)
+            ->filter(function ($word) {
+                $name = $word['name'] ?? '';
+                // Excluir palabras con espacios, guiones o caracteres especiales
+                return preg_match('/^[a-zA-ZÀ-ÿ]+$/u', $name);
+            })
             ->take(5)
             ->values()
             ->toArray();
@@ -79,37 +85,47 @@ class Dragdrop extends Component
         $this->loadRandomWord();
     }
 
-    public function loadRandomWord()
-    {
-        $this->completed = false;
+        public function loadRandomWord()
+        {
+            $this->completed = false;
 
-        //  \Log::info("🔄 loadRandomWord() - Reseteando completed a false");
+            if (empty($this->words)) {
+                logger('❌ No words available in API');
+                return;
+            }
 
-        if (empty($this->words)) {
-            logger('❌ No words available in API');
-            return;
+            // Índices disponibles (excluir los ya usados)
+            $availableIndexes = array_diff(
+                array_keys($this->words),
+                $this->usedWordIndexes
+            );
+
+            // Si ya se usaron todas, resetear
+            if (empty($availableIndexes)) {
+                $this->usedWordIndexes = [];
+                $availableIndexes = array_keys($this->words);
+            }
+
+            $index = $availableIndexes[array_rand($availableIndexes)];
+            $this->usedWordIndexes[] = $index;
+
+            $this->currentWord = $this->words[$index]['attributes'] ?? $this->words[$index];
+
+            $wordName = $this->currentWord['name'] ?? '';
+            if ($wordName === '') {
+                $this->wordSlots = [];
+                return;
+            }
+
+            $normalized = $this->normalize($wordName);
+            $this->wordSlots = array_fill(0, strlen($normalized), null);
+
+            foreach ($this->letters as &$l) {
+                $l['used'] = false;
+            }
+
+            $this->dispatch('$refresh');
         }
-
-        $random = $this->words[array_rand($this->words)];
-        $this->currentWord = $random['attributes'] ?? $random;
-
-        //  \Log::info("📝 Nueva palabra cargada: " . ($this->currentWord['name'] ?? 'N/A'));
-
-        $wordName = $this->currentWord['name'] ?? '';
-        if ($wordName === '') {
-            $this->wordSlots = [];
-            return;
-        }
-
-        $normalized = $this->normalize($wordName);
-        $this->wordSlots = array_fill(0, strlen($normalized), null);
-
-        foreach ($this->letters as &$l) {
-            $l['used'] = false;
-        }
-
-        $this->dispatch('$refresh');
-    }
 
     public function dropLetter($slotIndex, $symbol)
     {
@@ -209,17 +225,23 @@ class Dragdrop extends Component
         $this->refreshKey++;
     }
 
-    private function normalize(string $text): string
-    {
-        $text = strtolower(trim($text));
-        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
-        return preg_replace('/[^a-z0-9]/', '', $text);
-    }
+        private function normalize(string $text): string
+        {
+            $text = mb_strtolower(trim($text));
+
+             $text = str_replace(
+                ['é','è','ê','ë','à','â','ä','î','ï','ô','ö','ù','û','ü','ç','æ','œ','É','È','Ê','Ë','À','Â','Î','Ï','Ô','Ù','Û','Ü','Ç'],
+                ['e','e','e','e','a','a','a','i','i','o','o','u','u','u','c','ae','oe','e','e','e','e','a','a','i','i','o','u','u','u','c'],
+                $text
+            );
+
+            return preg_replace('/[^a-z0-9]/', '', $text);
+        }
 
     public function render()
     {
         return view('livewire.dragdrop')->layout('components.layouts.app.home', [
-            'title' => 'Jeu de lettres - Drag and Drop',
+            'title' => 'Jeu de lettres',
         ]);
     }
 }

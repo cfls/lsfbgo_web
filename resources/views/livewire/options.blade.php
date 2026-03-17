@@ -15,17 +15,17 @@
             <div class="flex items-center gap-2">
                 <a wire:navigate href="{{ route('games',['ue' => $this->ue]) }}" class="text-white inline-flex items-center gap-2">
                     <flux:icon.arrow-left-circle class="size-5"/>
-                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
+                    @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 </a>
-                <flux:subheading class="text-white text-base">
+                <flux:subheading size="xl" class="text-white">
                     @php
                         switch($this->type):
-                            case 'text':         $title = 'Traduire la LSFB'; break;
-                            case 'video-choice': $title = 'Choix vidéo';      break;
-                            case 'choice':       $title = 'Choix';            break;
-                            case 'yes-no':       $title = 'Oui / Non';        break;
+                            case 'text':         $title = 'Traduis en français'; break;
+                            case 'video-choice': $title = 'Choisis la bonne vidéo';      break;
+                            case 'choice':       $title = 'Choisir le bon mot';            break;
+                            case 'yes-no':       $title = 'Vrai / Faux';        break;
                             case 'match':        $title = 'Associer les paires'; break;
-                            default:             $title = ucfirst($this->type); break;
+                            default:             $title = 'Question surprise'; break;
                         endswitch;
                     @endphp
 

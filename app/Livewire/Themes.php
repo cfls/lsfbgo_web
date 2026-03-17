@@ -13,12 +13,18 @@ class Themes extends Component
     public $results = [];
     public string $theme;
     public string $ue;
+    public string $color;
 
     public function mount(ApiService $api, string $ue, string $theme){
 
             $this->theme = $theme;
             $response = $api->ThemeSyllabus($ue, $theme);
+            $responseColor = $api->ThemeColor($ue);
+            
             $this->results = $response->json('data', []);
+            $this->color = $responseColor->json('data.attributes.hex_color', '#000000');
+
+           
 
 
     }

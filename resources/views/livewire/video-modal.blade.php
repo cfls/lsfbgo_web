@@ -58,26 +58,27 @@
             </div>
 
             {{-- Video --}}
-            <video
-                    x-ref="myVideo"
-                    x-bind:src="videoUrl"
-                    x-bind:poster="posterUrl"
-                    class="w-full rounded-lg transition-opacity duration-300"
-                    :class="{ 'opacity-0': !videoLoaded }"
-                    autoplay
-                    muted
-                    playsinline
-                    preload="metadata"
-                    @loadeddata="videoLoaded = true"
+          <video
+                x-ref="myVideo"
+                x-bind:src="videoUrl"
+                x-bind:poster="posterUrl"
+                class="w-full rounded-lg transition-opacity duration-300"
+                :class="{ 'opacity-0': !videoLoaded }"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                @loadeddata="videoLoaded = true"
             ></video>
         </div>
 
-        <button
+        {{-- <button
                 class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                 @click="$refs.myVideo.currentTime = 0; $refs.myVideo.play();"
         >
             Revoir
-        </button>
+        </button> --}}
 
     </div>
 </flux:modal>

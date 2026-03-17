@@ -4,8 +4,8 @@
         <div class="px-4">
             <div class="p-2 inline-block">
                 <a wire:navigate href="{{ route('syllabus') }}" class="text-white inline-flex items-center gap-2">
-                    <flux:icon.arrow-left-circle class="size-5"/>
-                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
+                    <flux:icon.arrow-left-circle class="size-10"/>
+                    @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 </a>
             </div>
         </div>
@@ -41,7 +41,8 @@
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 scale-95"
                             x-transition:enter-end="opacity-100 scale-100"
-                            class="bg-orange-400 px-4 py-5 rounded-lg font-bold hover:bg-orange-700 transition"
+                            class="px-4 py-5 rounded-lg font-bold hover:bg-orange-700 transition"
+                            style="background-color: {{ $this->color }};"
                     >
                         <a href="{{ route('syllabus.theme', [
                             $this->results['attributes']['slug_syllabu'],

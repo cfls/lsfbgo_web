@@ -1,4 +1,5 @@
-<div class="p-4">
+<div class="min-h-screen flex items-center justify-center dark:bg-gray-100">
+    <div class="p-4 m-8 mt-12 rounded-xl shadow-lg">
      <!-- Header with Logo -->
      <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br dark:from-blue-600 dark:to-blue-800 rounded-2xl shadow-lg mb-4">
@@ -84,4 +85,5 @@
                </div>
           </div>
      @endif
+</div>
 </div>

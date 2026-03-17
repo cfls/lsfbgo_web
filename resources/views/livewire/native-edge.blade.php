@@ -2,8 +2,8 @@
 
 
     <native:top-bar
-            title="{{\Native\Mobile\Facades\System::isAndroid() ? $title : 'Native Edge'  }}"
-            show-navigation-icon="{{\Native\Mobile\Facades\System::isAndroid()}}">
+            title="{{\Native\Mobile\Facades\System::isAndroid() ? $title : ''  }}"
+            show-navigation-icon="true">
 
         <native:top-bar-action
                 id="home"
@@ -56,12 +56,11 @@
                 id="jeux"
                 label="Jeux"
                 url="{{ route('games') }}"
-                icon="computer-desktop"
+                icon="more"
                 :active="request()->routeIs('games')"
 
         />
         <native:bottom-nav-item
-                :active="request()->routeIs('profile')"
                 id="profile"
                 label="Profil"
                 url="{{ route('profile.edit') }}"
@@ -69,5 +68,16 @@
                 />
 
     </native:bottom-nav>
-    @endif
+    @else
+       <native:bottom-nav>
+           <native:bottom-nav-item
+                   id="home"
+                   label="Accueil"
+                   url="{{ route('access.dashboard') }}"
+                   icon="home"
+           />
+       </native:bottom-nav>
+     @endif      
+
+
 </div>

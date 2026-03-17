@@ -12,7 +12,7 @@
         <div class="p-5">
             {{-- ✅ Progreso mejorado con botón de feedback --}}
 
-            <livewire:back />
+            
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <div class="flex items-center gap-3">

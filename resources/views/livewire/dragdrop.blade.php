@@ -15,8 +15,8 @@
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-3 py-2">
             <div class="flex items-center gap-2">
-                @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
-                <flux:subheading class="text-white text-base">
+                @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
+                <flux:subheading size="xl" class="text-white text-base">
                     {{$title}}
                 </flux:subheading>
             </div>
@@ -142,6 +142,16 @@
             </template>
         </div>
 
+        {{-- 🔤 Réponse --}}
+            {{-- @if ($currentWord)
+                <div class="text-center mb-2">
+                    <p class="text-xs text-gray-400 uppercase tracking-widest mb-0.5">Réponse</p>
+                    <p class="text-lg font-bold text-gray-700 tracking-wide">
+                        {{ $currentWord['name'] ?? '' }}
+                    </p>
+                </div>
+            @endif --}}
+
         {{-- 🧩 Slots --}}
         <div class="flex flex-wrap justify-center gap-1.5 mb-3">
             @foreach ($wordSlots as $i => $slot)
@@ -203,15 +213,24 @@
             </div>
         @endif
 
-        {{-- 🎉 Mensaje final --}}
+    
+       {{-- 🎉 Modal final --}}
         <div x-show="showFinal"
-             x-transition:enter="transition ease-out duration-500"
-             x-transition:enter-start="opacity-0 transform scale-90"
-             x-transition:enter-end="opacity-100 transform scale-100"
-             class="bg-gradient-to-br from-green-400 to-blue-500 rounded-xl p-4 text-center text-white mt-3">
-            <h1 class="text-xl font-bold mb-2">🎉 Félicitations !</h1>
-            <img src="{{ asset('img/lsfgo/good.png') }}" alt="Applaudissements" class="mx-auto w-20 mb-2" />
-            <p class="font-semibold text-sm">Vous avez complété tous les mots!</p>
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6"
+            style="display: none;">
+            <div x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-90"
+                x-transition:enter-end="opacity-100 scale-100"
+                class="bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl p-8 text-center text-white shadow-2xl w-full max-w-sm">
+                <div class="text-5xl mb-3">🎉</div>
+                <h1 class="text-2xl font-bold mb-3">Félicitations !</h1>
+                <img src="{{ asset('img/lsfgo/good.png') }}" alt="Applaudissements" class="mx-auto w-24 mb-3" />
+                <p class="font-semibold text-sm opacity-90">Vous avez complété tous les mots!</p>
+                <p class="text-xs opacity-75 mt-2">Redirection en cours...</p>
+            </div>
         </div>
     </div>
 </div>

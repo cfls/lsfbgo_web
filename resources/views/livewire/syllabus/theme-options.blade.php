@@ -14,12 +14,10 @@
     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-3 py-2">
             <div class="flex items-center gap-2">
-                <a wire:navigate href="{{ route('games') }}" class="text-white inline-flex items-center gap-2">
-                    <flux:icon.arrow-left-circle class="size-5"/>
-                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
-                </a>
-                <flux:subheading class="text-white text-base">
-                    {{$title}} - Sélectionner une option
+                    @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])                
+                <flux:subheading size="xl" class="text-white text-base">
+                    {{$title}} 
+                    
                 </flux:subheading>
             </div>
         </div>
@@ -36,7 +34,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => $attributes['type']]) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    {{ ucfirst($attributes['name']) }}
+                   🎲 Question surprise
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
@@ -60,7 +58,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => 'text']) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    Traduire la LSFB
+                    🎥✍️ Traduis en français
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
@@ -83,7 +81,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => 'video-choice']) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    Choix vidéo
+                    🎥👆 Choisis la bonne vidéo
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
@@ -106,7 +104,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => 'yes-no']) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    Oui / Non
+                    ✅❌ Vrai / Faux
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
@@ -129,7 +127,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => 'choice']) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    Choix
+                    🎥📝 Choisir le bon mot
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
@@ -152,7 +150,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => 'match']) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    Associer les paires
+                   🔗 Associer les paires
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
@@ -175,7 +173,7 @@
                href="{{ route('questions', ['ue' => $ue, 'type' => 'tous']) }}"
                class="flex items-center justify-between w-full max-w-sm p-5  rounded-lg" style="background-color: {{$bgClass}}">
                 <flux:label class="text-lg font-semibold text-white">
-                    Révision complète du Syllabus {{strtoupper($ue) }}
+                  🧠🔁  Révision complète
                 </flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->

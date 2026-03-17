@@ -165,6 +165,11 @@ class ApiService
         return $this->get('/v1/syllabus', [ 'token' => $token ]);
     }
 
+     public function ThemeColor($ue)
+    {
+
+        return $this->get('/v1/syllabus/settings/'. $ue);
+    }
 
     public function ThemeSyllabus($ue, $theme)
     {

@@ -226,8 +226,6 @@ class Dictionary extends Component
     {
         $featuredDemos = [];
         return view('livewire.dictionary', compact('featuredDemos'))
-            ->layout('components.layouts.app.home', [
-                'title' => 'Dictionnaire LSFB',
-            ]);
+            ->layout('components.layouts.app.home');
     }
 }
