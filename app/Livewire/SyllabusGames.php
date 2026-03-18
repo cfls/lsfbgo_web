@@ -5,11 +5,7 @@ namespace App\Livewire;
 use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
-use Native\Mobile\Attributes\OnNative;
-use Native\Mobile\Events\Alert\ButtonPressed;
-use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\Browser as BrowserFacade;
-use Native\Mobile\Facades\Dialog;
 use Native\Mobile\Facades\SecureStorage;
 
 class SyllabusGames extends Component
@@ -29,122 +25,76 @@ class SyllabusGames extends Component
     public ?string $ue = null;
     public $sections = [];
     public $syllabusData; // Datos del syllabus desde API
+    public $color = '#000000'; // Color por defecto
+    public $selectedSyllabus = null;
 
 
+public function mount(?string $ue = null): void
+{
+    $this->ue = $ue; // ← faltaba esta línea
 
-    public function mount(?string $ue = null)
-    {
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
+    $storedData = SecureStorage::get('data');
+    $data = json_decode($storedData, true);
 
-
-        if ($this->ue) {
-            // Lógica cuando hay un UE específico
-            // Cargar datos del syllabus desde la API
-            $syllabusResponse = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-                'timeout' => 60, // Increase to 60 seconds
-                'connect_timeout' => 10, // Connection timeout
-            ])
-                ->withToken($data['token'])
-                ->acceptJson()
-                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->ue);
-
-
-
-            $this->syllabusData = $syllabusResponse->json('data', []);
-
-
-            $this->loadTheme($this->ue);
-
-        } else {
-            // Lógica para listado general
-            $this->loadAllThemes();
-
-
-        }
-    }
-
-    public function loadAllThemes()
-    {
-        $api = app(ApiService::class);
-
-
-
-        // Si allThemes() requiere autenticación, pasa el token
-        $responseUser = $api->allThemes();
-        $verifyUser = $responseUser->json('data', []);
-        $this->verifyUser = collect($verifyUser);
-
-        // Asegúrate de que el token sea consistente
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
-
-        // Usa el mismo token
-        $response = $api->MemberSyllabus($data['token']);
-
-        $this->results = $response->json('data', []);
-    }
-
-
-    public function loadTheme($ue)
-    {
-
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
-
-        $response = Http::withOptions([
+    if ($this->ue) {
+        $syllabusResponse = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
+            'timeout' => 60,
+            'connect_timeout' => 10,
         ])
             ->withToken($data['token'])
             ->acceptJson()
-            ->get(config('services.api.url') . '/v1/sections/' . $ue);
-        // save in public property
+            ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->ue);
 
-        $this->results = $response->json('data', []);
+         
 
-
+        $this->syllabusData = $syllabusResponse->json('data', []);
     }
 
 
-    // abrir modal
-//    public function openPaymentModal($link)
-//    {
-//
-//        $this->selectedLink = $link;
-//
-//        Dialog::alert(
-//            'Accès Syllabus',
-//            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
-//            [
-//                'Oui, ouvrir la boutique',
-//                'Non, plus tard'
-//            ]
-//        )->id('alert-demo');;
-//
-//
-//    }
-//
-//    #[OnNative(ButtonPressed::class)]
-//    public function handleAlert(int $index, string $id): void
-//    {
-//        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
-//            Browser::open($this->selectedLink);
-//        }
-//    }
 
-    public function openInApp()
-    {
-        BrowserFacade::inApp('https://www.facebook.com/share/v/1BepzAgdKA');
-    }
+    $this->allThemes();
+    $this->loadTheme('ue1-themes');
+}
+
+public function allThemes()
+{
+    $api = app(ApiService::class);
+    $response = $api->allThemes();
+  
+  
+    $this->themes = $response->json('data', []);
+
+}
+
+public function loadTheme($ue): void
+{
+   
+       $api = app(ApiService::class);
+    $storedData = SecureStorage::get('data');
+    $data = json_decode($storedData, true);
+
+    $this->ue = $ue;
+
+    $response = Http::withOptions(['verify' => env('API_VERIFY_SSL', true)])
+        ->withToken($data['token'])
+        ->acceptJson()
+        ->get(config('services.api.url') . '/v1/sections/' . $this->ue);
 
 
-// cerrar modal
-    public function closePaymentModal()
-    {
-        $this->showPaymentModal = false;
-        $this->selectedSyllabuForPayment = null;
-    }
+    $this->results = $response->json('data', []);
+
+    $syllabusData = $api->ThemeColor($this->ue);
+    $this->color = $syllabusData->json('data.attributes.hex_color', '#000000');
+}
+
+
+public function updatedSelectedSyllabus($value): void
+{
+    
+    
+    $this->loadTheme($value);
+}
 
 
     public function render()
