@@ -93,8 +93,10 @@ class SignTypeQuiz extends Component
         if ($correct) {
             $this->score += 10;
             $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
+            $this->js('setTimeout(() => $wire.nextStep(), 1500)');
         } else {
             $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
+            $this->js('setTimeout(() => $wire.nextStep(), 3000)');
         }
     }
 
@@ -155,10 +157,13 @@ class SignTypeQuiz extends Component
                 $this->isCorrect = true;
                 $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
                 $this->score += 10;
+                $this->js('setTimeout(() => $wire.nextStep(), 1500)');
             } else {
                 $this->isCorrect = false;
-                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
+                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-32 h-32 object-contain p-5 dark:bg-gray-200 rounded-full" />';
                 $this->message = $correctAnswer;
+                $this->js('setTimeout(() => $wire.nextStep(), 3000)');
+
             }
         }
     }
@@ -192,15 +197,20 @@ class SignTypeQuiz extends Component
             }
         }
 
+       
+
         if ($isValid) {
             $this->isCorrect = true;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-32 h-32 object-contain p-5 dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
+            $this->js('setTimeout(() => $wire.nextStep(), 1500)');
         } else {
             $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-20 p-5 object-cover dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-32 h-32 object-contain p-5 dark:bg-gray-200 rounded-full" />';
             $this->message = implode(' / ', $validAnswers);
-        }
+            $this->js('setTimeout(() => $wire.nextStep(), 3000)');
+
+            }
     }
 
     public function nextStep()

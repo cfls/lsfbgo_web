@@ -1,5 +1,7 @@
-<div class="space-y-4 min-h-screen">
-    <div class="rounded-xl w-full mx-auto" x-data="quizData()">
+<div 
+     x-data="quizData()"    
+     class="space-y-4 min-h-screen">
+    <div class="rounded-xl w-full mx-auto">
 
         {{-- Modals --}}
         @include('partials.quiz.modals.success')
@@ -67,7 +69,7 @@
                         @include('partials.quiz.question-types.' . $currentQuestion['type'])
 
                         {{-- Action Buttons --}}
-                        @include('partials.quiz.action-buttons')
+                        {{-- @include('partials.quiz.action-buttons') --}}
 
                         {{-- Feedback Message --}}
                         @include('partials.quiz.feedback')
@@ -92,7 +94,7 @@
             }
 
             // Log to browser console
-            console.log(`[${timestamp}] ${message}`, data || '');
+          // console.log(`[${timestamp}] ${message}`, data || '');
 
             // Dispatch event for visual console
             window.dispatchEvent(new CustomEvent('debug-log', {

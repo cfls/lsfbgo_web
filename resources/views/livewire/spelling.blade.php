@@ -179,7 +179,7 @@
                                 <img src="{{ asset('img/lsfgo/bad.png') }}" alt="Incorrect" class="w-24 h-24 object-contain">
                                 <span class="text-red-500 font-bold text-lg">Dommage !</span>
                                 <span class="text-gray-500 text-lg">
-                                    La bonne réponse est : <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $this->currentWord }}</span>
+                                    La bonne réponse est : <span class="font-semibold text-red-700 dark:text-gray-300">{{ $this->currentWord }}
                                 </span>
                             </div>
 

@@ -25,7 +25,7 @@
             <div class="flex items-center gap-2">
                 @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 <flux:subheading size="xl" class="text-white text-base">
-                    {{ $title }}
+                    {{ $title }} 
                 </flux:subheading>
             </div>
         </div>
@@ -52,18 +52,19 @@
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'tous']),     'label' => '🧠🔁 Révision complète'],
             ];
         @endphp
-@foreach($items as $item)
-    <a wire:navigate href="{{ $item['route'] }}"
-       class="flex items-center justify-between w-full px-5 py-4 rounded-xl shadow-sm active:scale-[0.98] transition cursor-pointer"
-       style="background-color: {{ $bgColor }}; color: {{ $textColor }}">
-        <span class="text-base font-semibold" style="color: {{ $textColor }}">
-            {{ $item['label'] }}
-        </span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.4 72.4" class="w-6 h-6 shrink-0">
-            <circle fill="white" cx="36.2" cy="36.2" r="36.2"/>
-            <polygon fill="#2c333e" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
-        </svg>
-    </a>
-@endforeach
+
+        @foreach($items as $item)
+            <a wire:navigate href="{{ $item['route'] }}"
+               class="flex items-center justify-between w-full px-5 py-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 active:scale-[0.98] transition cursor-pointer" style="background-color: {{$this->color}}">
+                <span class="text-base font-semibold text-white">
+                    {{ $item['label'] }}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-6 h-6 shrink-0">
+                    <circle fill="white" cx="36.2" cy="36.2" r="36.2"/>
+                    <polygon fill="#2c333e" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                </svg>
+            </a>
+        @endforeach
+
     </div>
 </div>

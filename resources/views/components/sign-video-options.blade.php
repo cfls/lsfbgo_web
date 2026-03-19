@@ -75,7 +75,7 @@
         @endforeach
     @else
         <div class="w-full text-center text-gray-500 py-8">
-            No hay opciones de video disponibles
+             Aucune option vidéo n'est disponible
         </div>
     @endif
 </div>

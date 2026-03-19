@@ -8,13 +8,17 @@
 @if($isCorrect && $image)
     <div class="flex flex-col items-center justify-center animate-fade-in mt-2">
         {!! $image !!}
+         <span class="text-emerald-600 font-bold text-lg">Bravo ! C'est la bonne réponse.</span>
     </div>
 @elseif(!$isCorrect && $image)
     <div class="flex justify-center mx-auto animate-fade-in ">
-        <div class="mt-2 font-semibold text-white text-center flex flex-col items-center">
+        <div class="mt-2 font-semibold  text-center flex flex-col items-center">
             {!! $image !!}
             @if(($currentQuestion['type'] ?? null) !== 'video-choice')
-                Réponse correcte: {{ $message }}
+             <span class="text-gray-500 text-lg">
+                     La bonne réponse est : <span class="font-semibold text-red-700 dark:text-gray-300">{{ $message }}
+              </span> 
+             
             @endif
         </div>
     </div>
