@@ -8,7 +8,7 @@
         </h1>
 
         <div class="my-4 flex justify-center">
-            @include('partials.quiz.svg.logo')
+            @include('partials.quiz.svg.logo')    
         </div>
 
         {{-- ✅ Usar Alpine.js con @entangle --}}
