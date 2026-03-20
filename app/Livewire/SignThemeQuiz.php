@@ -82,9 +82,9 @@ class SignThemeQuiz extends Component
 
         if ($correct) {
             $this->score += 10;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-32 h-32 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         } else {
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-32 h-32 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         }
     }
 
@@ -143,11 +143,11 @@ class SignThemeQuiz extends Component
 
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
-                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-32 h-32 object-contain dark:bg-gray-200 rounded-full" />';
+                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
                 $this->score += 10;
             } else {
                 $this->isCorrect = false;
-                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-32 h-32 object-contain dark:bg-gray-200 rounded-full" />';
+                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
                 $this->message = $correctAnswer;
             }
         }
@@ -188,11 +188,11 @@ class SignThemeQuiz extends Component
 
         if ($isValid) {
             $this->isCorrect = true;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-32 h-32 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
         } else {
             $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-32 h-32 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
             $this->message = implode(' / ', $validAnswers);
         }
     }

@@ -217,20 +217,18 @@
        {{-- 🎉 Modal final --}}
         <div x-show="showFinal"
             x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6"
+            x-transition:enter-start="opacity-0 translate-y-full"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-full"
+            class="fixed inset-x-0 bottom-16 z-50 flex flex-col items-center gap-3 pb-8 pt-6 rounded-t-3xl bg-gradient-to-br from-green-400 to-blue-500 text-white shadow-[0_-4px_16px_rgba(0,0,0,0.1)]"
             style="display: none;">
-            <div x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100"
-                class="bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl p-8 text-center text-white shadow-2xl w-full max-w-sm">
-                <div class="text-5xl mb-3">🎉</div>
-                <h1 class="text-2xl font-bold mb-3">Félicitations !</h1>
-                <img src="{{ asset('img/lsfgo/good.png') }}" alt="Applaudissements" class="mx-auto w-24 mb-3" />
-                <p class="font-semibold text-sm opacity-90">Vous avez complété tous les mots!</p>
-                <p class="text-xs opacity-75 mt-2">Redirection en cours...</p>
-            </div>
+            <div class="text-5xl">🎉</div>
+            <h1 class="text-2xl font-bold">Félicitations !</h1>
+            <img src="{{ asset('img/lsfgo/good.png') }}" alt="Applaudissements" class="w-24" />
+            <p class="font-semibold text-sm opacity-90">Vous avez complété tous les mots!</p>
+            <p class="text-xs opacity-75">Redirection en cours...</p>
         </div>
     </div>
 </div>

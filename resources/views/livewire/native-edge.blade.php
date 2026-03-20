@@ -68,7 +68,7 @@
                 />
 
     </native:bottom-nav>
-    @else
+    {{-- @else
        <native:bottom-nav>
            <native:bottom-nav-item
                    id="home"
@@ -76,7 +76,7 @@
                    url="{{ route('access.dashboard') }}"
                    icon="home"
            />
-       </native:bottom-nav>
+       </native:bottom-nav> --}}
      @endif      
 
 

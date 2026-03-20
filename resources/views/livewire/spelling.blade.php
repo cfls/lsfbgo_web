@@ -153,36 +153,37 @@
                         @keydown.enter.prevent="$wire.checkAnswer()"
                     />
                 </div>
-                  {{-- Feedback debajo de botones --}}
-                        <div class="flex justify-center mt-4 min-h-24">
-
-                            <div
-                                x-show="showFeedback && isCorrect"
-                                x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 scale-75"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                class="flex flex-col items-center gap-2"
-                                style="display:none"
-                            >
-                                <img src="{{ asset('img/lsfgo/good.png') }}" alt="Correct" class="w-24 h-24 object-contain">
-                                <span class="text-emerald-600 font-bold text-lg">Bravo ! C'est la bonne réponse.</span>
-                            </div>
-
-                            <div
-                                x-show="showFeedback && !isCorrect"
-                                x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 scale-75"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                class="flex flex-col items-center gap-2"
-                                style="display:none"
-                            >
-                                <img src="{{ asset('img/lsfgo/bad.png') }}" alt="Incorrect" class="w-24 h-24 object-contain">
-                                <span class="text-red-500 font-bold text-lg">Dommage !</span>
-                                <span class="text-gray-500 text-lg">
-                                    La bonne réponse est : <span class="font-semibold text-red-700 dark:text-gray-300">{{ $this->currentWord }}
-                                </span>
-                            </div>
-
+                {{-- Feedback: overlay slide-up fijo --}}
+                <div
+                    x-show="showFeedback"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-full"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-full"
+                    class="fixed inset-x-0 bottom-16 z-50 flex flex-col items-center gap-3 pb-8 pt-6 rounded-t-3xl shadow-[0_-4px_16px_rgba(0,0,0,0.1)]"
+                    :class="isCorrect
+                        ? 'bg-emerald-50 dark:bg-emerald-900'
+                        : 'bg-red-50 dark:bg-red-900'"
+                    style="display:none"
+                >
+                    <template x-if="isCorrect">
+                        <div class="flex flex-col items-center gap-2">
+                            <img src="{{ asset('img/lsfgo/good.png') }}" alt="Correct" class="w-20 h-20 object-contain">
+                            <span class="text-emerald-600 dark:text-emerald-300 font-bold text-xl">Bravo ! C'est la bonne réponse.</span>
+                        </div>
+                    </template>
+                    <template x-if="!isCorrect">
+                        <div class="flex flex-col items-center gap-2">
+                            <img src="{{ asset('img/lsfgo/bad.png') }}" alt="Incorrect" class="w-20 h-20 object-contain">
+                            <span class="text-red-500 font-bold text-xl">Dommage !</span>
+                            <span class="text-gray-600 dark:text-gray-300 text-base">
+                                La bonne réponse est :
+                                <span class="font-semibold text-red-700 dark:text-red-300">{{ $this->currentWord }}</span>
+                            </span>
+                        </div>
+                    </template>
                 </div>
 
             @else

@@ -73,76 +73,18 @@
                             @include('partials.quiz.question-types.' . $currentQuestion['type'])
                         @endif
 
-                        @include('partials.quiz.action-buttons')
-                        @include('partials.quiz.feedback')
+                        {{-- @include('partials.quiz.action-buttons') --}}
+                        
                     </div>
                 </div>
+                @include('partials.quiz.feedback')
             @else
                 <div class="flex justify-center">Aucun thème disponible</div>
             @endif
         </div>
     </div>
 
-    {{-- 🐛 DEBUG CONSOLE VISUAL (solo en local) --}}
-{{--    @if(app()->environment('local'))--}}
-{{--        <div x-data="{--}}
-{{--            logs: [],--}}
-{{--            show: true,--}}
-{{--            clearLogs() { this.logs = [] }--}}
-{{--        }"--}}
-{{--             @debug-log.window="--}}
-{{--            logs.unshift($event.detail);--}}
-{{--            if(logs.length > 20) logs.pop();--}}
-{{--         "--}}
-{{--             class="fixed bottom-4 right-4 z-[9999]">--}}
-
-{{--            --}}{{-- Toggle button --}}
-{{--            <button @click="show = !show"--}}
-{{--                    class="mb-2 bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-full shadow-lg font-bold text-sm hover:scale-105 transition">--}}
-{{--                <span x-show="!show">🐛 Show</span>--}}
-{{--                <span x-show="show">🐛 Hide</span>--}}
-{{--            </button>--}}
-
-{{--            --}}{{-- Console panel --}}
-{{--            <div x-show="show"--}}
-{{--                 x-transition--}}
-{{--                 class="w-96 max-h-[70vh] bg-black/95 text-green-400 rounded-lg shadow-2xl overflow-hidden border-2 border-green-500">--}}
-
-{{--                --}}{{-- Header --}}
-{{--                <div class="flex items-center justify-between bg-gradient-to-r from-green-600 to-emerald-600 px-3 py-2">--}}
-{{--                    <div class="flex items-center gap-2">--}}
-{{--                        <span class="text-white font-bold text-sm">🐛 DEBUG</span>--}}
-{{--                        <span class="text-xs text-green-200" x-text="logs.length"></span>--}}
-{{--                    </div>--}}
-{{--                    <button @click="clearLogs()"--}}
-{{--                            class="text-white text-xs hover:bg-white/20 px-2 py-1 rounded">--}}
-{{--                        Clear--}}
-{{--                    </button>--}}
-{{--                </div>--}}
-
-{{--                --}}{{-- Logs --}}
-{{--                <div class="p-3 overflow-auto max-h-[60vh] text-xs font-mono">--}}
-{{--                    <template x-for="(log, index) in logs" :key="index">--}}
-{{--                        <div class="mb-2 pb-2 border-b border-gray-800">--}}
-{{--                            <div x-html="log" class="break-words"></div>--}}
-{{--                        </div>--}}
-{{--                    </template>--}}
-
-{{--                    <div x-show="logs.length === 0" class="text-gray-500 text-center py-4">--}}
-{{--                        No logs yet...--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    @endif--}}
-{{--</div>--}}
-
-{{--@if(app()->environment('local'))--}}
-{{--    --}}{{-- 🔥 Eruda Mobile Console --}}
-{{--    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>--}}
-{{--    <script>eruda.init();</script>--}}
-{{--@endif--}}
-
+   
 @push('scripts')
     <script>
         // 🐛 Helper function para debug visual
