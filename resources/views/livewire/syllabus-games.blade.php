@@ -43,10 +43,10 @@
 
         @php
             $items = [
-                ['route' => route('questions', ['ue' => $ue, 'type' => 'question']), 'label' => '🎲 Question surprise'],
+              //  ['route' => route('questions', ['ue' => $ue, 'type' => 'question']), 'label' => '🎲 Question surprise'],
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'text']),     'label' => '🎥✍️ Traduis en français'],
-                ['route' => route('questions', ['ue' => $ue, 'type' => 'video-choice']), 'label' => '🎥👆 Choisis la bonne vidéo'],
-                ['route' => route('questions', ['ue' => $ue, 'type' => 'yes-no']),   'label' => '✅❌ Vrai / Faux'],
+                // ['route' => route('questions', ['ue' => $ue, 'type' => 'video-choice']), 'label' => '🎥👆 Choisis la bonne vidéo'],
+                // ['route' => route('questions', ['ue' => $ue, 'type' => 'yes-no']),   'label' => '✅❌ Vrai / Faux'],
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'choice']),   'label' => '🎥📝 Choisir le bon mot'],
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'match']),    'label' => '🔗 Associer les paires'],
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'tous']),     'label' => '🧠🔁 Révision complète'],

@@ -77,8 +77,12 @@ class Options extends Component
         $storedData = SecureStorage::get('data');
         $data = json_decode($storedData, true);
 
-        if($this->type == 'tous') {
-            return view('syllabus.theme_all')->layout('components.layouts.app.home', [
+        if($this->type == 'tous') { /** OJO */
+            // return view('syllabus.theme_all')->layout('components.layouts.app.home', [
+            //     'title' => 'Questions Options',
+            // ]);
+
+            return view('syllabus.theme_nevel')->layout('components.layouts.app.home', [
                 'title' => 'Questions Options',
             ]);
 
