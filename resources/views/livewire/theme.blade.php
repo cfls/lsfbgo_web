@@ -4,8 +4,8 @@
         <div class="px-3 py-2">
             <div class="flex items-center gap-2">
                 <a wire:navigate href="{{ route('syllabus.themes', ['ue' => $this->ue, 'theme' => $this->theme]) }}" class="text-white inline-flex items-center gap-2">
-                    <flux:icon.arrow-left-circle class="size-5"/>
-                    @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
+                    <flux:icon.arrow-left-circle class="size-8"/>
+                    @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 </a>
             </div>
         </div>

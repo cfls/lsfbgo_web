@@ -49,7 +49,7 @@
                 // ['route' => route('questions', ['ue' => $ue, 'type' => 'yes-no']),   'label' => '✅❌ Vrai / Faux'],
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'choice']),   'label' => '🎥📝 Choisir le bon mot'],
                 ['route' => route('questions', ['ue' => $ue, 'type' => 'match']),    'label' => '🔗 Associer les paires'],
-                ['route' => route('questions', ['ue' => $ue, 'type' => 'tous']),     'label' => '🧠🔁 Révision complète'],
+                //['route' => route('questions', ['ue' => $ue, 'type' => 'tous']),     'label' => '🧠🔁 Révision complète'],
             ];
         @endphp
 

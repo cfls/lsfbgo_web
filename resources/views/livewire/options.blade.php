@@ -14,7 +14,7 @@
         <div class="px-3 py-2">
             <div class="flex items-center gap-2">
                 <a wire:navigate href="{{ route('games',['ue' => $this->ue]) }}" class="text-white inline-flex items-center gap-2">
-                    <flux:icon.arrow-left-circle class="size-5"/>
+                    <flux:icon.arrow-left-circle class="size-8"/>
                     @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 </a>
                 <flux:subheading size="xl" class="text-white">

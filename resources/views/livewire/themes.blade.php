@@ -4,7 +4,7 @@
         <div class="px-4">
             <div class="p-2 inline-block">
                 <a wire:navigate href="{{ route('syllabus') }}" class="text-white inline-flex items-center gap-2">
-                    <flux:icon.arrow-left-circle class="size-10"/>
+                    <flux:icon.arrow-left-circle class="size-8"/>
                     @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 </a>
             </div>
