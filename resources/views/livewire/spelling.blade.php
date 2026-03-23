@@ -82,7 +82,7 @@
              }">
 
             <!-- Progresión -->
-          <div class="w-full max-w-2xl px-3">
+          <div class="w-full max-w-2xl px-3 mb-5">
             @php
                 $percent = $this->roundTotal ? min(100, (int)(($this->score / $this->roundTotal) * 100)) : 0;
             @endphp
@@ -150,7 +150,7 @@
                         autocorrect="off"
                         autocapitalize="none"
                         spellcheck="false"
-                        @keydown.enter.prevent="$wire.checkAnswer()"
+                        @keydown.enter.prevent="$el.blur(); $wire.checkAnswer()"
                     />
                 </div>
                 {{-- Feedback: overlay slide-up fijo --}}
