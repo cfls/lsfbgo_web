@@ -49,9 +49,9 @@
                             $this->results['attributes']['slug'],
                             'id' => $video['id']
                         ]) }}">
-                            <flux:text class="flex font-bold items-center justify-between text-black">
+                            <flux:text class="flex font-bold items-center justify-between text-white">
                                 <span>{{ $video['title'] }}</span>
-                                <flux:icon.arrow-right-circle class="size-6 text-black" />
+                                <flux:icon.arrow-right-circle class="size-6 text-white" />
                             </flux:text>
                         </a>
                     </div>
