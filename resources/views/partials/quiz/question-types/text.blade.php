@@ -9,5 +9,5 @@
            spellcheck="false"
            class="border rounded px-3 py-2 text-center bg-white w-1/2 text-black"
            placeholder="Votre réponse"
-           @keydown.enter.prevent="$wire.set('userInput', $event.target.value).then(() => $wire.checkAnswer())" />
+           @keydown.enter.prevent="$el.blur();$wire.set('userInput', $event.target.value).then(() => $wire.checkAnswer())" />
 </div>
