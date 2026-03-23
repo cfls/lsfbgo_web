@@ -1,4 +1,4 @@
-<div class="min-h-screen flex items-center justify-center dark:bg-gray-100">
+<div class="min-h-screen flex items-center justify-center dark:bg-gray-500">
     <div class="p-4 m-8 mt-12 rounded-xl shadow-lg">
      <!-- Header with Logo -->
      <div class="text-center mb-8">
