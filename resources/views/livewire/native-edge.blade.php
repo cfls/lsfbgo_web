@@ -17,7 +17,7 @@
             :gestures_enabled="false">
         <native:side-nav-header
                 title="LSFBGO"
-                subtitle="LsfbGo App"
+                subtitle=""
                 :show-close-button="true"
                 pinned
         />
@@ -26,10 +26,6 @@
         <native:horizontal-divider />
 
             <native:side-nav-item id="visit-site" icon="globe-alt" url="https://cfls.be" label="Cfls.be"/>
-            <native:side-nav-item active="{{ request()->routeIs('numbers.practice') }}" id="numbers" icon="dashboard" url="{{ route('numbers.practice') }}" label="Chiffres"/>
-            <native:side-nav-item active="{{ request()->routeIs('alphabet.practice') }}" id="alphabet" icon="dashboard" url="{{ route('alphabet.practice') }}" label="Épeler"/>
-            <native:side-nav-item active="{{ request()->routeIs('games') }}" id="games" icon="dashboard" url="{{ route('games') }}" label="Jeux"/>
-            <native:side-nav-item active="{{ request()->routeIs('games.dragdrop') }}" id="dragdrop" icon="dashboard" url="{{ route('games.dragdrop') }}" label="Jeu de lettres"/>
             <native:side-nav-item active="{{ request()->routeIs('access.logout') }}" id="logout" icon="exit" url="{{ route('access.logout') }}" label="Déconnexion"/>
     </native:side-nav>
 

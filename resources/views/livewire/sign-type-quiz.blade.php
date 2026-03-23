@@ -12,10 +12,6 @@
         <div class="p-5">
             {{-- ✅ Barra de progreso mejorada --}}
             {{-- Fuera del div principal, al nivel del layout --}}
-
-                <livewire:back />
-
-
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium">

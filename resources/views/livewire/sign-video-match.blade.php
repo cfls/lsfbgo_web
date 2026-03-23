@@ -47,7 +47,7 @@
     <div class="grid grid-cols-2 gap-6 xs:grid-cols-1">
 
         <!-- COLUMNA IZQUIERDA: PALABRAS -->
-        <div class="space-y-4">
+        <div class="space-y-2 mt-12">
 
             @foreach ($pairsWords as $word)
                 @php
@@ -57,7 +57,7 @@
 
                 <button
                         wire:click="selectWord(@js($word))"
-                        class="w-full px-4 py-3 rounded-xl border text-lg font-medium transition
+                        class="w-full px-4 py-3  rounded-xl border text-lg font-medium transition
 
                         @if($isCorrect)
                             bg-green-600 text-white border-green-600 border-4 opacity-70 cursor-not-allowed
@@ -71,9 +71,10 @@
                     "
                         @if($isCorrect) disabled @endif
                 >
-                    {{ $word }}
+                   {{ explode(' / ', $word)[0] }}
                 </button>
             @endforeach
+            
 
         </div>
 
@@ -93,9 +94,10 @@
                     $isWrong = $wrongVideo === $videoWord;
                 @endphp
 
-                <div
-                        wire:click="selectVideo(@js($videoWord))"
-                        class="rounded-xl overflow-hidden cursor-pointer shadow transition
+               <button
+                    type="button"
+                    wire:click="selectVideo(@js($videoWord))"
+                    class="w-full rounded-xl overflow-hidden cursor-pointer shadow transition text-left
                         @if($isCorrect)
                             ring-4 ring-green-500 opacity-70 pointer-events-none
                         @elseif($isWrong)
@@ -104,15 +106,19 @@
                             ring-4 ring-blue-500
                         @endif
                     "
+                    @if($isCorrect) disabled @endif
+                    aria-label="Select video for {{ $videoWord }}"
                 >
                     <video
-                            preload="metadata"
-                            src="{{ encode_cloudinary_url($optimizedUrl) }}"
-                            poster="{{ encode_cloudinary_url($posterUrl) }}"
-                            class="w-full h-auto max-h-[220px] object-cover"
-                            muted autoplay loop playsinline>
+                        preload="metadata"
+                        src="{{ encode_cloudinary_url($optimizedUrl) }}"
+                        poster="{{ encode_cloudinary_url($posterUrl) }}"
+                        class="w-full h-auto max-h-[220px] object-cover"
+                        muted autoplay loop playsinline
+                        tabindex="-1"
+                    >
                     </video>
-                </div>
+                </button>
             @endforeach
 
         </div>

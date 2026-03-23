@@ -82,7 +82,7 @@
                 $isUnlocked = true;
 
                 // Colores: completado = verde, normal = color UE
-                $colorClass = $alreadyDone ? '#34eb40' : $bgClass;
+                $colorClass = $alreadyDone ? '#519A66' : $bgClass;
 
                 // Siempre se puede acceder
                 $link = route('syllabus.play', [
