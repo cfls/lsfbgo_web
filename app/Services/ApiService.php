@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Native\Mobile\Facades\SecureStorage;
+use Illuminate\Support\Facades\Log;
 
 class ApiService
 {
@@ -33,12 +34,29 @@ class ApiService
     /**
      * Realizar petición POST a la API
      */
-    public function post(string $endpoint, array $data = []): Response
+  public function post(string $endpoint, array $data = []): Response
     {
-        return Http::withOptions(['verify' => $this->verifySsl])
+        $stored = SecureStorage::get('data');              // ✅ Variable separada
+        $token  = json_decode($stored, true)['token'] ?? null;
+
+        Log::info('POST Request', [
+            'endpoint' => $endpoint,
+            'token'    => $token,
+            'data'     => $data,  // Ahora sí muestra el payload real
+        ]);
+
+        $response = Http::withOptions(['verify' => $this->verifySsl])
+            ->withToken($token)
             ->asJson()
             ->acceptJson()
-            ->post($this->baseUrl.$endpoint, $data);
+            ->post($this->baseUrl . $endpoint, $data); // ✅ Envía el código correcto
+
+        // Log::info('POST Response', [
+        //     'status' => $response->status(),
+        //     'body'   => $response->json(),
+        // ]);
+
+        return $response;
     }
 
     /**
@@ -214,6 +232,18 @@ class ApiService
 
         // Pasar el token explícitamente
         return $this->get('/user', [], $token);
+    }
+
+    public function Code($userId, $code, $theme)
+    {
+   
+       
+      
+        return $this->post('/v1/verify-code', [
+            'user_id' => $userId,
+            'code' => $code,
+            'theme' => $theme,
+        ]);
     }
 
 

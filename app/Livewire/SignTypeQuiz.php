@@ -4,13 +4,9 @@ namespace App\Livewire;
 
 use AllowDynamicProperties;
 use App\Services\ApiService;
-use Illuminate\Http\Request;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
-use Native\Mobile\Attributes\OnNative;
-use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
-use Native\Mobile\Facades\Dialog;
 use Native\Mobile\Facades\SecureStorage;
 
 #[AllowDynamicProperties]
@@ -35,6 +31,10 @@ class SignTypeQuiz extends Component
     public $selectedLink;
     public $totalQuestions;
     public $storedData;
+    public bool $showPaymentModal = false;
+    public string $accessCode = '';
+    public string $link = '';
+    public string $theme = '';
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -80,7 +80,7 @@ class SignTypeQuiz extends Component
               //  logger()->info('Preguntas tipo cargadas: ' . count($this->questions));
             }
         } catch (\Throwable $e) {
-            logger()->error('Error cargando preguntas: ' . $e->getMessage());
+           // logger()->error('Error cargando preguntas: ' . $e->getMessage());
             $this->questions = [];
         }
     }
@@ -93,10 +93,10 @@ class SignTypeQuiz extends Component
         if ($correct) {
             $this->score += 10;
             $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';
-      
+
            // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
         } else {
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';    
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';
           //  $this->js('setTimeout(() => $wire.nextStep(), 3000)');
         }
     }
@@ -157,12 +157,12 @@ class SignTypeQuiz extends Component
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
                 $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
-                $this->score += 10;          
+                $this->score += 10;
                // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
             } else {
                 $this->isCorrect = false;
                 $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';
-                $this->message = $correctAnswer;         
+                $this->message = $correctAnswer;
                // $this->js('setTimeout(() => $wire.nextStep(), 3000)');
 
             }
@@ -198,17 +198,17 @@ class SignTypeQuiz extends Component
             }
         }
 
-       
+
 
         if ($isValid) {
             $this->isCorrect = true;
             $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
-            $this->score += 10;           
+            $this->score += 10;
            // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
         } else {
             $this->isCorrect = false;
             $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
-            $this->message = implode(' / ', $validAnswers);            
+            $this->message = implode(' / ', $validAnswers);
            // $this->js('setTimeout(() => $wire.nextStep(), 3000)');
 
             }
@@ -233,9 +233,9 @@ class SignTypeQuiz extends Component
 
             $this->syllabusData = $syllabusResponse->json('data', []);
 
-            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');
+            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');          
 
-            $this->openPaymentModal($link);
+            $this->openPaymentModal($link, $this->slug); // ✅ Pasar slug para identificar el tema
             return;
         }
 
@@ -257,34 +257,76 @@ class SignTypeQuiz extends Component
             }
 
             // ✅ Log para depuración
-            logger()->info("Pregunta tipo {$this->currentIndex} de " . count($this->questions));
+            // logger()->info("Pregunta tipo {$this->currentIndex} de " . count($this->questions));
         } else {
             // ✅ Completar el quiz
             $this->completed();
         }
     }
 
-    public function openPaymentModal($link)
+    public function openPaymentModal($link, $theme = null): void
     {
+        
+        $this->theme = $theme; // resetear UE para evitar conflictos
         $this->selectedLink = $link;
-
-        Dialog::alert(
-            'Accès Syllabus',
-            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
-            [
-                'Oui, ouvrir la boutique',
-                'Non, plus tard'
-            ]
-        )->id('alert-demo');
+        $this->showPaymentModal = true;
     }
 
-    #[OnNative(ButtonPressed::class)]
-    public function handleAlert(int $index, string $id): void
+    
+
+    public function closePaymentModal(): void
     {
-        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
+        $this->redirectRoute('games');
+    }
+
+    public function openShop(): void
+    {
+        if ($this->selectedLink) {
             Browser::open($this->selectedLink);
         }
     }
+
+public function validateCode(): void
+{
+       $this->validate([
+                'accessCode' => ['required', 'string'],
+            ]);
+
+            $api = app(ApiService::class);
+            $dataUser = SecureStorage::get('data');
+            $user = json_decode($dataUser, true)['user'];
+
+            $verifyUser = $api->Code($user['id'], $this->accessCode, $this->theme);      
+
+           if ($verifyUser->successful() && $verifyUser->json('data.attributes.active') === 1) {
+                $this->showPaymentModal = false;
+                $this->accessCode = '';
+            } else {
+                $this->addError('accessCode', 'Code invalide');
+            }
+}
+
+    // public function openPaymentModal($link)
+    // {
+
+
+    //     Dialog::alert(
+    //         'Accès Syllabus',
+    //         'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
+    //         [
+    //             'Oui, ouvrir la boutique',
+    //             'Non, plus tard'
+    //         ]
+    //     )->id('alert-demo');
+    // }
+
+    // #[OnNative(ButtonPressed::class)]
+    // public function handleAlert(int $index, string $id): void
+    // {
+    //     if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
+    //         Browser::open($this->selectedLink);
+    //     }
+    // }
 
     protected function resetQuestionState()
     {
@@ -398,10 +440,7 @@ class SignTypeQuiz extends Component
         return $text;
     }
 
-    public function closePaymentModal()
-    {
-        $this->redirect('/syllabus');
-    }
+   
 
     public function restartQuiz()
     {

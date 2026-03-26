@@ -8,6 +8,10 @@
         @include('partials.quiz.modals.failure')
         @include('partials.quiz.modals.feedback')
 
+        @if ($showPaymentModal)
+           @include('partials.quiz.modals.code', ['link' => $selectedLink, 'theme' => $theme])
+        @endif
+
         {{-- Quiz Content --}}
         <div class="p-5">
             {{-- ✅ Barra de progreso mejorada --}}
@@ -68,7 +72,9 @@
                         {{-- @include('partials.quiz.action-buttons') --}}
 
                         {{-- Feedback Message --}}
-                        @include('partials.quiz.feedback')
+                          @if (!$showPaymentModal)
+                             @include('partials.quiz.feedback')
+                         @endif
                     </div>
                 </div>
             @else
@@ -129,12 +135,12 @@
 
                         };
 
-                        debugLog('📦 Payload prepared', payload);
-                        debugLog('🚀 Calling Livewire submitFeedback...');
+                        // debugLog('📦 Payload prepared', payload);
+                        // debugLog('🚀 Calling Livewire submitFeedback...');
 
                         const response = await @this.call('submitFeedback', payload);
 
-                        debugLog('✅ Response received', response);
+                        // debugLog('✅ Response received', response);
 
                         // Mostrar notificación de éxito
                         this.$dispatch('notify', {
@@ -148,10 +154,10 @@
                         this.openFeedback = false;
 
                     } catch (error) {
-                        debugLog('❌ ERROR', {
-                            message: error.message,
-                            stack: error.stack
-                        });
+                        // debugLog('❌ ERROR', {
+                        //     message: error.message,
+                        //     stack: error.stack
+                        // });
 
                         this.$dispatch('notify', {
                             type: 'error',
@@ -171,7 +177,7 @@
                 },
 
                 init() {
-                    console.log('Total preguntas tipo cargadas:', {{ count($questions) }});
+                    //console.log('Total preguntas tipo cargadas:', {{ count($questions) }});
 
                     this.$watch('openCongrats', value => {
                         if (value) this.showFailModal = false;

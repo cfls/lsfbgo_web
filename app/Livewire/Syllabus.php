@@ -5,15 +5,10 @@ namespace App\Livewire;
 use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
-use Native\Mobile\Attributes\OnNative;
-use Native\Mobile\Events\Alert\ButtonPressed;
 use Native\Mobile\Facades\Browser;
-use Native\Mobile\Facades\Browser as BrowserFacade;
-use Native\Mobile\Facades\Dialog;
 use Native\Mobile\Facades\SecureStorage;
-use Native\Mobile\Facades\System;
+
 
 class Syllabus extends Component
 {
@@ -30,14 +25,14 @@ class Syllabus extends Component
     public $selectedSyllabuForPayment = null;
     public $selectedLink = null;
     public ?string $ue = null;
-    public $userExcept;
-
+    public $role;
+    public string $accessCode = '';
+    public string $link = '';
+    public string $theme = '';
 
 
     public function mount(?string $ue = null)
     {
-
-
 
         $this->ue = $ue;
 
@@ -56,10 +51,12 @@ class Syllabus extends Component
         $dataUser = SecureStorage::get('data');
         $user = json_decode($dataUser, true)['user'];
 
-        $this->userExcept = $user['id'];
-
+        Log::info('User ID for Syllabus', ['data' => $user['role']]);
+        
+        $this->role = $user['role'] ?? 'unknown';
+      
         // Obtener códigos verificados del usuario
-        $verifyUser = $api->verifycodeStatus($user['id']);
+        $verifyUser = $api->verifycodeStatus($user['id']);    
         $this->verifyUser = collect($verifyUser->json('data', []));
 
         // Obtener los NOMBRES de los temas activos (ue1-themes, ue2-themes)
@@ -73,14 +70,18 @@ class Syllabus extends Component
 
         // MOSTRAR TODOS los temas, pero marcar cuáles están activos
         $this->results = $allThemes
-            ->map(function($theme) use ($activeThemes) {
-                // Verificar si este tema está en los temas activos del usuario
-                $theme['isActive'] = $activeThemes->contains($theme['attributes']['slug']);
+                ->map(function($theme) use ($activeThemes) {
+                    $theme['isActive'] = $activeThemes->contains($theme['attributes']['slug']);
 
-                return $theme;
-            })
-            ->values()
-            ->all();
+                    Log::info('Theme isActive', [
+                        'slug'     => $theme['attributes']['slug'],
+                        'isActive' => $theme['isActive'],
+                    ]);
+
+                    return $theme;
+                })
+                ->values()
+                ->all();
     }
 
     public function loadTheme($ue)
@@ -100,56 +101,59 @@ class Syllabus extends Component
         $this->selectedTheme = $response->json('data', []);
     }
 
-
-// abrir modal de pago
-    public function openPaymentModal($link): void
+  public function openPaymentModal($link, $theme): void
     {
-
-
+        $this->theme = $theme; // resetear UE para evitar conflictos
         $this->selectedLink = $link;
-     //   $this->showPaymentModal = true;
-
-        Dialog::alert(
-            'Accès Syllabus',
-            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
-            [
-                'Oui, ouvrir la boutique',
-                'Non, plus tard'
-            ]
-        )->id('payment-modal'); // ID único
+        $this->showPaymentModal = true;
+      
     }
 
+    
 
-    #[OnNative(ButtonPressed::class)]
-    public function handleAlert(int $index, string $id): void
+    public function closePaymentModal(): void
     {
-        // Manejar modal de pago
-        if ($id === 'payment-modal' && $index === 0 && $this->selectedLink) {
+        $this->redirectRoute('syllabus');
+    }
+
+    public function openShop(): void
+    {
+        if ($this->selectedLink) {
             Browser::open($this->selectedLink);
         }
-
-
     }
+      public function validateCode(): void
+        {
+            $this->validate([
+                'accessCode' => ['required', 'string'],
+            ]);
+
+            $api = app(ApiService::class);
+            $dataUser = SecureStorage::get('data');
+            $user = json_decode($dataUser, true)['user'];
+
+            $verifyUser = $api->Code($user['id'], $this->accessCode, $this->theme);      
+
+           if ($verifyUser->successful() && $verifyUser->json('data.attributes.active') === 1) {
+                $this->showPaymentModal = false;
+                $this->accessCode = '';
+            } else {
+                $this->addError('accessCode', 'Code invalide');
+            }
+        }
+
 
 
     public function openInApp()
     {
-        BrowserFacade::inApp('https://www.facebook.com/share/v/1BepzAgdKA');
+        Browser::inApp('https://www.facebook.com/share/v/1BepzAgdKA');
     }
 
     public function openSystem()
     {
-        BrowserFacade::open('https://nativephp.com');
+        Browser::open('https://nativephp.com');
     }
 
-
-
-// cerrar modal
-    public function closePaymentModal()
-    {
-        $this->showPaymentModal = false;
-        $this->selectedSyllabuForPayment = null;
-    }
 
 
 

@@ -9,6 +9,7 @@
     <div
         x-data="{ show: false }"
         x-init="$nextTick(() => { setTimeout(() => { show = true }, 50) })"
+        x-on:close-quiz-modals.window="show = false" 
         :style="show
             ? 'max-height: 400px; bottom: calc(56px + env(safe-area-inset-bottom, 0px))'
             : 'max-height: 0px; bottom: calc(56px + env(safe-area-inset-bottom, 0px))'"
