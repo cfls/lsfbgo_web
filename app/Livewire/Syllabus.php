@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+//use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Native\Mobile\Facades\Browser;
 use Native\Mobile\Facades\SecureStorage;
@@ -51,7 +51,7 @@ class Syllabus extends Component
         $dataUser = SecureStorage::get('data');
         $user = json_decode($dataUser, true)['user'];
 
-        Log::info('User ID for Syllabus', ['data' => $user['role']]);
+       // Log::info('User ID for Syllabus', ['data' => $user['role']]);
         
         $this->role = $user['role'] ?? 'unknown';
       
@@ -73,10 +73,10 @@ class Syllabus extends Component
                 ->map(function($theme) use ($activeThemes) {
                     $theme['isActive'] = $activeThemes->contains($theme['attributes']['slug']);
 
-                    Log::info('Theme isActive', [
-                        'slug'     => $theme['attributes']['slug'],
-                        'isActive' => $theme['isActive'],
-                    ]);
+                    // Log::info('Theme isActive', [
+                    //     'slug'     => $theme['attributes']['slug'],
+                    //     'isActive' => $theme['isActive'],
+                    // ]);
 
                     return $theme;
                 })

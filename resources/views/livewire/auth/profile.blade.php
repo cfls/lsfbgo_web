@@ -1,13 +1,10 @@
-<div
-        class="space-y-4 bg-white  min-h-screen">
-    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
-        <div class="px-3 py-2">
-            <div class="flex items-center gap-2">
-                @include('partials.quiz.svg.logo', ['class' => 'w-8 h-8'])
-                <flux:subheading class="text-white text-base">
-                    Mon Profil
-                </flux:subheading>
-            </div>
+<div class="space-y-4 bg-white dark:bg-gray-800  min-h-screen">
+     <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] shrink-0">
+        <div class="px-4 py-3 flex items-center gap-3">
+            @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
+            <flux:subheading size="xl" class="text-white text-base font-semibold">
+                Mon Profil
+            </flux:subheading>
         </div>
     </div>
 
@@ -30,9 +27,9 @@
                 {{ session('error') }}
             </div>
         @endif
-
-        {{-- Tarjeta del perfil --}}
-        <div class="flex flex-col w-full max-w-sm p-5 bg-white border border-gray-200 rounded-lg shadow-sm space-y-4">
+        
+         {{-- Tarjeta del perfil --}}
+        <div class="flex flex-col w-full max-w-sm p-5 bg-white border-2 border-gray-300 rounded-lg space-y-4">
 
             {{-- Nombre --}}
             <div class="flex flex-col">
@@ -54,7 +51,7 @@
 
             {{-- Paramètres --}}
             <a href="{{ route('profile.parameters') }}"
-               class="flex items-center justify-between w-full p-5 bg-gray-500 border border-gray-200 rounded-lg shadow-sm">
+               class="flex items-center justify-between w-full p-5 border-2 border-gray-300 rounded-lg">
                 <flux:label class="text-lg font-semibold text-gray-900 ">Paramètres</flux:label>
                 <svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 72.4 72.4" class="w-5 h-5">
                     <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->

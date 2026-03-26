@@ -1,12 +1,12 @@
 <div class="min-h-screen flex items-center justify-center dark:bg-gray-500">
-    <div class="p-4 m-8 mt-12 rounded-xl shadow-lg">
+    <div class="p-4 m-8 mt-12 rounded-xl border-2 border-gray-300 bg-white shadow-lg w-full max-w-md">
      <!-- Header with Logo -->
      <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br dark:from-blue-600 dark:to-blue-800 rounded-2xl shadow-lg mb-4">
                @include('partials.quiz.svg.logo')
           </div>
-          <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Scanner QR</h1>
-          <p class="text-sm text-gray-500 mt-1 dark:text-white">Scannez les codes QR instantanément</p>
+          <h1 class="text-2xl font-bold text-gray-800">Scanner QR</h1>
+          <p class="text-sm text-gray-500 mt-1 font-semibold">Scannez les codes QR instantanément</p>
      </div>
 
      <!-- Hidden Format Input (QR Code only) -->
@@ -17,7 +17,7 @@
           <flux:button
                   variant="primary"
                    wire:click="scan"
-                  class="w-full  py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3 mt-5"
+                  class="w-full  py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3 mt-5 dark:bg-blue-400 dark:hover:bg-blue-700"
 
           ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />

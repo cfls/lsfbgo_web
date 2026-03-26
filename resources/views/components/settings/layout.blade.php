@@ -1,9 +1,26 @@
 <div class="flex items-start max-md:flex-col">
     <div class="me-10 w-full pb-4 md:w-[220px]">
         <flux:navlist>
-            <flux:navlist.item :href="route('profile.edit')" wire:navigate>{{ __('Profil') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('user-password.edit')" wire:navigate>{{ __('Mot de passe') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('appearance.edit')" wire:navigate>{{ __('Apparence') }}</flux:navlist.item>
+            <flux:navlist.item 
+                :href="route('profile.edit')" 
+                wire:navigate
+                class="border-2 border-gray-400 dark:border-gray-500 rounded-lg mb-1">
+                {{ __('Profil') }}
+            </flux:navlist.item>
+
+            <flux:navlist.item 
+                :href="route('user-password.edit')" 
+                wire:navigate
+                class="border-2 border-gray-400 dark:border-gray-500 rounded-lg mb-1">
+                {{ __('Mot de passe') }}
+            </flux:navlist.item>
+
+            <flux:navlist.item 
+                :href="route('appearance.edit')" 
+                wire:navigate
+                class="border-2 border-gray-400 dark:border-gray-500 rounded-lg mb-1">
+                {{ __('Apparence') }}
+            </flux:navlist.item>
         </flux:navlist>
     </div>
 
