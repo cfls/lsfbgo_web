@@ -1,4 +1,4 @@
-<div>
+<div class="pt-[var(--inset-top)]">
 
 
     <native:top-bar
