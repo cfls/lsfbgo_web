@@ -30,11 +30,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                         </svg>
                         <span>Feedback</span>
-                    </button>
-
+                    </button>                
                     <span class="text-sm text-black dark:text-white">
-            Points : {{ $score }} / {{ count($questions) * 10 }}
-        </span>
+                          Points: {{ $score }} / {{ count($questions) * 10 }}
+                    </span>
                 </div>
 
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -77,6 +76,20 @@
                          @endif
                     </div>
                 </div>
+               
+                   {{-- ✅ Botón de velocidad (aquí) --}}
+                <div
+                    x-show="!openFeedback"
+                    x-transition
+                >
+                    <button
+                        @click="toggleSpeed()"
+                        class="flex items-center justify-center w-20 h-20 rounded-full bg-blue-500 text-white shadow-lg"
+                    >
+                         <span class="text-[10px]" x-html="slow ? '<img src=\'{{ asset('img/lsfgo/slow.png') }}\' alt=\'lent\' />' : '<img src=\'{{ asset('img/lsfgo/speed.png') }}\' alt=\'Normal\' />'"></span>
+                    </button>
+                </div>
+                
             @else
                 <div class="flex justify-center">Aucun thème disponible</div>
             @endif

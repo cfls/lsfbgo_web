@@ -13,7 +13,7 @@
         :style="show
             ? 'max-height: 400px; bottom: calc(56px + env(safe-area-inset-bottom, 0px))'
             : 'max-height: 0px; bottom: calc(56px + env(safe-area-inset-bottom, 0px))'"
-        class="fixed inset-x-0 z-50 flex flex-col items-center gap-2 pb-6 pt-4 rounded-t-3xl shadow-[0_-4px_16px_rgba(0,0,0,0.1)] overflow-hidden transition-[max-height] duration-500 ease-out {{ $isCorrect ? 'bg-green-500 dark:bg-green-900' : 'bg-red-500 dark:bg-red-900' }}"
+        class="fixed inset-x-0 flex flex-col items-center gap-2 pb-6 pt-4 rounded-t-3xl shadow-[0_-4px_16px_rgba(0,0,0,0.1)] overflow-hidden transition-[max-height] duration-500 ease-out {{ $isCorrect ? 'bg-green-500 dark:bg-green-900' : 'bg-red-500 dark:bg-red-900' }}"
     >
         {!! $image !!}
 
