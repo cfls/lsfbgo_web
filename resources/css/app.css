@@ -79,7 +79,7 @@ html, body {
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
-    },
+    }
 html, body {
     @apply h-full min-h-screen overflow-x-hidden overflow-y-auto;
     -webkit-overflow-scrolling: touch;
@@ -159,4 +159,11 @@ select:focus[data-flux-control] {
 
 footer {
     touch-action: pan-y;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

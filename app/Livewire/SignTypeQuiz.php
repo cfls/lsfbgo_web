@@ -462,7 +462,7 @@ public function validateCode(): void
 
         $api = app(ApiService::class);
 
-        logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
+        //logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
 
         try {
             // Validar los datos del feedback que vienen del frontend
@@ -473,16 +473,16 @@ public function validateCode(): void
 
             ])->validate();
 
-            logger()->info('✅ Feedback validation passed:', $validatedFeedback);
+            //logger()->info('✅ Feedback validation passed:', $validatedFeedback);
 
             // Obtener datos del usuario de SecureStorage
             $storedData = SecureStorage::get('data');
             $userData = json_decode($storedData, true);
 
 
-            logger()->info('👤 User data loaded:', [
-                'user_id' => $userData['user']['id'] ?? 'null'
-            ]);
+            //logger()->info('👤 User data loaded:', [
+            //    'user_id' => $userData['user']['id'] ?? 'null'
+            //]);
 
             $completeData = [
                     'user_id' => $userData['user']['id'] ?? null,
@@ -492,7 +492,7 @@ public function validateCode(): void
                     'status' => 'pending',
                 ];
 
-            logger()->info('📦 Sending to API:', $completeData);
+            //logger()->info('📦 Sending to API:', $completeData);
 
             // ✅ Llamar a la API con el array completo
             $result = $api->FeedBack($completeData);

@@ -13,7 +13,47 @@
         @endif
 
         {{-- Quiz Content --}}
-        <div class="p-5">
+        <div class="p-5"> 
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+            {{-- ✅ Botón de velocidad (aquí) --}}
+                    <div>
+                        <a href="{{ route('questions',['ue' => $slug, 'type' => $type]) }}"  aria-label="Quitter le quiz">                           
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            
+                        </a>
+                </div>
+                   <div>
+                      <button
+                            @click="openFeedback = true"
+                            aria-label="Envoyer un commentaire"
+                            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700 transition"
+                    >
+                        <svg 
+                        aria-hidden="true" 
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                            </svg>
+                    </button>
+                    </div>                   
+                     <div
+                        x-show="!openFeedback"
+                        x-transition
+                    >
+                      <button
+                            @click="toggleSpeed()"
+                            :aria-pressed="slow.toString()"
+                            :aria-label="slow ? 'Mode lent activé' : 'Mode normal activé'"
+                            class="flex items-center justify-center w-14 h-14 rounded-full bg-gray-600 dark:bg-white text-white shadow-lg"
+                        >
+                            <span class="text-[10px]" x-html="slow ? '<img src=\'{{ asset('img/lsfgo/slow.png') }}\' alt=\'Activer la vitesse lente\' class=\'w-14 h-14 object-contain\' />' : '<img src=\'{{ asset('img/lsfgo/speed.png') }}\' alt=\'Activer la vitesse normale\' class=\'w-14 h-14 object-contain\' />'"></span>
+                        </button>
+                    </div>
+                    
+                </div>
+            </div>   
             {{-- ✅ Barra de progreso mejorada --}}
             {{-- Fuera del div principal, al nivel del layout --}}
             <div class="mb-6">
@@ -22,21 +62,22 @@
                         Question {{ $currentIndex + 1 }} a {{ count($questions) }}
                     </span>
 
-                    <button
-                            @click="openFeedback = true"
-                            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700 transition"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                        </svg>
-                        <span>Feedback</span>
-                    </button>                
-                    <span class="text-sm text-black dark:text-white">
+                                  
+                    <span  class="text-sm text-black dark:text-white">
                           Points: {{ $score }} / {{ count($questions) * 10 }}
                     </span>
-                </div>
+                      <span class="sr-only" aria-live="polite" aria-atomic="true">
+                         Points: {{ $score }} / {{ count($questions) * 10 }}
+                      </span>
+                 </div>
 
-                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                role="progressbar"
+                 aria-valuenow="{{ $currentIndex + 1 }}"
+                 aria-valuemin="1"
+                 aria-valuemax="{{ count($questions) }}"
+                 aria-label="Avancement du quiz"
+                class="w-full bg-gray-200 rounded-full h-2.5">
                     <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                          style="width: {{ count($questions) > 0 ? (($currentIndex + 1) / count($questions)) * 100 : 0 }}%">
                     </div>
@@ -77,18 +118,7 @@
                     </div>
                 </div>
                
-                   {{-- ✅ Botón de velocidad (aquí) --}}
-                <div
-                    x-show="!openFeedback"
-                    x-transition
-                >
-                    <button
-                        @click="toggleSpeed()"
-                        class="flex items-center justify-center w-20 h-20 rounded-full bg-blue-500 text-white shadow-lg"
-                    >
-                         <span class="text-[10px]" x-html="slow ? '<img src=\'{{ asset('img/lsfgo/slow.png') }}\' alt=\'lent\' />' : '<img src=\'{{ asset('img/lsfgo/speed.png') }}\' alt=\'Normal\' />'"></span>
-                    </button>
-                </div>
+                
                 
             @else
                 <div class="flex justify-center">Aucun thème disponible</div>

@@ -24,7 +24,7 @@
 <div class="min-h-screen game-container flex flex-col bg-gray-50 dark:bg-zinc-950">
 
     {{-- Header --}}
-    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] shrink-0">
+    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-4 py-3 flex items-center gap-3">
             @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
             <flux:subheading size="xl" class="text-white text-base font-semibold">
