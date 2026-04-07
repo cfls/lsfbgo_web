@@ -1,7 +1,7 @@
 <?php
 
 test('registration screen can be rendered', function () {
-    $response = $this->get(route('register'));
+    $response = $this->get(route('access.register'));
 
     $response->assertStatus(200);
 });
@@ -15,7 +15,7 @@ test('new users can register', function () {
     ]);
 
     $response->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect(route('access.dashboard', absolute: false));
 
     $this->assertAuthenticated();
 });

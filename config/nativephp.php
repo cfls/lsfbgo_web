@@ -316,6 +316,16 @@ return [
             'landscape_right' => false,
         ],
     ],
+    'runtime' => [
+        'mode' => 'classic', // or 'classic'
+        'reset_instances' => true,
+        'gc_between_dispatches' => false,
+    ],
+    'android' => [
+        'compile_sdk' => env('NATIVEPHP_ANDROID_COMPILE_SDK', 36),
+        'min_sdk' => env('NATIVEPHP_ANDROID_MIN_SDK', 30),
+        'target_sdk' => env('NATIVEPHP_ANDROID_TARGET_SDK', 36),
+    ],
 
    
 ];

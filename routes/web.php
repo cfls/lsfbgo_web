@@ -138,6 +138,7 @@ Route::get('/syllabus/{ue}/{theme}/{id}', Theme::class)->name('syllabus.theme');
 Route::get('/syllabus-games/{ue?}', SyllabusGames::class)->name('games');
 Route::get('/syllabus-games/{ue}/{type?}', Options::class)->name('questions');
 
+
 Route::get('/syllabus-games/{ue}/{type}/{theme}', [SyllabusGameController::class, 'index'])
     ->name('syllabus.play');
 

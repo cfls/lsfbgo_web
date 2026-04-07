@@ -57,48 +57,49 @@ public function mount(?string $ue = null): void
     $this->loadTheme('ue1-themes');
 }
 
-public function allThemes()
-{
-    $api = app(ApiService::class);
-    $response = $api->allThemes();
-  
-  
-    $this->themes = $response->json('data', []);
-
-}
-
-public function loadTheme($ue): void
-{
-   
-       $api = app(ApiService::class);
-    $storedData = SecureStorage::get('data');
-    $data = json_decode($storedData, true);
-
-    $this->ue = $ue;
-
-    $response = Http::withOptions(['verify' => env('API_VERIFY_SSL', true)])
-        ->withToken($data['token'])
-        ->acceptJson()
-        ->get(config('services.api.url') . '/v1/sections/' . $this->ue);
-
-
-    $this->results = $response->json('data', []);
-
-    $syllabusData = $api->ThemeColor($this->ue);
-    $this->color = $syllabusData->json('data.attributes.hex_color', '#000000');
-}
-
-
-public function updatedSelectedSyllabus($value): void
-{
+    public function allThemes()
+    {
+        $api = app(ApiService::class);
+        $response = $api->allThemes();
     
     
-    $this->loadTheme($value);
-}
+        $this->themes = $response->json('data', []);
+
+    }
+
+    public function loadTheme($ue): void
+    {
+    
+        $api = app(ApiService::class);
+        $storedData = SecureStorage::get('data');
+        $data = json_decode($storedData, true);
+
+        $this->ue = $ue;
+
+        $response = Http::withOptions(['verify' => env('API_VERIFY_SSL', true)])
+            ->withToken($data['token'])
+            ->acceptJson()
+            ->get(config('services.api.url') . '/v1/sections/' . $this->ue);
+
+
+        $this->results = $response->json('data', []);
+
+        $syllabusData = $api->ThemeColor($this->ue);
+        $this->color = $syllabusData->json('data.attributes.hex_color', '#000000');
+    }
+
+
+    public function updatedSelectedSyllabus($value): void
+    {
+        
+        
+        $this->loadTheme($value);
+    }
 
 
     public function render()
     {
+     
         return view('livewire.syllabus-games')->layout('components.layouts.app.home');
     }
 }

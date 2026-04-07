@@ -14,7 +14,7 @@ class ApiService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.api.url');
+        $this->baseUrl = config('services.api.url') ?? '';
         $this->verifySsl = env('API_VERIFY_SSL', true);
     }
 

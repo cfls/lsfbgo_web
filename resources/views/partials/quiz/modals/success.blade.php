@@ -27,7 +27,7 @@
             <flux:button
                     @click="window.location.href='{{ route('questions', ['ue' => $slug, 'type' => $type]) }}'"
                     class="bg-gray-500 text-white hover:bg-gray-600 w-full sm:w-auto">
-                Suivant
+                Suivant {{ $slug }} {{ $type }}
             </flux:button>
         </div>
     </div>
