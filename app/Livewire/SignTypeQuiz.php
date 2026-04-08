@@ -180,12 +180,14 @@ class SignTypeQuiz extends Component
         $current = $this->questions[$this->currentIndex];
 
         $validAnswers = array_map(
-            fn($a) => strtolower($this->normalizeAnswer(trim($a))),
+          //  fn($a) => strtolower($this->normalizeAnswer(trim($a))),
+           fn($a) => strtolower(trim($a)),
             explode('/', $current['answer'])
         );
 
         $userAnswers = array_map(
-            fn($a) => strtolower($this->normalizeAnswer(trim($a))),
+         //   fn($a) => strtolower($this->normalizeAnswer(trim($a))),
+            fn($a) => strtolower(trim($a)),
             explode('/', $this->userInput)
         );
 
