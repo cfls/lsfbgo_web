@@ -126,7 +126,7 @@
         <flux:card class="bg-gradient-to-br from-teal-500 to-purple-600 border border-amber-200 dark:border-amber-700 mt-6">
             <p class="text-white text-xs font-semibold leading-relaxed mb-3">
                 Votre code unique se trouve à l'intérieur de la couverture arrière de votre syllabus.
-                Pour toute demande, écrivez à info@cfls.be.
+                Pour toute demande, écrivez à support@cfls.be
             </p>
             {{-- ✅ aria-label explícito por si el icono de Flux no tiene aria-hidden automático --}}
             <flux:button
