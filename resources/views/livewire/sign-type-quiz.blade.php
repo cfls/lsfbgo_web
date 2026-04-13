@@ -27,7 +27,7 @@
                 </div>
                    <div>
                       <button
-                            @click="openFeedback = true"
+                            @click="openFeedbackModal()"
                             aria-label="Envoyer un commentaire"
                             class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700 transition"
                     >
@@ -59,12 +59,12 @@
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium">
-                        Question {{ $currentIndex + 1 }} a {{ count($questions) }}
+                        Question {{ $currentIndex + 1 }} a {{ count($questions) }} 
                     </span>
 
                                   
                     <span  class="text-sm text-black dark:text-white">
-                          Points: {{ $score }} / {{ count($questions) * 10 }}
+                          Points: {{ $score }} / {{ count($questions) * 10 }} 
                     </span>
                       <span class="sr-only" aria-live="polite" aria-atomic="true">
                          Points: {{ $score }} / {{ count($questions) * 10 }}
@@ -153,14 +153,21 @@
                 showFailModal: false,
                 score: 0,
                 openFeedback: false,
-                feedbackType: 'bug',
+                feedbackQuestionId: null,  // ← null por defecto, se asigna al abrir
+                feedbackType: 'bug',             
                 feedbackMessage: '',
                 feedbackSending: false,
                 openSubscription: false,
                 isTransitioning: false,
                 liveScore: @entangle('score'),
+                liveQuestionId: @entangle('currentQuestionId'), 
                 totalPoints: {{ count($questions) * 10 }},
-                failPercentage: 0,
+                failPercentage: 0,  
+                 // ✅ Añadir aquí
+                openFeedbackModal() {
+                    this.feedbackQuestionId = this.liveQuestionId;
+                    this.openFeedback = true;
+                },
 
                 async submitFeedback() {
                     if (!this.feedbackMessage.trim()) {
@@ -174,7 +181,7 @@
                         const payload = {
                             type: this.feedbackType,
                             message: this.feedbackMessage,
-                            question_id: {{ $currentQuestion['id'] ?? 'null' }},
+                            question_id: this.feedbackQuestionId,
 
                         };
 

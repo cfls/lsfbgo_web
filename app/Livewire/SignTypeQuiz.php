@@ -14,6 +14,7 @@ class SignTypeQuiz extends Component
 {
     public $questions = []; // ✅ TODAS las preguntas cargadas UNA SOLA VEZ
     public $currentIndex = 0;
+    public int $currentQuestionId = 0;
     public $message = '';
     public $image;
     public $answered = false;
@@ -55,6 +56,7 @@ class SignTypeQuiz extends Component
         // ✅ Inicializar currentQuestion
         if (!empty($this->questions)) {
             $this->currentQuestion = $this->questions[0];
+            $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
         }
     }
 
@@ -156,12 +158,12 @@ class SignTypeQuiz extends Component
 
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
-                $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+                $this->image = true; // solo activa el flag
                 $this->score += 10;
                // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
             } else {
                 $this->isCorrect = false;
-                $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';
+                $this->image = true; // solo activa el flag
                 $this->message = $correctAnswer;
                // $this->js('setTimeout(() => $wire.nextStep(), 3000)');
 
@@ -250,6 +252,8 @@ class SignTypeQuiz extends Component
 
             // ✅ Obtener la pregunta actual del array existente
             $this->currentQuestion = $this->questions[$this->currentIndex];
+            
+            $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
 
             $this->resetQuestionState();
 
@@ -338,6 +342,7 @@ public function validateCode(): void
         $this->isCorrect = false;
         $this->userInput = '';
         $this->selectedAnswer = ''; // ✅ Añadir esto también
+        $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
     }
 
     public function completed()
