@@ -23,3 +23,5 @@ yarn-error.log
 /.zed
 .DS_Store
 NUL
+# Credential files (keystores, private keys, etc.)
+/credentials/

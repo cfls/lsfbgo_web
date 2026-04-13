@@ -182,15 +182,13 @@ class SignTypeQuiz extends Component
         $current = $this->questions[$this->currentIndex];
 
         $validAnswers = array_map(
-          //  fn($a) => strtolower($this->normalizeAnswer(trim($a))),
-           fn($a) => strtolower(trim($a)),
-            explode('/', $current['answer'])
+        fn($a) => mb_strtolower(trim($a), 'UTF-8'),  // 👈 mb_strtolower
+        explode(' / ', $current['answer'])
         );
 
         $userAnswers = array_map(
-         //   fn($a) => strtolower($this->normalizeAnswer(trim($a))),
-            fn($a) => strtolower(trim($a)),
-            explode('/', $this->userInput)
+            fn($a) => mb_strtolower(trim($a), 'UTF-8'),  // 👈 mb_strtolower
+            explode(' / ', $this->userInput)
         );
 
         $isValid = false;
