@@ -3,6 +3,5 @@
 return [
     App\Providers\AppServiceProvider::class,
     App\Providers\FortifyServiceProvider::class,
-    App\Providers\DeepLinkServiceProvider::class,
-    App\Providers\NetworkServiceProvider::class,
+
 ];

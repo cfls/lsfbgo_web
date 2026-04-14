@@ -3,11 +3,12 @@
 namespace App\Livewire;
 
 use App\Services\ApiService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-use Native\Mobile\Facades\SecureStorage;
+
 
 
 class Spelling extends Component
@@ -27,25 +28,28 @@ class Spelling extends Component
     public array $spellings = [];
     public string $title = 'Exercices épellation';
 
-    public function mount(ApiService $api): void
+    public function mount(ApiService $api)
     {
+        $token = session('token');
 
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
+        if (!$token) {
+            $this->redirect(route('home'), navigate: true);
+            return;
+        }
 
-        $response = $api->getSpellings($data['token']);
+        $this->words = Cache::remember('spellings_words_' . md5($token), 600, function () use ($api, $token) {
+            $response = $api->getSpellings($token);
 
-
-
-        $this->words = $response->ok()
-            ? collect($response->json('data', []))
-                ->pluck('attributes')
-                ->where('active', 1)
-                ->pluck('word')
-                ->shuffle()
-                ->values()
-                ->toArray()
-            : [];
+            return $response->ok()
+                ? collect($response->json('data', []))
+                    ->pluck('attributes')
+                    ->where('active', 1)
+                    ->pluck('word')
+                    ->shuffle()
+                    ->values()
+                    ->toArray()
+                : [];
+        });
 
         if (empty($this->words)) {
             $this->finished = true;

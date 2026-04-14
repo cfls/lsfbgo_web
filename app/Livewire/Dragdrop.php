@@ -28,17 +28,21 @@ class Dragdrop extends Component
     {
 
 
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
+        $data = session('data');
+
+        if (!$data || empty($data['token'])) {
+            return redirect()->route('home');
+        }
+
+        $token = $data['token'];
 
         // Cargar palabras
         $response = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
-            ->withToken($data['token'])
+            ->withToken($token)
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/spell/');
-
 
 
         $wordsData = $response->json('data', $response->json());
@@ -64,7 +68,7 @@ class Dragdrop extends Component
         $responseLetters = Http::withOptions([
             'verify' => env('API_VERIFY_SSL', true),
         ])
-            ->withToken($data['token'])
+            ->withToken($token)
             ->acceptJson()
             ->get(config('services.api.url') . '/v1/letters/');
 

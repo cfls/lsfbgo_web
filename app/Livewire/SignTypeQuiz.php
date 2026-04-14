@@ -4,15 +4,13 @@ namespace App\Livewire;
 
 use AllowDynamicProperties;
 use App\Services\ApiService;
-use Livewire\Component;
 use Illuminate\Support\Facades\Http;
-use Native\Mobile\Facades\Browser;
-use Native\Mobile\Facades\SecureStorage;
+use Livewire\Component;
 
 #[AllowDynamicProperties]
 class SignTypeQuiz extends Component
 {
-    public $questions = []; // ✅ TODAS las preguntas cargadas UNA SOLA VEZ
+    public $questions = [];
     public $currentIndex = 0;
     public int $currentQuestionId = 0;
     public $message = '';
@@ -36,6 +34,7 @@ class SignTypeQuiz extends Component
     public string $accessCode = '';
     public string $link = '';
     public string $theme = '';
+    public $syllabusData = [];
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -43,17 +42,20 @@ class SignTypeQuiz extends Component
 
     public function mount()
     {
+        $this->storedData = session('data');
 
+        if (!$this->storedData || empty(session('token'))) {
+            $this->redirect(route('home'), navigate: true);
+            return;
+        }
 
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
-        // ✅ Cargar preguntas UNA SOLA VEZ
         if (empty($this->questions)) {
             $this->loadQuestions();
         }
 
-        // ✅ Inicializar currentQuestion
         if (!empty($this->questions)) {
             $this->currentQuestion = $this->questions[0];
             $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
@@ -62,27 +64,29 @@ class SignTypeQuiz extends Component
 
     protected function loadQuestions()
     {
-
         try {
+            $token = session('token');
+
+            if (!$token) {
+                $this->questions = [];
+                return;
+            }
+
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
             ])
-               // ->withToken(SecureStorage::get('data.token'))
+                ->withToken($token)
                 ->acceptJson()
                 ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
-
-                // ✅ Mezclar y guardar TODAS las preguntas
                 shuffle($data);
                 $this->questions = $data;
-
-                // ✅ Log para verificar
-              //  logger()->info('Preguntas tipo cargadas: ' . count($this->questions));
             }
         } catch (\Throwable $e) {
-           // logger()->error('Error cargando preguntas: ' . $e->getMessage());
             $this->questions = [];
         }
     }
@@ -94,12 +98,9 @@ class SignTypeQuiz extends Component
 
         if ($correct) {
             $this->score += 10;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';
-
-           // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         } else {
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain  dark:bg-gray-200 rounded-full" />';
-          //  $this->js('setTimeout(() => $wire.nextStep(), 3000)');
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         }
     }
 
@@ -111,10 +112,10 @@ class SignTypeQuiz extends Component
     protected function checkUserSubscription(): void
     {
         try {
-            $storedData = SecureStorage::get('data');
-            $data = json_decode($storedData, true);
+            $data = session('data');
+            $token = session('token');
 
-            if (!$data['user']['id'] || !$data['token']) {
+            if (!$data || !$token || empty($data['user']['id'])) {
                 return;
             }
 
@@ -122,8 +123,10 @@ class SignTypeQuiz extends Component
 
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
             ])
-                ->withToken($data['token'])
+                ->withToken($token)
                 ->acceptJson()
                 ->get($url);
 
@@ -131,11 +134,12 @@ class SignTypeQuiz extends Component
                 $subscriptionData = $response->json('data', []);
 
                 foreach ($subscriptionData as $sub) {
-                    if ($sub['attributes']['theme'] === $this->slug) {
-                        if ($sub['attributes']['active'] === 1) {
-                            $this->hasSubscription = true;
-                            return;
-                        }
+                    if (
+                        ($sub['attributes']['theme'] ?? null) === $this->slug &&
+                        ($sub['attributes']['active'] ?? 0) === 1
+                    ) {
+                        $this->hasSubscription = true;
+                        return;
                     }
                 }
             }
@@ -158,15 +162,12 @@ class SignTypeQuiz extends Component
 
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
-                $this->image = true; // solo activa el flag
+                $this->image = true;
                 $this->score += 10;
-               // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
             } else {
                 $this->isCorrect = false;
-                $this->image = true; // solo activa el flag
+                $this->image = true;
                 $this->message = $correctAnswer;
-               // $this->js('setTimeout(() => $wire.nextStep(), 3000)');
-
             }
         }
     }
@@ -179,15 +180,19 @@ class SignTypeQuiz extends Component
 
         $this->answered = true;
 
-        $current = $this->questions[$this->currentIndex];
+        $current = $this->questions[$this->currentIndex] ?? null;
+
+        if (!$current) {
+            return;
+        }
 
         $validAnswers = array_map(
-        fn($a) => mb_strtolower(trim($a), 'UTF-8'),  // 👈 mb_strtolower
-        explode(' / ', $current['answer'])
+            fn ($a) => mb_strtolower(trim($a), 'UTF-8'),
+            explode(' / ', $current['answer'])
         );
 
         $userAnswers = array_map(
-            fn($a) => mb_strtolower(trim($a), 'UTF-8'),  // 👈 mb_strtolower
+            fn ($a) => mb_strtolower(trim($a), 'UTF-8'),
             explode(' / ', $this->userInput)
         );
 
@@ -200,137 +205,106 @@ class SignTypeQuiz extends Component
             }
         }
 
-
-
         if ($isValid) {
             $this->isCorrect = true;
             $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
-           // $this->js('setTimeout(() => $wire.nextStep(), 1500)');
         } else {
             $this->isCorrect = false;
             $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
             $this->message = implode(' / ', $validAnswers);
-           // $this->js('setTimeout(() => $wire.nextStep(), 3000)');
-
-            }
+        }
     }
 
     public function nextStep()
     {
+        $data = session('data');
+        $token = session('token');
 
-        $data = json_decode(SecureStorage::get('data'), true);
-
-        // ✅ Verificar suscripción
-        if ($this->currentIndex == 2 && !$this->hasSubscription) {
-            $syllabusResponse = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken(SecureStorage::get($data['token']))
-                ->acceptJson()
-                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
-
-
-
-
-            $this->syllabusData = $syllabusResponse->json('data', []);
-
-            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');          
-
-            $this->openPaymentModal($link, $this->slug); // ✅ Pasar slug para identificar el tema
+        if (!$data || !$token) {
+            $this->redirect(route('home'), navigate: true);
             return;
         }
 
-        // ✅ Avanzar a la siguiente pregunta (SIN CARGAR MÁS DATOS)
+        if ($this->currentIndex == 2 && !$this->hasSubscription) {
+            $syllabusResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
+            ])
+                ->withToken($token)
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
+
+            $this->syllabusData = $syllabusResponse->json('data', []);
+            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');
+
+            $this->openPaymentModal($link, $this->slug);
+            return;
+        }
+
         if ($this->currentIndex < count($this->questions) - 1) {
             $this->dispatch('next-step');
 
-            // ✅ Simplemente incrementar el índice
             $this->currentIndex++;
-
-            // ✅ Obtener la pregunta actual del array existente
             $this->currentQuestion = $this->questions[$this->currentIndex];
-            
             $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
 
             $this->resetQuestionState();
 
-            // ✅ Actualizar video si existe
             if (!empty($this->currentQuestion['video'])) {
                 $this->dispatch('quiz-video-update', publicId: $this->currentQuestion['video']);
             }
-
-            // ✅ Log para depuración
-            // logger()->info("Pregunta tipo {$this->currentIndex} de " . count($this->questions));
         } else {
-            // ✅ Completar el quiz
             $this->completed();
         }
     }
 
     public function openPaymentModal($link, $theme = null): void
     {
-        
-        $this->theme = $theme; // resetear UE para evitar conflictos
+        $this->theme = $theme;
         $this->selectedLink = $link;
         $this->showPaymentModal = true;
     }
-
-    
 
     public function closePaymentModal(): void
     {
         $this->redirectRoute('games');
     }
 
-    public function openShop(): void
+    public function openShop()
     {
         if ($this->selectedLink) {
-            Browser::open($this->selectedLink);
+            return redirect()->away($this->selectedLink);
         }
     }
 
-public function validateCode(): void
-{
-       $this->validate([
-                'accessCode' => ['required', 'string'],
-            ]);
+    public function validateCode(): void
+    {
+        $this->validate([
+            'accessCode' => ['required', 'string'],
+        ]);
 
-            $api = app(ApiService::class);
-            $dataUser = SecureStorage::get('data');
-            $user = json_decode($dataUser, true)['user'];
+        $api = app(ApiService::class);
+        $data = session('data');
 
-            $verifyUser = $api->Code($user['id'], $this->accessCode, $this->theme);      
+        if (!$data || empty($data['user']['id'])) {
+            $this->addError('accessCode', 'Session invalide');
+            return;
+        }
 
-           if ($verifyUser->successful() && $verifyUser->json('data.attributes.active') === 1) {
-                $this->showPaymentModal = false;
-                $this->accessCode = '';
-            } else {
-                $this->addError('accessCode', 'Code invalide');
-            }
-}
+        $user = $data['user'];
 
-    // public function openPaymentModal($link)
-    // {
+        $verifyUser = $api->Code($user['id'], $this->accessCode, $this->theme);
 
-
-    //     Dialog::alert(
-    //         'Accès Syllabus',
-    //         'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
-    //         [
-    //             'Oui, ouvrir la boutique',
-    //             'Non, plus tard'
-    //         ]
-    //     )->id('alert-demo');
-    // }
-
-    // #[OnNative(ButtonPressed::class)]
-    // public function handleAlert(int $index, string $id): void
-    // {
-    //     if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
-    //         Browser::open($this->selectedLink);
-    //     }
-    // }
+        if ($verifyUser->successful() && $verifyUser->json('data.attributes.active') === 1) {
+            $this->showPaymentModal = false;
+            $this->accessCode = '';
+            $this->hasSubscription = true;
+        } else {
+            $this->addError('accessCode', 'Code invalide');
+        }
+    }
 
     protected function resetQuestionState()
     {
@@ -339,35 +313,37 @@ public function validateCode(): void
         $this->answered = false;
         $this->isCorrect = false;
         $this->userInput = '';
-        $this->selectedAnswer = ''; // ✅ Añadir esto también
+        $this->selectedAnswer = '';
         $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
     }
 
     public function completed()
     {
         $total = count($this->questions) * 10;
-        $percentage = ($this->score / $total) * 100;
+        $percentage = $total > 0 ? ($this->score / $total) * 100 : 0;
 
         if ($percentage < 80) {
             $this->dispatch('quiz-failed', percentage: round($percentage, 2));
             return;
         }
 
-
-            $this->saveQuizResult();
-
+        $this->saveQuizResult();
 
         $this->dispatch('quiz-finished', [
             'score' => $this->score,
-            'total' => $total
+            'total' => $total,
         ]);
     }
 
     protected function saveQuizResult()
     {
         try {
+            $data = session('data');
+            $token = session('token');
 
-            $data = json_decode(SecureStorage::get('data'), true);
+            if (!$data || !$token || empty($data['user']['id'])) {
+                return;
+            }
 
             $checkUrl = sprintf(
                 '%s/v1/quiz-results/check/%s/%s/%s/%s',
@@ -380,24 +356,26 @@ public function validateCode(): void
 
             $checkResponse = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
             ])
-                ->withToken($data['token'])
+                ->withToken($token)
                 ->acceptJson()
                 ->get($checkUrl);
 
             if ($checkResponse->successful()) {
-                $data = $checkResponse->json('data', []);
-                if (!empty($data)) {
+                $existing = $checkResponse->json('data', []);
+                if (!empty($existing)) {
                     return;
                 }
             }
-            $secure = SecureStorage::get('data');
-            $data = json_decode($secure, true);
 
             Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
             ])
-                ->withToken($data['token'])
+                ->withToken($token)
                 ->acceptJson()
                 ->post(config('services.api.url') . '/v1/quiz-results', [
                     'user_id'   => $data['user']['id'],
@@ -407,7 +385,6 @@ public function validateCode(): void
                     'score'     => $this->score,
                     'played_at' => now()->toDateString(),
                 ]);
-
         } catch (\Throwable $e) {
             logger()->error('Error guardando resultado del quiz: ' . $e->getMessage());
         }
@@ -423,29 +400,31 @@ public function validateCode(): void
         $text = strtolower(trim($text));
 
         $text = str_replace(
-            ['á', 'à', 'ä', 'â', 'ã', 'å', 'æ',
+            [
+                'á', 'à', 'ä', 'â', 'ã', 'å', 'æ',
                 'ç',
                 'é', 'è', 'ë', 'ê',
                 'í', 'ì', 'ï', 'î',
                 'ñ',
                 'ó', 'ò', 'ö', 'ô', 'õ', 'œ',
                 'ú', 'ù', 'ü', 'û',
-                'ý', 'ÿ'],
-            ['a','a','a','a','a','a','ae',
+                'ý', 'ÿ'
+            ],
+            [
+                'a', 'a', 'a', 'a', 'a', 'a', 'ae',
                 'c',
-                'e','e','e','e',
-                'i','i','i','i',
+                'e', 'e', 'e', 'e',
+                'i', 'i', 'i', 'i',
                 'n',
-                'o','o','o','o','o','oe',
-                'u','u','u','u',
-                'y','y'],
+                'o', 'o', 'o', 'o', 'o', 'oe',
+                'u', 'u', 'u', 'u',
+                'y', 'y'
+            ],
             $text
         );
 
         return $text;
     }
-
-   
 
     public function restartQuiz()
     {
@@ -453,75 +432,52 @@ public function validateCode(): void
         $this->score = 0;
         $this->completed = false;
 
-        // ✅ Volver a cargar y mezclar las preguntas
         $this->loadQuestions();
         $this->resetQuestionState();
 
         if (!empty($this->questions)) {
             $this->currentQuestion = $this->questions[0];
+            $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
         }
     }
 
-    public function submitFeedback($feedbackData)  // ✅ Recibe array, no Request
+    public function submitFeedback($feedbackData)
     {
-
         $api = app(ApiService::class);
 
-        //logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
-
         try {
-            // Validar los datos del feedback que vienen del frontend
             $validatedFeedback = validator($feedbackData, [
                 'type' => 'required|in:bug,suggestion,question',
                 'message' => 'required|string|max:1000',
                 'question_id' => 'nullable|integer',
-
             ])->validate();
 
-            //logger()->info('✅ Feedback validation passed:', $validatedFeedback);
-
-            // Obtener datos del usuario de SecureStorage
-            $storedData = SecureStorage::get('data');
-            $userData = json_decode($storedData, true);
-
-
-            //logger()->info('👤 User data loaded:', [
-            //    'user_id' => $userData['user']['id'] ?? 'null'
-            //]);
+            $data = session('data');
 
             $completeData = [
-                    'user_id' => $userData['user']['id'] ?? null,
-                    'type' => $validatedFeedback['type'],
-                    'message' => $validatedFeedback['message'],
-                    'question_id' => $validatedFeedback['question_id'] ?? null,
-                    'status' => 'pending',
-                ];
+                'user_id' => $data['user']['id'] ?? null,
+                'type' => $validatedFeedback['type'],
+                'message' => $validatedFeedback['message'],
+                'question_id' => $validatedFeedback['question_id'] ?? null,
+                'status' => 'pending',
+            ];
 
-            //logger()->info('📦 Sending to API:', $completeData);
-
-            // ✅ Llamar a la API con el array completo
-            $result = $api->FeedBack($completeData);
-
-            // logger()->info('✅ API response:', ['result' => $result]);
-
-            // logger()->info('🎉 Feedback saved successfully!');
+            $api->FeedBack($completeData);
 
             return [
                 'success' => true,
-                'message' => 'Feedback received successfully'
+                'message' => 'Feedback received successfully',
             ];
-
         } catch (\Illuminate\Validation\ValidationException $e) {
-            logger()->error('❌ Validation failed:', [
-                'errors' => $e->errors()
+            logger()->error('Validation failed:', [
+                'errors' => $e->errors(),
             ]);
             throw $e;
-
         } catch (\Exception $e) {
-            logger()->error('❌ Exception:', [
+            logger()->error('Exception:', [
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
-                'file' => $e->getFile()
+                'file' => $e->getFile(),
             ]);
             throw $e;
         }
@@ -529,7 +485,6 @@ public function validateCode(): void
 
     public function render()
     {
-        // ✅ Obtener la pregunta actual del array existente
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
         return view('livewire.sign-type-quiz', [

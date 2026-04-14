@@ -2,39 +2,32 @@
 
 namespace App\Http\Middleware;
 
-
 use Closure;
 use Illuminate\Http\Request;
-use Native\Mobile\Facades\SecureStorage;
-
 
 class ApiTokenExists
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
     public function handle(Request $request, Closure $next)
     {
-        // Check if data exists in SecureStorage
-        $storedData = SecureStorage::get('data');
+        $data = session('data');
 
-        if (!$storedData) {
-            return redirect()->route('home');
+        if (!$data) {
+            return redirect('/');
         }
 
-        // Decode and check for token
-        $data = json_decode($storedData, true);
-
-        if (!isset($data['token']) || empty($data['token'])) {
-            return redirect()->route('home');
+        if (empty($data['token'])) {
+            return redirect('/');
         }
 
         // Verificar expiración de 365 días
         if (!isset($data['expires_at']) || now()->timestamp > $data['expires_at']) {
-            SecureStorage::forget('data');
-            return redirect()->route('home');
+            session()->forget(['data', 'token']);
+            return redirect('/');
         }
 
         return $next($request);

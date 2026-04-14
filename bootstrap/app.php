@@ -17,11 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'api.token.exists' => ApiTokenExists::class,
-            'check.network' => CheckNetworkConnection::class,
             'guest' => RedirectIfAuthenticated::class,
-        ]);
-        $middleware->web(append: [
-           CheckNetworkConnection::class,
         ]);
 
 

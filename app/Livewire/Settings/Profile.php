@@ -2,44 +2,31 @@
 
 namespace App\Livewire\Settings;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Native\Mobile\Facades\SecureStorage;
 
 class Profile extends Component
 {
     public string $name = '';
-
     public string $email = '';
 
-    /**
-     * Mount the component.
-     */
     public function mount(): void
     {
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
-
+        $data = session('data');
 
         if (!$data) {
-            $this->redirect(route('home')); // si no hay sesión, fuera
+            $this->redirect(route('home'), navigate: true);
+            return;
         }
 
         $this->name = $data['user']['name'] ?? '';
         $this->email = $data['user']['email'] ?? '';
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
     public function updateProfileInformation(): void
     {
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
+        $data = session('data');
 
         if (!isset($data['token'])) {
             $this->addError('email', 'Debe iniciar sesión nuevamente.');
@@ -62,7 +49,6 @@ class Profile extends Component
         if ($response->successful()) {
             $userData = $response->json('data');
 
-            // conservar el token
             session([
                 'data' => [
                     'token' => $data['token'],
@@ -70,32 +56,21 @@ class Profile extends Component
                 ],
             ]);
 
-            $this->dispatch('profile-updated', name: $userData['name']);
+            $this->name = $userData['name'] ?? $this->name;
+            $this->email = $userData['email'] ?? $this->email;
+
+            $this->dispatch('profile-updated', name: $userData['name'] ?? $this->name);
         } else {
-            $this->addError('email', $response->json('message') ?? 'Error al actualizar el perfil.');
+            $this->addError(
+                'email',
+                $response->json('message') ?? 'Error al actualizar el perfil.'
+            );
         }
     }
 
-
-    /**
-     * Send an email verification notification to the current user.
-     */
-    public function resendVerificationNotification(): void
+    public function render()
     {
-        $user = Auth::user();
-
-        if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('access.dashboard', absolute: false));
-
-            return;
-        }
-
-        $user->sendEmailVerificationNotification();
-
-        Session::flash('status', 'verification-link-sent');
-    }
-
-    public function render() {
-        return view('livewire.settings.profile')->layout('components.layouts.app.home');
+        return view('livewire.settings.profile')
+            ->layout('components.layouts.app.home');
     }
 }

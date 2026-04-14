@@ -3,12 +3,10 @@
 namespace App\Livewire\Auth;
 
 use App\Services\ApiService;
-use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Native\Mobile\Edge\Edge;
-use Native\Mobile\Facades\SecureStorage;
+
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
@@ -25,11 +23,7 @@ class Login extends Component
 
     public ?string $error = null;
 
-    public function mount(): void
-    {
 
-        Edge::clear();
-    }
 
     public function render()
     {
@@ -52,15 +46,14 @@ class Login extends Component
                 return;
             }
 
-
             $data['expires_at'] = now()->addDays(365)->timestamp;
-            SecureStorage::set('data', json_encode($data));
+
+            session(['data' => $data]);
+            session(['token' => $data['token'] ?? null]);
 
             $this->redirect(route('access.dashboard'), navigate: true);
             return;
         }
-
-
 
         $this->error = $response->json('message');
     }

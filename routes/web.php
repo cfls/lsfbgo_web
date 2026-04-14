@@ -36,13 +36,6 @@ use Native\Mobile\Facades\SecureStorage;
 | Estas rutas NO deben verificar la conexión para evitar loops infinitos
 */
 
-Route::get('/sin-conexion', [NetworkController::class, 'sinConexion'])
-    ->name('sin-conexion')
-    ->withoutMiddleware(['check.network']);
-
-Route::get('/api/network/status', [NetworkController::class, 'checkStatus'])
-    ->name('api.network.status')
-    ->withoutMiddleware(['check.network']);
 
 /*
 |--------------------------------------------------------------------------
@@ -51,19 +44,17 @@ Route::get('/api/network/status', [NetworkController::class, 'checkStatus'])
 */
 
 Route::get('/', function () {
-    // Limpiar EDGE en la página de bienvenida/login
-    Edge::clear();
 
-    $storedData = SecureStorage::get('data');
-    $data = json_decode($storedData, true);
+    // Obtener datos desde sesión (web)
+    $data = session('data');
 
-    // Verificar si existe el token en la sesión
+    // Verificar si existe token
     if (!empty($data['token'])) {
         return redirect()->route('access.dashboard');
     }
 
     return view('welcome');
-})->name('home');
+});
 
 
 

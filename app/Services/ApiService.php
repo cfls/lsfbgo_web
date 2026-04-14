@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Native\Mobile\Facades\SecureStorage;
+
 use Illuminate\Support\Facades\Log;
 
 class ApiService
@@ -17,46 +17,19 @@ class ApiService
         $this->baseUrl = config('services.api.url') ?? '';
         $this->verifySsl = env('API_VERIFY_SSL', true);
     }
-
-//    public function getAuthenticatedUser(): Response
-//    {
-//        return Http::withOptions([
-//            'verify' => $this->verifySsl,
-//        ])
-//            ->asJson()
-//            ->acceptJson()
-//            ->withToken(SecureStorage::get('token'))
-//            ->get($this->baseUrl . 'auth/user');
-//    }
-
-
-
-    /**
+        /**
      * Realizar petición POST a la API
      */
-  public function post(string $endpoint, array $data = []): Response
+    public function post(string $endpoint, array $data = []): Response
     {
-        $stored = SecureStorage::get('data');              // ✅ Variable separada
-        $token  = json_decode($stored, true)['token'] ?? null;
+        $sessionData = session('data');
+        $token = $sessionData['token'] ?? null;
 
-        Log::info('POST Request', [
-            'endpoint' => $endpoint,
-            'token'    => $token,
-            'data'     => $data,  // Ahora sí muestra el payload real
-        ]);
-
-        $response = Http::withOptions(['verify' => $this->verifySsl])
+       return Http::withOptions(['verify' => $this->verifySsl])
             ->withToken($token)
             ->asJson()
             ->acceptJson()
-            ->post($this->baseUrl . $endpoint, $data); // ✅ Envía el código correcto
-
-        // Log::info('POST Response', [
-        //     'status' => $response->status(),
-        //     'body'   => $response->json(),
-        // ]);
-
-        return $response;
+            ->post($this->baseUrl . $endpoint, $data);
     }
 
     /**
@@ -64,27 +37,18 @@ class ApiService
      */
     public function get(string $endpoint, array $params = [], ?string $token = null): Response
     {
-        // Si no se proporciona token, intentar obtenerlo
         if (!$token) {
-            // Opción 1: Token directo
-            $token = SecureStorage::get('token');
+            $token = session('token');
 
-            // Opción 2: Token dentro de 'data'
             if (!$token) {
-                $storedData = SecureStorage::get('data');
-                if ($storedData) {
-                    $data = json_decode($storedData, true);
-                    $token = $data['token'] ?? null;
-                }
+                $data = session('data');
+                $token = $data['token'] ?? null;
             }
         }
 
-        // Si aún no hay token, lanzar excepción
         if (!$token) {
             throw new \Exception('No authentication token found');
         }
-
-
 
         return Http::withOptions(['verify' => $this->verifySsl])
             ->asJson()
@@ -159,8 +123,7 @@ class ApiService
 
     public function allThemes()
     {
-        $storedData = SecureStorage::get('data');
-        $data = json_decode($storedData, true);
+        $data = session('data');
         return $this->get('/v1/syllabus', [], $data['token'] ?? null);
     }
 
@@ -212,25 +175,21 @@ class ApiService
             'status' => $data['status'] ?? 'pending',
         ]);
     }
+
     public function ProfilUser(?string $token = null)
     {
-        // Obtener token directamente
-        $storedData = SecureStorage::get('data');
+        $data = session('data');
 
-        if (!$storedData) {
+        if (!$data) {
             throw new \Exception('No stored authentication data');
         }
 
-        $data = json_decode($storedData, true);
         $token = $data['token'] ?? null;
 
         if (!$token) {
-            throw new \Exception('Token not found in stored data');
+            throw new \Exception('Token not found in session');
         }
 
-
-
-        // Pasar el token explícitamente
         return $this->get('/user', [], $token);
     }
 
@@ -249,22 +208,15 @@ class ApiService
 
     public function logout(?string $token = null): Response
     {
-        // Si no se proporciona token, intentar obtenerlo
         if (!$token) {
-            // Opción 1: Token directo
-            $token = SecureStorage::get('token');
+            $token = session('token');
 
-            // Opción 2: Token dentro de 'data'
             if (!$token) {
-                $storedData = SecureStorage::get('data');
-                if ($storedData) {
-                    $data = json_decode($storedData, true);
-                    $token = $data['token'] ?? null;
-                }
+                $data = session('data');
+                $token = $data['token'] ?? null;
             }
         }
 
-        // Si aún no hay token, lanzar excepción
         if (!$token) {
             throw new \Exception('No authentication token found for logout');
         }
