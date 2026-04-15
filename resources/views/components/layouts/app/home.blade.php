@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Apprends la langue des signes de Belgique francophone (LSFB) de manière interactive et ludique. Vidéos, exercices, dictionnaire et jeux.">
-    <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta property="og:title"       content="Lsfbgo — Apprends la LSFB">
     <meta property="og:description"  content="Plateforme interactive pour apprendre la langue des signes de Belgique francophone.">
@@ -145,13 +144,14 @@
 @fluxScripts
 @livewireScripts
 @stack('scripts')
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DM2RRCY0TH"></script>
 <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-    gtag('config', 'G-DM2RRCY0TH');
+  gtag('config', 'G-DM2RRCY0TH');
 </script>
 <script>
     function navActive() {
