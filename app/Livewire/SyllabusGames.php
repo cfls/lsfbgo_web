@@ -64,7 +64,6 @@ class SyllabusGames extends Component
 
     public function loadTheme($ue): void
     {
-        $api = app(ApiService::class);
         $token = session('token');
 
         if (!$token) {
@@ -73,20 +72,35 @@ class SyllabusGames extends Component
         }
 
         $this->ue = $ue;
-
-        $response = Http::withOptions([
-            'verify' => env('API_VERIFY_SSL', true),
-            'timeout' => 60,
+        $baseUrl  = config('services.api.url');
+        $options  = [
+            'verify'          => env('API_VERIFY_SSL', true),
+            'timeout'         => 60,
             'connect_timeout' => 10,
-        ])
-            ->withToken($token)
-            ->acceptJson()
-            ->get(config('services.api.url') . '/v1/sections/' . $this->ue);
+        ];
 
-        $this->results = $response->json('data', []);
+        [$sectionsResponse, $colorResponse] = Http::pool(fn ($pool) => [
+            $pool->withOptions($options)
+                ->withToken($token)
+                ->acceptJson()
+                ->get("{$baseUrl}/v1/sections/{$ue}"),
 
-        $syllabusData = $api->ThemeColor($this->ue);
-        $this->color = $syllabusData->json('data.attributes.hex_color', '#000000');
+            $pool->withOptions($options)
+                ->withToken($token)
+                ->acceptJson()
+                ->get("{$baseUrl}/v1/syllabus/settings/{$ue}"),
+        ]);
+
+        $this->results = $sectionsResponse->json('data', []);
+
+        // ✅ Primera vez llama a la API, las siguientes 5 min usa el caché
+        $this->color = cache()->remember(
+            "theme_color_{$ue}",
+            now()->addMinutes(5),
+            fn() => $colorResponse->json('data.attributes.hex_color', '#000000')
+        );
+
+        $this->dispatch('color-updated', color: $this->color);
     }
 
     public function updatedSelectedSyllabus($value): void

@@ -1,5 +1,5 @@
 <section class="w-full flex items-center justify-center mx-auto px-4 py-8">
-    <div class="w-full max-w-2xl border-2 border-black dark:border-white rounded-lg p-4 bg-gray-700 dark:bg-gray-900">
+    <div class="w-full max-w-2xl border-2 border-black dark:border-white rounded-lg p-4 bg-white dark:bg-gray-900">
 
     <x-settings.layout :heading="__('Mettre à jour le mot de passe')" :subheading="__('Assurez-vous que votre compte utilise un mot de passe long et aléatoire pour rester sécurisé')">
         <form method="POST" wire:submit="updatePassword" class="mt-6 space-y-6">

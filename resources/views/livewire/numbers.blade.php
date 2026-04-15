@@ -48,7 +48,7 @@
 }">
 
         {{-- Video --}}
-        <div class="relative rounded-2xl overflow-hidden bg-black shadow-xl">
+        <div class="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-xl">
 
             {{-- Loader --}}
             <div x-show="loading"
@@ -63,7 +63,7 @@
             </div>
 
             <video x-ref="video"
-                   class="w-full aspect-video object-cover"
+                   class="w-full h-full object-cover transition-all duration-500"
                    autoplay muted loop playsinline
                    @loadeddata="loading = false"
                    @waiting="loading = true"

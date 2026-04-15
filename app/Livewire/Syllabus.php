@@ -122,15 +122,9 @@ class Syllabus extends Component
         }
     }
 
-    public function openInApp()
-    {
-        $this->dispatch('open-link', url: 'https://www.facebook.com/share/v/1BepzAgdKA');
-    }
 
-    public function openSystem()
-    {
-        $this->dispatch('open-link', url: 'https://nativephp.com');
-    }
+
+
 
     public function render()
     {

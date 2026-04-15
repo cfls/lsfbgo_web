@@ -42,15 +42,17 @@
             </div>
         </div>
 
-        <video
-                preload="metadata"
-                src="{{ encode_cloudinary_url($optimizedUrl) }}"
-                controlsList="nodownload"
-                poster="{{ $posterUrl }}"
-                class="w-full h-auto max-h-[220px] object-cover rounded-lg transition-opacity duration-300"
-                :class="{ 'opacity-0': !videoLoaded }"
-                muted autoplay loop playsinline
-                @loadeddata="videoLoaded = true"
-        ></video>
+        <div class="w-full max-w-2xl mx-auto">
+            <video
+                    preload="metadata"
+                    src="{{ encode_cloudinary_url($optimizedUrl) }}"
+                    controlsList="nodownload"
+                    poster="{{ $posterUrl }}"
+                    class="w-full h-auto max-h-[220px] md:max-h-[360px] object-cover rounded-lg transition-opacity duration-300"
+                    :class="{ 'opacity-0': !videoLoaded }"
+                    muted autoplay loop playsinline
+                    @loadeddata="videoLoaded = true"
+            ></video>
+        </div>
     </div>
 @endif
