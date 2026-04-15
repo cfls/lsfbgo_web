@@ -137,7 +137,7 @@
                         controlsList="nodownload nofullscreen"
                         oncontextmenu="return false"
                         aria-label="Vidéo du mot à deviner en langue des signes"
-                        class="rounded-xl shadow-md w-1/2 h-auto object-cover transition-opacity duration-700"
+                        class="rounded-xl shadow-md  w-full md:w-1/2 h-auto object-cover transition-opacity duration-700"
                         :class="{'opacity-0': !isVisible, 'opacity-100': isVisible}"
                 >
                     <source :src="videoUrl" type="video/mp4">

@@ -52,8 +52,10 @@
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-6 py-4 dark:bg-slate-900">
 
         <div class="flex items-center gap-3">
+            <a href="{{ route('access.dashboard') }}" class="flex items-center gap-2">
             <h1 class="text-lg font-bold leading-none">LSFBGO</h1>
             <p class="text-sm text-white/60 hidden sm:block">Plateforme d'apprentissage</p>
+            </a>
         </div>
 
         <div class="flex items-center gap-3">
