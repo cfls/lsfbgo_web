@@ -45,7 +45,7 @@
 <body class="min-h-screen dark:bg-slate-900 text-white overflow-x-hidden">
 
 <header
-        class="border-b border-white/10 bg-slate-900 sticky top-0 z-50"
+        class="border-b border-white/10 bg-slate-900"
         x-data="{ open: false }"
 >
     {{-- Barra principal --}}

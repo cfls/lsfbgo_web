@@ -100,7 +100,7 @@
                     <textarea x-model="feedbackMessage"
                               rows="4"
                               placeholder="Décrivez votre problème, suggestion ou question..."
-                              class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-zinc-800 dark:text-white resize-none"
+                              class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-zinc-800 text-black dark:text-white resize-none"
                     ></textarea>
                 </div>
 

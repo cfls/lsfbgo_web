@@ -6,7 +6,7 @@
     @endif
 
     {{-- Header --}}
-    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] md:pt-0 sticky top-0 z-10 shadow-md">
+    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] md:pt-0  shadow-md">
         <div class="max-w-4xl mx-auto px-4 md:px-6 py-3 md:py-4">
             <div class="flex items-center gap-3">
                 <span aria-hidden="true">
