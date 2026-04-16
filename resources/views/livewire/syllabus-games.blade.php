@@ -95,8 +95,8 @@
 
             <div wire:loading.remove wire:target="selectedSyllabus" class="space-y-3">
                 @foreach([
-                    ['type' => 'text',   'label' => '🎥✍️ Traduis en français'],
-                    ['type' => 'choice', 'label' => '🎥📝 Choisir le bon mot'],
+                    ['type' => 'text',   'label' => 'Traduis en français'],
+                    ['type' => 'choice', 'label' => 'Choisis le bon mot'],
                 ] as $item)
                    <a
                     wire:navigate

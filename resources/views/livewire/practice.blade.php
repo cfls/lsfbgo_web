@@ -1,31 +1,47 @@
-<div class="space-y-4 min-h-screen">
-    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
-        <div class="px-4">
-            <div class="p-2 inline-block">
+<div class="space-y-4 min-h-screen bg-gray-50">
+
+    {{-- Header --}}
+    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)]">
+        <div class="px-4 py-4">
+            <div class="flex flex-col items-start gap-3">
                 @include('partials.quiz.svg.logo')
-                <flux:subheading class="text-white text-xl pb-4">
+
+                <flux:subheading class="text-white text-base sm:text-lg leading-snug max-w-md">
                     Maîtrisez la LSFB grâce à LSFBGo — une application pensée pour l'accessibilité et l'inclusion.
                 </flux:subheading>
             </div>
         </div>
     </div>
 
-    <div class="px-4 py-4">
+    {{-- Grid --}}
+    <div class="px-4 pb-6">
         <div class="grid grid-cols-2 gap-4">
             @foreach($topics as $topic)
-                <a href="{{ route($topic['route']) }}" wire:key="demo-{{ $loop->index }}">
-                    <flux:card class="bg-gradient-to-br {{ $topic['gradient'] }} hover:shadow-lg transition-shadow cursor-pointer rounded-xl w-full">
-                        <div class="flex flex-col items-center justify-center text-center gap-2 py-6 px-3">
-                            <div class="size-16 rounded-full bg-white/30 flex items-center justify-center">
-                                <flux:icon icon="{{ $topic['icon'] }}" class="size-10 text-white"/>
+                <a href="{{ route($topic['route']) }}" wire:key="demo-{{ $loop->index }}" class="block h-full">
+
+                    <flux:card class="bg-gradient-to-br {{ $topic['gradient'] }} rounded-2xl shadow-md active:scale-95 transition-transform duration-150 h-full">
+
+                        <div class="flex flex-col justify-between h-full p-4">
+
+                            {{-- Icon --}}
+                            <div class="flex justify-center">
+                                <div class="size-14 rounded-full bg-white/25 backdrop-blur flex items-center justify-center">
+                                    <flux:icon icon="{{ $topic['icon'] }}" class="size-8 text-white"/>
+                                </div>
                             </div>
-                            <h1 class="text-sm font-bold text-white leading-tight">{{ $topic['title'] }}</h1>
+
+                            {{-- Title --}}
+                            <h2 class="text-sm font-semibold text-white text-center leading-snug line-clamp-2 min-h-[2.75rem] flex items-center justify-center">
+                                {{ $topic['title'] }}
+                            </h2>
+
                         </div>
+
                     </flux:card>
                 </a>
             @endforeach
         </div>
     </div>
 
-    <div class="pb-32"></div>
+    <div class="pb-28"></div>
 </div>

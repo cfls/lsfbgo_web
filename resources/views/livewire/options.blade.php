@@ -22,7 +22,7 @@
                         switch($this->type):
                             case 'text':         $title = 'Traduis en français'; break;
                             // case 'video-choice': $title = 'Choisis la bonne vidéo';      break;
-                            case 'choice':       $title = 'Choisir le bon mot';            break;
+                            case 'choice':       $title = 'Choisis le bon mot';            break;
                             // case 'yes-no':       $title = 'Vrai / Faux';        break;
                             case 'match':        $title = 'Associer les paires'; break;
                             default:             $title = 'Question surprise'; break;
