@@ -28,6 +28,14 @@ class Theme extends Component
             $this->results = $response->json('data', []);
             $this->videos = $this->results['attributes']['videos'] ?? [];
 
+            $this->videos = collect($this->videos)->map(function ($video) {
+                if (isset($video['url'])) {
+                    $video['url'] = str_replace('http://', 'https://', $video['url']);
+                }
+                return $video;
+            })->toArray();
+
+
 
             // Buscar índice actual
             $foundIndex = collect($this->videos)->search(function ($video) use ($id) {
