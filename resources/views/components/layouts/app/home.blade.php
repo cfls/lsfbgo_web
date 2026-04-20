@@ -146,15 +146,16 @@
 @fluxScripts
 @livewireScripts
 @stack('scripts')
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DM2RRCY0TH"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DM2RRCY0TH');
-</script>
+@if(app()->environment('production'))
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DM2RRCY0TH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-DM2RRCY0TH');
+    </script>
+@endif
 <script>
     function navActive() {
         return {

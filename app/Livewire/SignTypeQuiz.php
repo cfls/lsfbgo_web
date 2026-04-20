@@ -180,19 +180,20 @@ class SignTypeQuiz extends Component
 
         $this->answered = true;
 
-        $current = $this->questions[$this->currentIndex] ?? null;
+        $current = $this->questions[$this->currentIndex];
 
-        if (!$current) {
-            return;
-        }
+        $normalize = function(string $s): string {
+            $s = str_replace(['œ', 'Œ', 'æ', 'Æ'], ['oe', 'OE', 'ae', 'AE'], $s);
+            return mb_strtolower(trim($s), 'UTF-8');
+        };
 
         $validAnswers = array_map(
-            fn ($a) => mb_strtolower(trim($a), 'UTF-8'),
+            fn($a) => $normalize($a),
             explode(' / ', $current['answer'])
         );
 
         $userAnswers = array_map(
-            fn ($a) => mb_strtolower(trim($a), 'UTF-8'),
+            fn($a) => $normalize($a),
             explode(' / ', $this->userInput)
         );
 
