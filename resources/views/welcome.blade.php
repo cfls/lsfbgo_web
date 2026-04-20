@@ -148,6 +148,7 @@
 @fluxScripts
 @livewireScripts
 @stack('scripts')
+@if(app()->environment('production'))
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DM2RRCY0TH"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -155,6 +156,7 @@
     gtag('js', new Date());
 
     gtag('config', 'G-DM2RRCY0TH');
+ @endif
 </script>
 </body>
 </html>
