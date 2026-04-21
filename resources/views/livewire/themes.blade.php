@@ -61,7 +61,7 @@
             <p
                 x-show="search !== ''"
                 x-transition
-                class="text-sm text-gray-600 mb-3"
+                class="text-sm dark:text-white text-gray-600 mb-3"
                 aria-hidden="true"
             >
                 <span x-text="visibleCount"></span> résultat(s) trouvé(s)

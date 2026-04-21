@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-gray-50 dark:bg-zinc-900">
 
     {{-- Header sticky --}}
-    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] md:pt-0 sticky top-0 z-10 shadow-md">
+    <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] md:pt-0  shadow-md">
         <div class="max-w-5xl mx-auto px-4 md:px-6 py-3 md:py-4">
             <div class="flex items-center gap-3">
               <a
@@ -25,6 +25,7 @@
         @if(count($videos) > 0)
             <div
                     x-data="{
+                    videoError: false,
                     videos: @js($videos),
                     current: {{ $currentIndex }},
                     isPaused: true,
@@ -64,6 +65,7 @@
                     resetVideo() {
                         const video = this.$refs.player;
                         if (!video) return;
+                        this.videoError = false;
                         video.pause();
                         video.currentTime = 0;
                         this.isPaused = true;
@@ -105,18 +107,46 @@
                         </div>
                     </div>
 
+                    {{-- 👇 Error state con botón de reintento --}}
+                    <div
+                            x-show="videoError"
+                            class="absolute inset-0 bg-gray-900 flex flex-col items-center justify-center z-10 gap-4"
+                    >
+                        <svg class="w-12 h-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        </svg>
+                        <p class="text-white text-sm">La vidéo n'a pas pu se charger</p>
+                        <button
+                                @click="
+                                    videoError = false;
+                                    videoLoaded = false;
+                                    const v = $refs.player;
+                                    const src = v.src;
+                                    v.src = '';
+                                    v.load();
+                                    v.src = src;
+                                    v.load();
+                                    v.play().then(() => { isPaused = false; }).catch(() => {});        "
+                                class="px-5 py-2 bg-white text-gray-900 rounded-full font-semibold text-sm hover:bg-gray-200 transition"
+                        >
+                            🔄 Réessayer
+                        </button>
+                    </div>
+
                     <video
                             x-ref="player"
                             class="w-full h-full object-cover transition-all duration-500"
                             :class="{
-                            'opacity-0': !videoLoaded,
-                            'opacity-100': videoLoaded,
-                            'scale-95 blur-sm': isTransitioning,
-                            'scale-100 blur-0': !isTransitioning
-                        }"
+                                'opacity-0': !videoLoaded,
+                                'opacity-100': videoLoaded,
+                                'scale-95 blur-sm': isTransitioning,
+                                'scale-100 blur-0': !isTransitioning
+                            }"
                             :src="currentVideo?.url"
                             autoplay muted playsinline
-                            @loadeddata="videoLoaded = true"
+                            x-on:loadeddata="videoLoaded = true"
+                            x-on:error="handleVideoError()"
                     >
                         Votre navigateur ne supporte pas la vidéo.
                     </video>
