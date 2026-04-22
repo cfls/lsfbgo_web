@@ -3,5 +3,5 @@
 {{--</div>--}}
 
 <h2 class="font-medium text-sm mb-4 text-center text-black dark:text-white">
-    {{ $currentQuestion['question_text'] }}
+    {{ $currentQuestion['question_text'] ?? '' }}
 </h2>

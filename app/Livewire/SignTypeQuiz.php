@@ -98,9 +98,9 @@ class SignTypeQuiz extends Component
 
         if ($correct) {
             $this->score += 10;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         } else {
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         }
     }
 
@@ -168,6 +168,7 @@ class SignTypeQuiz extends Component
                 $this->isCorrect = false;
                 $this->image = true;
                 $this->message = $correctAnswer;
+                $this->userAnswer = $answer;
             }
         }
     }
@@ -208,12 +209,13 @@ class SignTypeQuiz extends Component
 
         if ($isValid) {
             $this->isCorrect = true;
-            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
         } else {
             $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
             $this->message = implode(' / ', $validAnswers);
+            $this->userAnswer = $this->userInput; // ← añadir
         }
     }
 
@@ -315,6 +317,7 @@ class SignTypeQuiz extends Component
         $this->isCorrect = false;
         $this->userInput = '';
         $this->selectedAnswer = '';
+        $this->userAnswer = ''; // ← añadir
         $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
     }
 

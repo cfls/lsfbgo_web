@@ -276,7 +276,7 @@
                 Félicitations !
             </h2>
 
-            <img src="{{ asset('img/lsfgo/good.png') }}" alt="Applaudissements" class="w-24" />
+            <img src="{{ asset('img/lsfbgo/good.png') }}" alt="Applaudissements" class="w-24" />
             <p class="font-semibold text-sm opacity-90">Vous avez complété tous les mots !</p>
 
             {{-- ✅ aria-live para anunciar la redirección pendiente --}}

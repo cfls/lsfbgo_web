@@ -170,7 +170,7 @@
                 >
                     <template x-if="isCorrect">
                         <div class="flex flex-col items-center gap-2">
-                            <img src="{{ asset('img/lsfgo/good.png') }}" alt="Correct" class="w-20 h-20 object-contain">
+                            <img src="{{ asset('img/lsfbgo/good.png') }}" alt="Correct" class="w-20 h-20 object-contain">
                             <span class="text-emerald-600 dark:text-emerald-300 font-bold text-xl">Bravo ! C'est la bonne réponse.</span>
                         </div>
                     </template>

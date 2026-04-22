@@ -48,7 +48,7 @@
                             :aria-label="slow ? 'Mode lent activé' : 'Mode normal activé'"
                             class="flex items-center justify-center w-14 h-14 rounded-full bg-white text-white shadow-lg"
                         >
-                            <span class="text-[10px]" x-html="slow ? '<img src=\'{{ asset('img/lsfgo/slow.png') }}\' alt=\'Activer la vitesse lente\' class=\'w-14 h-14 object-contain\' />' : '<img src=\'{{ asset('img/lsfgo/speed.png') }}\' alt=\'Activer la vitesse normale\' class=\'w-14 h-14 object-contain\' />'"></span>
+                            <span class="text-[10px]" x-html="slow ? '<img src=\'{{ asset('img/lsfbgo/slow.png') }}\' alt=\'Activer la vitesse lente\' class=\'w-14 h-14 object-contain\' />' : '<img src=\'{{ asset('img/lsfbgo/speed.png') }}\' alt=\'Activer la vitesse normale\' class=\'w-14 h-14 object-contain\' />'"></span>
                         </button>
                     </div>
                     
