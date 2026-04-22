@@ -4,12 +4,18 @@
     'image' => null,
     'userAnswer' => '',
     'currentQuestion' => [],
+    'isLastQuestion' => false,
 ])
 
 @if($image)
 <div
     x-data="{ show: false }"
-    x-init="$nextTick(() => { setTimeout(() => { show = true }, 50) })"
+    x-init="$nextTick(() => {
+    setTimeout(() => { show = true }, 50)
+    @if($isLastQuestion)
+    setTimeout(() => { $wire.nextStep() }, 2000)
+    @endif
+    })"
     x-on:close-quiz-modals.window="show = false"
     :style="show
         ? 'max-height: 600px; bottom: calc(56px + env(safe-area-inset-bottom, 0px))'
@@ -51,8 +57,10 @@
     </div>
 
     {{-- Botón siguiente --}}
+    @if(!$isLastQuestion)
     <div class="w-full flex justify-center mt-1">
         <x-sign-video-next-button :nextStep="'nextStep'" />
     </div>
+    @endif
 </div>
 @endif

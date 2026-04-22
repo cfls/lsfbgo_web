@@ -487,6 +487,11 @@ class SignTypeQuiz extends Component
         }
     }
 
+    public function getIsLastQuestionProperty(): bool
+    {
+        return $this->currentIndex >= count($this->questions) - 1;
+    }
+
     public function render()
     {
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;

@@ -4,4 +4,6 @@
         :image="$image"
         :userAnswer="$userInput ?: $selectedAnswer"
         :currentQuestion="$currentQuestion"
+        :isLastQuestion="$this->isLastQuestion"
+
 />

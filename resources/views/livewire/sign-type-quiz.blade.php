@@ -234,12 +234,14 @@
                     });
 
                     window.addEventListener('quiz-failed', (event) => {
+                        window.dispatchEvent(new CustomEvent('close-quiz-modals'));
                         this.openCongrats = false;
                         this.showFailModal = true;
                         this.failPercentage = event.detail.percentage || 0;
                     });
 
                     window.addEventListener('quiz-finished', (event) => {
+                        window.dispatchEvent(new CustomEvent('close-quiz-modals'))
                         this.showFailModal = false;
                         this.openCongrats = true;
                         if (event.detail) {
