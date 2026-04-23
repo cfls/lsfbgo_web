@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <div class="w-full max-w-2xl mx-auto">
+        <div class="w-full max-w-2xl mx-auto" x-show="!openFeedback">
             <video
                     x-ref="videoEl"
                     preload="metadata"

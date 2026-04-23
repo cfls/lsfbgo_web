@@ -150,6 +150,8 @@ class SignTypeQuiz extends Component
 
     public function selectAnswer($answer)
     {
+
+
         $this->selectedAnswer = $answer;
 
         $current = $this->questions[$this->currentIndex] ?? null;
@@ -159,6 +161,7 @@ class SignTypeQuiz extends Component
             $givenAnswer = strtolower($this->normalizeAnswer($answer));
 
             $this->answered = true;
+
 
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
@@ -175,6 +178,8 @@ class SignTypeQuiz extends Component
 
     public function checkAnswer()
     {
+
+
         if (empty($this->userInput)) {
             return;
         }
@@ -206,6 +211,8 @@ class SignTypeQuiz extends Component
                 break;
             }
         }
+
+
 
         if ($isValid) {
             $this->isCorrect = true;

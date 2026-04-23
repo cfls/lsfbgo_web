@@ -1,4 +1,4 @@
-<div class="flex justify-center mt-4">
+<div class="flex justify-center mt-4" x-show="!openFeedback">
     <input type="text"
            wire:model="userInput"
            inputmode="text"

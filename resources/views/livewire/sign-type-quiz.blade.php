@@ -1,6 +1,6 @@
-<div 
-     x-data="quizData()"    
-     class="space-y-4 min-h-screen">
+<div
+        x-data="quizData()"
+        class="space-y-4 min-h-screen">
     <div class="rounded-xl w-full mx-auto">
 
         {{-- Modals --}}
@@ -9,51 +9,51 @@
         @include('partials.quiz.modals.feedback')
 
         @if ($showPaymentModal)
-           @include('partials.quiz.modals.code', ['link' => $selectedLink, 'theme' => $theme])
+            @include('partials.quiz.modals.code', ['link' => $selectedLink, 'theme' => $theme])
         @endif
 
         {{-- Quiz Content --}}
-        <div class="p-5"> 
+        <div class="p-5">
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
-            {{-- ✅ Botón de velocidad (aquí) --}}
+                    {{-- ✅ Botón de velocidad (aquí) --}}
                     <div>
-                        <a href="{{ route('questions',['ue' => $slug, 'type' => $type]) }}"  aria-label="Quitter le quiz">                           
+                        <a href="{{ route('questions',['ue' => $slug, 'type' => $type]) }}"  aria-label="Quitter le quiz">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-black dark:text-white size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                            
+
                         </a>
-                </div>
-                   <div>
-                      <button
-                            @click="openFeedbackModal()"
-                            aria-label="Envoyer un commentaire"
-                            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700 transition"
-                    >
-                        <svg 
-                        aria-hidden="true" 
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                    </div>
+                    <div>
+                        <button
+                                @click="openFeedbackModal()"
+                                aria-label="Envoyer un commentaire"
+                                class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700 transition"
+                        >
+                            <svg
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
                             </svg>
-                    </button>
-                    </div>                   
-                     <div
-                        x-show="!openFeedback"
-                        x-transition
+                        </button>
+                    </div>
+                    <div
+                            x-show="!openFeedback"
+                            x-transition
                     >
-                      <button
-                            @click="toggleSpeed()"
-                            :aria-pressed="slow.toString()"
-                            :aria-label="slow ? 'Mode lent activé' : 'Mode normal activé'"
-                            class="flex items-center justify-center w-14 h-14 rounded-full bg-white text-white shadow-lg"
+                        <button
+                                @click="toggleSpeed()"
+                                :aria-pressed="slow.toString()"
+                                :aria-label="slow ? 'Mode lent activé' : 'Mode normal activé'"
+                                class="flex items-center justify-center w-14 h-14 rounded-full bg-white text-white shadow-lg"
                         >
                             <span class="text-[10px]" x-html="slow ? '<img src=\'{{ asset('img/lsfbgo/slow.png') }}\' alt=\'Activer la vitesse lente\' class=\'w-14 h-14 object-contain\' />' : '<img src=\'{{ asset('img/lsfbgo/speed.png') }}\' alt=\'Activer la vitesse normale\' class=\'w-14 h-14 object-contain\' />'"></span>
                         </button>
                     </div>
-                    
+
                 </div>
-            </div>   
+            </div>
             {{-- ✅ Barra de progreso mejorada --}}
             {{-- Fuera del div principal, al nivel del layout --}}
             <div class="mb-6">
@@ -62,22 +62,22 @@
                         Question {{ $currentIndex + 1 }} a {{ count($questions) }} 
                     </span>
 
-                                  
+
                     <span  class="text-sm text-black dark:text-white">
                           Points: {{ $score }} / {{ count($questions) * 10 }} 
                     </span>
-                      <span class="sr-only" aria-live="polite" aria-atomic="true">
+                    <span class="sr-only" aria-live="polite" aria-atomic="true">
                          Points: {{ $score }} / {{ count($questions) * 10 }}
                       </span>
-                 </div>
+                </div>
 
-                <div 
-                role="progressbar"
-                 aria-valuenow="{{ $currentIndex + 1 }}"
-                 aria-valuemin="1"
-                 aria-valuemax="{{ count($questions) }}"
-                 aria-label="Avancement du quiz"
-                class="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                        role="progressbar"
+                        aria-valuenow="{{ $currentIndex + 1 }}"
+                        aria-valuemin="1"
+                        aria-valuemax="{{ count($questions) }}"
+                        aria-label="Avancement du quiz"
+                        class="w-full bg-gray-200 rounded-full h-2.5">
                     <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                          style="width: {{ count($questions) > 0 ? (($currentIndex + 1) / count($questions)) * 100 : 0 }}%">
                     </div>
@@ -112,14 +112,14 @@
                         {{-- @include('partials.quiz.action-buttons') --}}
 
                         {{-- Feedback Message --}}
-                          @if (!$showPaymentModal)
-                             @include('partials.quiz.feedback')
-                         @endif
+                        @if (!$showPaymentModal)
+                            @include('partials.quiz.feedback')
+                        @endif
                     </div>
                 </div>
-               
-                
-                
+
+
+
             @else
                 <div class="flex justify-center">Aucun thème disponible</div>
             @endif
@@ -139,7 +139,7 @@
             }
 
             // Log to browser console
-          // console.log(`[${timestamp}] ${message}`, data || '');
+            // console.log(`[${timestamp}] ${message}`, data || '');
 
             // Dispatch event for visual console
             window.dispatchEvent(new CustomEvent('debug-log', {
@@ -154,16 +154,16 @@
                 score: 0,
                 openFeedback: false,
                 feedbackQuestionId: null,  // ← null por defecto, se asigna al abrir
-                feedbackType: 'bug',             
+                feedbackType: 'bug',
                 feedbackMessage: '',
                 feedbackSending: false,
                 openSubscription: false,
                 isTransitioning: false,
                 liveScore: @entangle('score'),
-                liveQuestionId: @entangle('currentQuestionId'), 
+                liveQuestionId: @entangle('currentQuestionId'),
                 totalPoints: {{ count($questions) * 10 }},
-                failPercentage: 0,  
-                 // ✅ Añadir aquí
+                failPercentage: 0,
+                // ✅ Añadir aquí
                 openFeedbackModal() {
                     this.feedbackQuestionId = this.liveQuestionId;
                     this.openFeedback = true;
@@ -227,36 +227,48 @@
                 },
 
                 init() {
-                    //console.log('Total preguntas tipo cargadas:', {{ count($questions) }});
-
-                    this.$watch('openCongrats', value => {
-                        if (value) this.showFailModal = false;
-                    });
-
-                    window.addEventListener('quiz-failed', (event) => {
+                    // Guardar referencias para poder removerlas
+                    this._onQuizFailed = (event) => {
                         window.dispatchEvent(new CustomEvent('close-quiz-modals'));
                         this.openCongrats = false;
                         this.showFailModal = true;
                         this.failPercentage = event.detail.percentage || 0;
-                    });
+                    };
 
-                    window.addEventListener('quiz-finished', (event) => {
-                        window.dispatchEvent(new CustomEvent('close-quiz-modals'))
+                    this._onQuizFinished = (event) => {
+                        window.dispatchEvent(new CustomEvent('close-quiz-modals'));
                         this.showFailModal = false;
                         this.openCongrats = true;
                         if (event.detail) {
                             this.liveScore = event.detail.score || this.liveScore;
                             this.totalPoints = event.detail.total || this.totalPoints;
                         }
-                    });
+                    };
 
-                    window.addEventListener('subscription-required', () => {
-                        this.openSubscription = true;
-                    });
-
-                    window.addEventListener('next-step', () => {
+                    this._onNextStep = () => {
                         this.handleNextStep();
+                    };
+
+                    this._onSubscription = () => {
+                        this.openSubscription = true;
+                    };
+
+                    window.addEventListener('quiz-failed', this._onQuizFailed);
+                    window.addEventListener('quiz-finished', this._onQuizFinished);
+                    window.addEventListener('next-step', this._onNextStep);
+                    window.addEventListener('subscription-required', this._onSubscription);
+
+                    this.$watch('openCongrats', value => {
+                        if (value) this.showFailModal = false;
                     });
+                },
+
+                // ✅ Limpieza al destruir el componente
+                destroy() {
+                    window.removeEventListener('quiz-failed', this._onQuizFailed);
+                    window.removeEventListener('quiz-finished', this._onQuizFinished);
+                    window.removeEventListener('next-step', this._onNextStep);
+                    window.removeEventListener('subscription-required', this._onSubscription);
                 },
 
                 handleNextStep() {

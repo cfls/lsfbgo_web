@@ -3,7 +3,7 @@
      <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-4">
             <div class="p-2 inline-flex items-center gap-2">
- 
+
                 {{-- ✅ Enlace separado del logo, con aria-label descriptivo --}}
                 <a
                     wire:navigate
@@ -13,12 +13,12 @@
                 >
                     <flux:icon.arrow-left-circle class="size-8" aria-hidden="true"/>
                 </a>
- 
+
                 {{-- ✅ Logo decorativo fuera del enlace, envuelto en span aria-hidden --}}
                 <span aria-hidden="true">
                     @include('partials.quiz.svg.logo', ['class' => 'w-20 h-20'])
                 </span>
- 
+
             </div>
         </div>
     </div>
@@ -66,7 +66,7 @@
             >
                 <span x-text="visibleCount"></span> résultat(s) trouvé(s)
             </p>
-            
+
 
             {{-- ✅ <ul role="list"> con id conectado al aria-controls del input --}}
             <ul

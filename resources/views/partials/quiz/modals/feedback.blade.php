@@ -2,7 +2,7 @@
 <div x-show="openFeedback"
      x-cloak
      @keydown.escape.window="openFeedback = false"
-     class="fixed inset-0 z-50 overflow-y-auto"
+     class="fixed inset-0 z-[100] overflow-y-auto"
      style="display: none;">
 
     {{-- Overlay --}}
@@ -13,12 +13,12 @@
          x-transition:leave="ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+         class="fixed inset-0 z-[100] bg-gray-900 bg-opacity-90 transition-opacity"
          @click="openFeedback = false">
     </div>
 
     {{-- Modal Panel --}}
-    <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative z-[110] flex min-h-full items-center justify-center p-4">
         <div x-show="openFeedback"
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
