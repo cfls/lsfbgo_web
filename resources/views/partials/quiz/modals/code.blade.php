@@ -22,7 +22,7 @@
             type="text"
             wire:model.live="accessCode"
             placeholder="Ex: ABC123UE1" 
-            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-zinc-800 dark:text-white text-center text-lg tracking-widest"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-zinc-800 text-black dark:text-white text-center text-lg tracking-widest"
         />
 
         {{-- Success Feedback --}}
