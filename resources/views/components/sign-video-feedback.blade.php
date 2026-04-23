@@ -27,22 +27,22 @@
 
             @if(!$isCorrect)
                 <div class="flex flex-col items-center gap-2 w-full">
-                    <div class="flex items-center gap-2 bg-white/20 rounded-xl px-4 py-2 w-full justify-center">
-                        <span class="text-white/70 text-xs uppercase tracking-widest">Tu as écrit</span>
-                        <span class="text-white font-bold text-lg line-through opacity-70">{{ $userAnswer }}</span>
-                    </div>
+{{--                    <div class="flex items-center gap-2 bg-white/20 rounded-xl px-4 py-2 w-full justify-center">--}}
+{{--                        <span class="text-white/70 text-xs uppercase tracking-widest">Tu as écrit</span>--}}
+{{--                        <span class="text-white font-bold text-lg line-through opacity-70">{{ $userAnswer }}</span>--}}
+{{--                    </div>--}}
 
-                    <span class="text-white/60 text-base leading-none">↓</span>
+{{--                    <span class="text-white/60 text-base leading-none">↓</span>--}}
 
                     <div class="flex items-center gap-2 bg-white/30 rounded-xl px-4 py-2 w-full justify-center">
                         <span class="text-white/70 text-xs uppercase tracking-widest">Réponse</span>
                         <span class="text-white font-extrabold text-2xl">{{ $message }}</span>
                     </div>
                 </div>
-            @else
-                <div class="flex items-center gap-2 bg-white/30 rounded-xl px-4 py-2 w-full justify-center">
-                    <span class="text-white font-bold text-lg">{{ $message ?: $currentQuestion['answer'] ?? '' }}</span>
-                </div>
+{{--            @else--}}
+{{--                <div class="flex items-center gap-2 bg-white/30 rounded-xl px-4 py-2 w-full justify-center">--}}
+{{--                    <span class="text-white font-bold text-lg">{{ $message ?: $currentQuestion['answer'] ?? '' }}</span>--}}
+{{--                </div>--}}
             @endif
         </div>
 
