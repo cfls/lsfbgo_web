@@ -135,7 +135,17 @@
 
          <a href="{{ route('access.login') }}" class="bg-orange-500 p-2 text-sm rounded-sm text-white"> Se connecter</a>
          <a href="{{ route('access.register') }}" class="bg-orange-500 text-sm p-2 rounded-sm text-white">S'inscrire gratuitement</a>
-
+            <!-- Google Play Badge -->
+            <!-- Google Play Badge (FR) -->
+            <div class="mt-6 flex flex-col items-center gap-2">
+                <span class="text-sm text-zinc-600 dark:text-zinc-300">
+                    Disponible sur Android
+                </span>
+                <a href="https://play.google.com/store/apps/details?id=com.cfls.lsfbgo" target="_blank">
+                    <img src="https://play.google.com/intl/fr/badges/static/images/badges/fr_badge_web_generic.png"  alt="Disponible sur Google Play"  class="h-14 hover:scale-105 transition"
+                    >
+                </a>
+            </div>
         </div>
 
         <!-- Footer -->
