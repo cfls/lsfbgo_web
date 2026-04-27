@@ -104,6 +104,7 @@ class Syllabus extends Component
 
     public function validateCode(): void
     {
+
         $this->validate([
             'accessCode' => ['required', 'string'],
         ]);
@@ -112,11 +113,14 @@ class Syllabus extends Component
         $dataUser = session('data');
         $user = $dataUser['user'] ?? [];
 
+
         $verifyUser = $api->Code($user['id'], $this->accessCode, $this->theme);
 
         if ($verifyUser->successful() && $verifyUser->json('data.attributes.active') === 1) {
             $this->showPaymentModal = false;
             $this->accessCode = '';
+            $this->redirectRoute('syllabus', ['ue' => $this->theme]);
+
         } else {
             $this->addError('accessCode', 'Code invalide');
         }

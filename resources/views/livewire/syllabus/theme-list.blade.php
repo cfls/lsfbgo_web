@@ -91,7 +91,7 @@
                             @endif
 
                         @else
-
+                            <a
                             wire:navigate
                             href="{{ $route }}"
                             aria-label="Accéder au jeu : {{ $themeName }}"

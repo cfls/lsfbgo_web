@@ -2,44 +2,43 @@
 <html class="min-h-screen" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>Lsfbgo — Apprends la LSFB</title>
+
     <meta name="description" content="Apprends la langue des signes de Belgique francophone (LSFB) de manière interactive et ludique. Vidéos, exercices, dictionnaire et jeux.">
     <meta name="robots" content="index, follow">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="description" content="Apprends la langue des signes de Belgique francophone (LSFB) de manière interactive et ludique. Vidéos, exercices, dictionnaire et jeux.">
     <link rel="canonical" href="{{ url()->current() }}">
-    <meta property="og:title"       content="Lsfbgo — Apprends la LSFB">
-    <meta property="og:description"  content="Plateforme interactive pour apprendre la langue des signes de Belgique francophone.">
-    <meta property="og:image"       content="{{ asset('img/meta/lsfbgo_og.png') }}">
+
+    {{-- Open Graph --}}
+    <meta property="og:title" content="Lsfbgo — Apprends la LSFB">
+    <meta property="og:description" content="Plateforme interactive pour apprendre la langue des signes de Belgique francophone.">
+    <meta property="og:image" content="{{ asset('img/meta/lsfbgo_og.png') }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:type"        content="website">
-    <meta property="og:url"         content="{{ url()->current() }}">
-    <meta property="og:locale"       content="fr_BE">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:locale" content="fr_BE">
 
     {{-- Twitter --}}
-    <meta name="twitter:card"        content="summary_large_image">
-    <meta name="twitter:title"       content="Lsfbgo — Apprends la LSFB">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lsfbgo — Apprends la LSFB">
     <meta name="twitter:description" content="Plateforme interactive pour apprendre la langue des signes de Belgique francophone.">
-    <meta name="twitter:image"       content="{{ asset('img/meta/lsfbgo_og.png') }}">
+    <meta name="twitter:image" content="{{ asset('img/meta/lsfbgo_og.png') }}">
 
-
-    {{-- ✅ Iconos --}}
-    <link rel="icon"             href="{{ asset('img/meta/favicon-32x32.png') }}"         type="image/png" sizes="32x32">
+    {{-- Iconos --}}
+    <link rel="icon" href="{{ asset('img/meta/favicon-32x32.png') }}" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="{{ asset('img/meta/apple-touch-icon.png') }}" sizes="180x180">
-    <link rel="manifest"         href="{{ asset('manifest.json') }}">
-    <meta name="theme-color"     content="#0099cc">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0099cc">
 
-
+    {{-- Fuentes --}}
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/cloudinary-video-player/dist/cld-video-player.min.css"
-    />
+
+    {{-- Cloudinary --}}
+    <link rel="stylesheet" href="https://unpkg.com/cloudinary-video-player/dist/cld-video-player.min.css">
     <script src="https://unpkg.com/cloudinary-core/cloudinary-core-shrinkwrap.min.js"></script>
     <script src="https://unpkg.com/cloudinary-video-player/dist/cld-video-player.min.js"></script>
-
-    <title>Lsfbgo</title>
-
 
     @vite('resources/css/app.css')
     @fluxAppearance
