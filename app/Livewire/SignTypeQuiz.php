@@ -178,51 +178,79 @@ class SignTypeQuiz extends Component
 
     public function checkAnswer()
     {
-
-
         if (empty($this->userInput)) {
             return;
         }
 
         $this->answered = true;
-
         $current = $this->questions[$this->currentIndex];
 
         $normalize = function(string $s): string {
-            $s = str_replace(['œ', 'Œ', 'æ', 'Æ'], ['oe', 'OE', 'ae', 'AE'], $s);
+            $s = preg_replace('/[\x{0300}-\x{036f}]/u', '', $s);
+            $s = str_replace(
+                ['á','à','ä','â','ã','å','æ','ç','é','è','ë','ê','í','ì','ï','î','ñ','ó','ò','ö','ô','õ','œ','ú','ù','ü','û','ý','ÿ'],
+                ['a','a','a','a','a','a','ae','c','e','e','e','e','i','i','i','i','n','o','o','o','o','o','oe','u','u','u','u','y','y'],
+                $s
+            );
+            $s = str_replace(['œ','Œ','æ','Æ'], ['oe','OE','ae','AE'], $s);
             return mb_strtolower(trim($s), 'UTF-8');
         };
 
-        $validAnswers = array_map(
-            fn($a) => $normalize($a),
-            explode(' / ', $current['answer'])
-        );
+        $originalAnswers  = explode(' / ', $current['answer']);
+        $userInputTrimmed = mb_strtolower(trim($this->userInput), 'UTF-8');
 
-        $userAnswers = array_map(
-            fn($a) => $normalize($a),
-            explode(' / ', $this->userInput)
-        );
+        $isValid      = false;
+        $isTypo       = false;
+        $isNoAccent   = false;
+        $typoOriginal = '';
 
-        $isValid = false;
-
-        foreach ($userAnswers as $ans) {
-            if (in_array($ans, $validAnswers, true)) {
+        // 1️⃣ Match exacto con acentos
+        foreach ($originalAnswers as $orig) {
+            if ($userInputTrimmed === mb_strtolower($orig, 'UTF-8')) {
                 $isValid = true;
                 break;
             }
         }
 
+        // 2️⃣ Solo si no fue exacto, verificar normalizado y levenshtein
+        if (!$isValid) {
+            $validAnswers = array_map(fn($a) => $normalize($a), $originalAnswers);
+            $userAnswers  = array_map(fn($a) => $normalize($a), explode(' / ', $this->userInput));
 
+            foreach ($userAnswers as $userAns) {
+                foreach ($validAnswers as $index => $validAns) {
 
-        if ($isValid) {
+                    // Sin acentos
+                    if ($userAns === $validAns) {
+                        $isNoAccent   = true;
+                        $typoOriginal = $originalAnswers[$index];
+                        break 2;
+                    }
+
+                    // Typo: 1 carácter de diferencia
+                    if (levenshtein($userAns, $validAns) === 1) {
+                        $isTypo       = true;
+                        $typoOriginal = $originalAnswers[$index];
+                    }
+                }
+            }
+        }
+
+        if ($isValid || $isTypo || $isNoAccent) {
             $this->isCorrect = true;
             $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
-            $this->score += 10;
+
+            if ($isNoAccent) {
+                $this->message = 'Attention aux accents : ' . mb_strtolower($typoOriginal, 'UTF-8');
+            } elseif ($isTypo) {
+                $this->message = 'Attention à l\'orthographe : ' . mb_strtolower($typoOriginal, 'UTF-8');
+            }
+
         } else {
-            $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
-            $this->message = implode(' / ', $validAnswers);
-            $this->userAnswer = $this->userInput; // ← añadir
+            $this->isCorrect  = false;
+            $this->image      = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
+            $this->message    = mb_strtolower(implode(' / ', $originalAnswers), 'UTF-8');
+            $this->userAnswer = $this->userInput;
         }
     }
 
@@ -408,6 +436,7 @@ class SignTypeQuiz extends Component
 
     private function normalizeAnswer($text)
     {
+        $text = preg_replace('/[\x{0300}-\x{036f}]/u', '', $text);
         $text = strtolower(trim($text));
 
         $text = str_replace(

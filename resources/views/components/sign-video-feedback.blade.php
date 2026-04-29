@@ -25,6 +25,13 @@
                 {{ $isCorrect ? 'Bravo !' : 'Dommage !' }}
             </span>
 
+            {{-- ✅ Aviso de acento/typo cuando es correcto --}}
+            @if($isCorrect && $message)
+                <div class="flex items-center gap-2 bg-white/30 rounded-xl px-4 py-2 w-full justify-center">
+                    <span class="text-white font-extrabold text-lg">{{ $message }}</span>
+                </div>
+            @endif
+
             @if(!$isCorrect)
                 <div class="flex flex-col items-center gap-2 w-full">
 {{--                    <div class="flex items-center gap-2 bg-white/20 rounded-xl px-4 py-2 w-full justify-center">--}}
