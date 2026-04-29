@@ -227,6 +227,7 @@
                 },
 
                 init() {
+                    this._componentId = this.$el.closest('[wire\\:id]')?.getAttribute('wire:id');
                     // Guardar referencias para poder removerlas
                     this._onQuizFailed = (event) => {
                         window.dispatchEvent(new CustomEvent('close-quiz-modals'));
@@ -271,13 +272,20 @@
                     window.removeEventListener('subscription-required', this._onSubscription);
                 },
 
-                handleNextStep() {
+                goNext() {
+                    if (this.isTransitioning) return;
                     this.isTransitioning = true;
-                    // ✅ Reducido de 500 a 350ms para que sea más rápido
-                    setTimeout(() => {
+
+                    setTimeout(async () => {
+                        const component = Livewire.find(this._componentId);
+                        if (component) {
+                            await component.nextStep();
+                        }
                         this.isTransitioning = false;
                     }, 350);
-                }
+                },
+
+
             };
         }
     </script>

@@ -254,7 +254,7 @@ class SignTypeQuiz extends Component
         }
 
         if ($this->currentIndex < count($this->questions) - 1) {
-            $this->dispatch('next-step');
+          //  $this->dispatch('next-step');
 
             $this->currentIndex++;
             $this->currentQuestion = $this->questions[$this->currentIndex];
