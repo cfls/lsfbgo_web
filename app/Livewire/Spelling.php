@@ -4,31 +4,27 @@ namespace App\Livewire;
 
 use App\Services\ApiService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Livewire\Component;
-
-
-
 
 class Spelling extends Component
 {
-    public array $words = [];
-    public array $letters = [];
-    public int $index = 0;
-    public string $answer = '';
-    public ?bool $isCorrect = null;
+    public array  $words      = [];
+    public array  $letters    = [];
+    public int    $index      = 0;
+    public string $answer     = '';
+    public ?bool  $isCorrect  = null;
 
-    public int $score = 0;          // aciertos de la ronda actual
-    public int $roundTotal = 10;
-    public int $total = 10; // alias
-    public bool $finished = false;  // fin de ronda
+    public int    $score      = 0;
+    public int    $roundTotal = 10;
+    public int    $total      = 10;
+    public bool   $finished   = false;
 
-    protected array $bag = [];      // bolsa de índices para evitar repeticiones inmediatas
-    public array $spellings = [];
-    public string $title = 'Exercices épellation';
+    public string $difficulty = 'easy'; // ✅
 
-    public function mount(ApiService $api)
+    protected array $bag      = [];
+    public string   $title    = 'Exercices épellation';
+
+    public function mount(ApiService $api): void
     {
         $token = session('token');
 
@@ -37,32 +33,65 @@ class Spelling extends Component
             return;
         }
 
-        $this->words = Cache::remember('spellings_words_' . md5($token), 600, function () use ($api, $token) {
+        $this->loadWords($api, $token);
+    }
+
+    protected function loadWords(ApiService $api, string $token): void
+    {
+        $allWords = Cache::remember('spellings_words_v2_' . md5($token), 600, function () use ($api, $token) {
             $response = $api->getSpellings($token);
 
             return $response->ok()
                 ? collect($response->json('data', []))
                     ->pluck('attributes')
                     ->where('active', 1)
-                    ->pluck('word')
-                    ->shuffle()
+                    ->map(fn($item) => [
+                        'word'       => $item['word'],
+                        'difficulty' => $item['difficulty'] ?? 'easy',
+                    ])
+                    ->filter(fn($item) => !empty($item['word']))
                     ->values()
                     ->toArray()
                 : [];
         });
+
+        $this->words = collect($allWords)
+            ->where('difficulty', $this->difficulty)
+            ->pluck('word')
+            ->shuffle()
+            ->values()
+            ->toArray();
+
+        if (empty($this->words)) {
+            $this->words = collect($allWords)
+                ->pluck('word')
+                ->shuffle()
+                ->values()
+                ->toArray();
+        }
 
         if (empty($this->words)) {
             $this->finished = true;
             return;
         }
 
+        $this->finished  = false;
+        $this->score     = 0;
+        $this->answer    = '';
+        $this->isCorrect = null;
+        $this->total     = $this->roundTotal;
+
         $this->refillBag();
         $this->chooseNextIndex();
         $this->recomputeLetters();
-        $this->total = $this->roundTotal;
     }
 
-
+    public function updatedDifficulty(): void
+    {
+        $api   = app(ApiService::class);
+        $token = session('token');
+        $this->loadWords($api, $token);
+    }
 
     public function getCurrentWordProperty(): ?string
     {
@@ -70,75 +99,68 @@ class Spelling extends Component
         return $this->words[$this->index] ?? null;
     }
 
+    public function checkAnswer(): void
+    {
+        if (!$this->currentWord) return;
 
-        public function checkAnswer(): void
-        {
-            if (!$this->currentWord) return;
+        $expected = $this->normalize($this->currentWord);
+        $given    = $this->normalize($this->answer);
 
-            $expected = $this->normalize($this->currentWord);
-            $given    = $this->normalize($this->answer);
+        $this->isCorrect = ($expected === $given);
 
-            $this->isCorrect = ($expected === $given);
-
-            if ($this->isCorrect) {
-                $this->score++;
-                // Dialog::alert('Réponse Correcte !', 'Bien joué !');  ← eliminar
-            } else {
-                // Dialog::alert('Réponse Incorrecte', "L'orthographe correcte est : {$this->currentWord}"); ← eliminar
-            }
+        if ($this->isCorrect) {
+            $this->score++;
         }
+    }
 
     public function next(): void
     {
         if ($this->isCorrect === null) {
             $this->checkAnswer();
         }
-        if ($this->isCorrect !== true) {
-            return; // solo avanza si es correcto
-        }
 
-        // ¿Ya alcanzamos 5 ejercicios correctos?
-        if ($this->score >= $this->roundTotal) {
-            $this->finished = true;
-            $this->answer = '';
-            $this->isCorrect = null;
-            $this->letters = [];     // limpia el player
+        if ($this->isCorrect !== true) {
             return;
         }
 
-        // Elegir siguiente palabra aleatoria sin repetir inmediata
-        $this->chooseNextIndex($this->index);
+        if ($this->score >= $this->roundTotal) {
+            $this->finished  = true;
+            $this->answer    = '';
+            $this->isCorrect = null;
+            $this->letters   = [];
+            return;
+        }
 
-        $this->answer = '';
+        $this->chooseNextIndex($this->index);
+        $this->answer    = '';
         $this->isCorrect = null;
         $this->recomputeLetters();
     }
 
-    // "Rejouer"/"Nuevo": nueva ronda (reinicia progreso de la ronda a 0)
     public function restart(): void
     {
-        $this->score = 0;
-        $this->finished = false;
-        $this->answer = '';
+        $this->score     = 0;
+        $this->finished  = false;
+        $this->answer    = '';
         $this->isCorrect = null;
 
         $this->refillBag();
-        $this->chooseNextIndex();   // arranca aleatorio
+        $this->chooseNextIndex();
         $this->recomputeLetters();
     }
 
     protected function refillBag(): void
     {
-        $this->bag = array_keys($this->words); // [0,1,2,...]
+        $this->bag = array_keys($this->words);
         shuffle($this->bag);
     }
 
     protected function chooseNextIndex(?int $avoid = null): void
     {
-        // Evitar repetir la palabra actual si hay alternativas
         if ($avoid !== null && count($this->words) > 1) {
             $this->bag = array_values(array_diff($this->bag, [$avoid]));
         }
+
         if (empty($this->bag)) {
             $this->refillBag();
             if ($avoid !== null && count($this->words) > 1) {
@@ -147,7 +169,7 @@ class Spelling extends Component
         }
 
         $next = array_shift($this->bag);
-        if ($next === null) $next = 0; // fallback
+        if ($next === null) $next = 0;
         $this->index = (int) $next;
     }
 
@@ -158,30 +180,25 @@ class Spelling extends Component
             return;
         }
 
-        // Normalizar palabra para eliminar tildes y caracteres especiales
-        $normalized = $this->normalize($this->currentWord);
-
-        // Generar letras del string normalizado
-        $this->letters = preg_split('//u', (string)$normalized, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $normalized    = $this->normalize($this->currentWord);
+        $this->letters = preg_split('//u', (string) $normalized, -1, PREG_SPLIT_NO_EMPTY) ?: [];
     }
- 
+
     private function normalize(string $text): string
-        {
-            $text = mb_strtolower(trim($text));
+    {
+        $text = mb_strtolower(trim($text));
 
-            $text = str_replace(
-                ['é','è','ê','ë','à','â','ä','î','ï','ô','ö','ù','û','ü','ç','æ','œ','É','È','Ê','Ë','À','Â','Î','Ï','Ô','Ù','Û','Ü','Ç'],
-                ['e','e','e','e','a','a','a','i','i','o','o','u','u','u','c','ae','oe','e','e','e','e','a','a','i','i','o','u','u','u','c'],
-                $text
-            );
+        $text = str_replace(
+            ['é','è','ê','ë','à','â','ä','î','ï','ô','ö','ù','û','ü','ç','æ','œ','É','È','Ê','Ë','À','Â','Î','Ï','Ô','Ù','Û','Ü','Ç'],
+            ['e','e','e','e','a','a','a','i','i','o','o','u','u','u','c','ae','oe','e','e','e','e','a','a','i','i','o','u','u','u','c'],
+            $text
+        );
 
-            return preg_replace('/[^a-z0-9]/', '', $text);
-        }
+        return preg_replace('/[^a-z0-9]/', '', $text);
+    }
 
     public function render()
     {
-
-
         return view('livewire.spelling')->layout('components.layouts.app.home', [
             'title' => 'Exercices épellation',
         ]);
