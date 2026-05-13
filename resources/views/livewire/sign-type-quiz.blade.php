@@ -59,12 +59,12 @@
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium">
-                        Question {{ $currentIndex + 1 }} a {{ count($questions) }} 
+                        Question {{ $currentIndex + 1 }} a {{ count($questions) }}
                     </span>
 
 
                     <span  class="text-sm text-black dark:text-white">
-                          Points: {{ $score }} / {{ count($questions) * 10 }} 
+                          Points: {{ $score }} / {{ count($questions) * 10 }}
                     </span>
                     <span class="sr-only" aria-live="polite" aria-atomic="true">
                          Points: {{ $score }} / {{ count($questions) * 10 }}

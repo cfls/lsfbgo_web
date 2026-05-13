@@ -151,6 +151,10 @@ class SignTypeQuiz extends Component
     public function selectAnswer($answer)
     {
 
+        if ($this->answered) {
+            return;
+        }
+
 
         $this->selectedAnswer = $answer;
 
@@ -178,9 +182,15 @@ class SignTypeQuiz extends Component
 
     public function checkAnswer()
     {
+        if ($this->answered) {
+            return;
+        }
+
+
         if (empty($this->userInput)) {
             return;
         }
+
 
         $this->answered = true;
         $current = $this->questions[$this->currentIndex];
@@ -238,6 +248,7 @@ class SignTypeQuiz extends Component
 
         if ($isValid || $isTypo || $isNoAccent) {
             $this->isCorrect = true;
+            $this->score += 10; // ✅ FALTA ESTO
             $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
 
             if ($isNoAccent) {
