@@ -46,10 +46,12 @@
                 speedIndex: 2,
                 speeds: [1200, 600, 400],
                 labels: ['×0.5', '×1', '×1.5'],
+                showLetter: true,
+                blankMs: 200,
 
                 speedMs(){ return this.speeds[this.speedIndex] },
 
-                start(){
+                 start(){
                     this.stop();
                     if (this.letters.length === 0) return;
                     this.playing = true;
@@ -58,9 +60,20 @@
                             this.stop();
                             return;
                         }
-                        this.pos++;
+                        const next = this.pos + 1;
+
+                        // Same letter coming up → flash a blank before advancing
+                        if (this.letters[next] === this.letters[this.pos]) {
+                            this.showLetter = false;
+                            setTimeout(() => {
+                                this.pos = next;
+                                this.showLetter = true;
+                            }, this.blankMs);
+                        } else {
+                            this.pos = next;
+                        }
                     }, this.speedMs());
-                },
+                    },
                 stop(){
                     if(this.timer){ clearInterval(this.timer); this.timer = null; }
                     this.playing = false;
@@ -94,7 +107,7 @@
                             this.showFeedback = true;
                             this.nextTimer = setTimeout(() => {
                                 this.showFeedback = false;
-                                $wire.restart();
+                                $wire.retryNext(); // ← antes era $wire.restart()
                             }, 3000);
                         }
                     });
@@ -109,9 +122,11 @@
                     $percent = $this->roundTotal ? min(100, (int)(($this->score / $this->roundTotal) * 100)) : 0;
                 @endphp
                 <div class="flex items-center justify-between mb-1 px-1">
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ $this->score }} / {{ $this->roundTotal }} correct
-                    </span>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="text-emerald-500 font-semibold">✅ {{ $this->score }}</span>
+                        <span class="text-red-500 font-semibold">❌ {{ $this->incorrect }}</span>
+                        <span class="text-gray-400">/ {{ $this->roundTotal }}</span>
+                    </div>
                     <span class="text-xs font-semibold
                         @if($difficulty === 'easy') text-teal-500
                         @elseif($difficulty === 'medium') text-amber-500
@@ -119,14 +134,15 @@
                         @if($difficulty === 'easy') 🟢 Facile
                         @elseif($difficulty === 'medium') 🟡 Moyen
                         @else 🔴 Difficile @endif
-                    </span>
+                     </span>
                 </div>
-                <div class="bg-gray-200 dark:bg-zinc-700 h-3 rounded-full overflow-hidden">
-                    <div class="h-3 rounded-full transition-all duration-500
-                        @if($difficulty === 'easy') bg-teal-500
-                        @elseif($difficulty === 'medium') bg-amber-500
-                        @else bg-red-500 @endif"
-                         style="width: {{ $percent }}%">
+                {{-- Barra dividida en correctas + incorrectas --}}
+                <div class="bg-gray-200 dark:bg-zinc-700 h-3 rounded-full overflow-hidden flex">
+                    <div class="h-3 bg-emerald-500 transition-all duration-500"
+                         style="width: {{ $this->roundTotal ? min(100, ($this->score / $this->roundTotal) * 100) : 0 }}%">
+                    </div>
+                    <div class="h-3 bg-red-400 transition-all duration-500"
+                         style="width: {{ $this->roundTotal ? min(100, ($this->incorrect / $this->roundTotal) * 100) : 0 }}%">
                     </div>
                 </div>
             </div>
@@ -136,12 +152,14 @@
                 <div class="w-full max-w-2xl">
                     <div class="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow">
 
-                        <div class="flex items-center justify-center mb-4">
+                        <div class="flex items-center justify-center mb-4 w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto">
+
                             <template x-if="letters.length">
                                 <img
+                                        x-show="showLetter"
                                         :src="srcFor(letters[pos])"
                                         :alt="`Lettre ${letters[pos]}`"
-                                        class="object-contain select-none w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64"
+                                        class="object-contain select-none w-full h-full"
                                 />
                             </template>
                         </div>
@@ -224,30 +242,41 @@
                 </div>
 
             @else
-                {{-- Fin de ronda --}}
-                <div class="w-full max-w-2xl bg-white dark:bg-zinc-800 border rounded-xl shadow p-6 text-center">
-                    <div class="text-5xl mb-3">🎉</div>
-                    <p class="text-xl font-semibold mb-1 dark:text-white">Tu as terminé !</p>
-                    <p class="text-gray-500 dark:text-gray-400 mb-1">
-                        Score : <span class="font-bold text-teal-500">{{ $this->score }}</span> / {{ $this->total }}
-                    </p>
-                    <p class="text-sm text-gray-400 dark:text-gray-500 mb-5">
-                        Niveau :
-                        @if($difficulty === 'easy') 🟢 Facile
-                        @elseif($difficulty === 'medium') 🟡 Moyen
-                        @else 🔴 Difficile @endif
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                        <flux:button variant="primary" color="cyan" wire:click="restart">
-                            🔁 Rejouer ce niveau
-                        </flux:button>
-                        @if($difficulty !== 'hard')
-                            <flux:button variant="outline" wire:click="$set('difficulty', '{{ $difficulty === 'easy' ? 'medium' : 'hard' }}')">
-                                ⬆️ Niveau supérieur
-                            </flux:button>
-                        @endif
-                    </div>
-                </div>
+           
+                  {{-- Fin de ronda --}}
+                        <div class="w-full max-w-2xl bg-white dark:bg-zinc-800 border rounded-xl shadow p-6 text-center">
+                            {{-- Icono según resultado --}}
+                            @if($this->score >= 6)
+                                <div class="text-5xl mb-3">🎉</div>
+                                <p class="text-xl font-semibold mb-1 dark:text-white text-emerald-500">Excellent !</p>
+                            @else
+                                <img src="{{ asset('img/lsfbgo/bad.png') }}" alt="Dommage" class="w-20 h-20 object-contain mx-auto mb-3">
+                                <p class="text-xl font-semibold mb-1 dark:text-white text-red-500">Dommage !</p>
+                            @endif
+
+                            <p class="text-gray-500 dark:text-gray-400 mb-1">
+                                ✅ <span class="font-bold text-teal-500">{{ $this->score }}</span>
+                                &nbsp;·&nbsp;
+                                ❌ <span class="font-bold text-red-400">{{ $this->incorrect }}</span>
+                                &nbsp;/ {{ $this->total }}
+                            </p>
+                            <p class="text-sm text-gray-400 dark:text-gray-500 mb-5">
+                                Niveau :
+                                @if($difficulty === 'easy') 🟢 Facile
+                                @elseif($difficulty === 'medium') 🟡 Moyen
+                                @else 🔴 Difficile @endif
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                <flux:button variant="primary" color="cyan" wire:click="restart">
+                                    🔁 Rejouer ce niveau
+                                </flux:button>
+                                @if($difficulty !== 'hard')
+                                    <flux:button variant="outline" wire:click="$set('difficulty', '{{ $difficulty === 'easy' ? 'medium' : 'hard' }}')">
+                                        ⬆️ Niveau supérieur
+                                    </flux:button>
+                                @endif
+                            </div>
+                        </div>
             @endif
 
         </div>

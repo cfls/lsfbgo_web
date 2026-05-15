@@ -13,16 +13,18 @@ class Spelling extends Component
     public int    $index      = 0;
     public string $answer     = '';
     public ?bool  $isCorrect  = null;
+    public int $incorrect = 0;
 
     public int    $score      = 0;
     public int    $roundTotal = 10;
     public int    $total      = 10;
     public bool   $finished   = false;
 
-    public string $difficulty = 'easy'; // ✅
+    public string $difficulty = 'easy';
+    public string $title      = 'Exercices épellation';
 
-    protected array $bag      = [];
-    public string   $title    = 'Exercices épellation';
+    public array $bag   = [];
+    public array $queue = [];
 
     public function mount(ApiService $api): void
     {
@@ -38,6 +40,7 @@ class Spelling extends Component
 
     protected function loadWords(ApiService $api, string $token): void
     {
+
         $allWords = Cache::remember('spellings_words_v2_' . md5($token), 600, function () use ($api, $token) {
             $response = $api->getSpellings($token);
 
@@ -80,8 +83,9 @@ class Spelling extends Component
         $this->answer    = '';
         $this->isCorrect = null;
         $this->total     = $this->roundTotal;
+        $this->incorrect = 0;
 
-        $this->refillBag();
+        $this->buildQueue();
         $this->chooseNextIndex();
         $this->recomputeLetters();
     }
@@ -110,6 +114,8 @@ class Spelling extends Component
 
         if ($this->isCorrect) {
             $this->score++;
+        } else {
+            $this->incorrect++; // ← nuevo
         }
     }
 
@@ -131,7 +137,7 @@ class Spelling extends Component
             return;
         }
 
-        $this->chooseNextIndex($this->index);
+        $this->chooseNextIndex(); // ← sin parámetro, la cola maneja todo
         $this->answer    = '';
         $this->isCorrect = null;
         $this->recomputeLetters();
@@ -139,38 +145,76 @@ class Spelling extends Component
 
     public function restart(): void
     {
+        $this->incorrect = 0;
         $this->score     = 0;
         $this->finished  = false;
         $this->answer    = '';
         $this->isCorrect = null;
 
-        $this->refillBag();
+        $this->buildQueue();
         $this->chooseNextIndex();
         $this->recomputeLetters();
     }
 
+    // Ya no se usa pero se mantiene por compatibilidad
     protected function refillBag(): void
     {
-        $this->bag = array_keys($this->words);
-        shuffle($this->bag);
+        $this->bag = [];
+    }
+
+    /**
+     * Genera una secuencia de roundTotal palabras únicas y sin repetición
+     * para el turno completo.
+     */
+    protected function buildQueue(): void
+    {
+        $indices = array_keys($this->words);
+        $total   = count($indices);
+
+        if ($total === 0) return;
+
+        // Si hay suficientes palabras, simplemente mezclar y tomar 10
+        if ($total >= $this->roundTotal) {
+            shuffle($indices);
+            $this->queue = array_slice($indices, 0, $this->roundTotal);
+            return;
+        }
+
+        // Si hay menos de 10 palabras → rellenar hasta 10 evitando repetir consecutivos
+        $queue    = [];
+        $lastUsed = null;
+
+        while (count($queue) < $this->roundTotal) {
+            // Candidatos: todos excepto el último usado
+            $candidates = $lastUsed !== null
+                ? array_values(array_diff($indices, [$lastUsed]))
+                : $indices;
+
+            // Si solo hay 1 palabra no hay opción, se repite igual
+            if (empty($candidates)) {
+                $candidates = $indices;
+            }
+
+            $pick     = $candidates[array_rand($candidates)];
+            $queue[]  = $pick;
+            $lastUsed = $pick;
+        }
+
+        $this->queue = $queue;
     }
 
     protected function chooseNextIndex(?int $avoid = null): void
     {
-        if ($avoid !== null && count($this->words) > 1) {
-            $this->bag = array_values(array_diff($this->bag, [$avoid]));
+        if (!empty($this->queue)) {
+            $next        = array_shift($this->queue);
+            $this->index = (int) $next;
+        } else {
+            // Cola vacía → terminar el turno
+            $this->finished  = true;
+            $this->answer    = '';
+            $this->isCorrect = null;
+            $this->letters   = [];
         }
-
-        if (empty($this->bag)) {
-            $this->refillBag();
-            if ($avoid !== null && count($this->words) > 1) {
-                $this->bag = array_values(array_diff($this->bag, [$avoid]));
-            }
-        }
-
-        $next = array_shift($this->bag);
-        if ($next === null) $next = 0;
-        $this->index = (int) $next;
     }
 
     protected function recomputeLetters(): void
@@ -195,6 +239,15 @@ class Spelling extends Component
         );
 
         return preg_replace('/[^a-z0-9]/', '', $text);
+    }
+
+    public function retryNext(): void
+    {
+        $this->answer    = '';
+        $this->isCorrect = null;
+
+        $this->chooseNextIndex();
+        $this->recomputeLetters();
     }
 
     public function render()
