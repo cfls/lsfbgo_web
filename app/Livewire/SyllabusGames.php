@@ -51,7 +51,10 @@ class SyllabusGames extends Component
         }
 
         $this->allThemes();
-        $this->loadTheme('ue1-themes');
+
+        $initialTheme = $this->ue ?: 'ue1-themes';
+        $this->selectedSyllabus = $initialTheme;
+        $this->loadTheme($initialTheme);
     }
 
     public function allThemes()

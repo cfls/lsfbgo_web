@@ -18,6 +18,12 @@ class Practice extends Component
                 'gradient' => 'from-indigo-500 to-blue-500 dark:from-indigo-400 dark:to-blue-400',
             ],
             [
+                'title' => 'L\'alphabet LSFB',
+                'icon' => 'hand-raised',
+                'route' => 'alphabetsigner.practice',
+                'gradient' => 'from-indigo-500 to-blue-500 dark:from-indigo-400 dark:to-blue-400',
+            ],
+            [
                 'title' => 'Écrire les mots épelés',
                 'icon' => 'hand-raised',
                 'route' => 'alphabet.practice',

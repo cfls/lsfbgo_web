@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\SyllabusGameController;
+use App\Livewire\AlphabetSigner;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Logout;
@@ -86,6 +87,7 @@ Route::get('table-au-de-bord', TableuBord::class)->name('access.dashboard');
 Route::get('/dictionary', Dictionary::class)->name('dictionary');
 Route::get('/practice', Practice::class)->name('practice');
 Route::get('/numbers-practice', Numbers::class)->name('numbers.practice');
+Route::get('/alphabet-signer-practice', AlphabetSigner::class)->name('alphabetsigner.practice');
 Route::get('/alphabet-practice', Spelling::class)->name('alphabet.practice');
 
 // ============================================
