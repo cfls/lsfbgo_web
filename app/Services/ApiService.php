@@ -195,10 +195,8 @@ class ApiService
 
     public function Code($userId, $code, $theme)
     {
-   
-       
-      
-        return $this->post('/v1/verify-code', [
+
+       return $this->post('/v1/verify-code', [
             'user_id' => $userId,
             'code' => $code,
             'theme' => $theme,
@@ -228,8 +226,38 @@ class ApiService
             ->post($this->baseUrl . '/auth/logout');
     }
 
+    /**
+     * Realizar petición DELETE a la API
+     */
+    public function delete(string $endpoint, array $data = [], ?string $token = null): Response
+    {
+        if (!$token) {
+            $token = session('token');
 
+            if (!$token) {
+                $sessionData = session('data');
+                $token = $sessionData['token'] ?? null;
+            }
+        }
 
+        if (!$token) {
+            throw new \Exception('No authentication token found');
+        }
 
+        return Http::withOptions([
+            'verify' => $this->verifySsl,
+        ])
+            ->withToken($token)
+            ->asJson()
+            ->acceptJson()
+            ->delete($this->baseUrl . $endpoint, $data);
+    }
+
+    public function deleteAccount(int $userId, string $password): Response
+    {
+        return $this->delete("/v1/users/{$userId}", [
+            'password' => $password,
+        ]);
+    }
 
 }

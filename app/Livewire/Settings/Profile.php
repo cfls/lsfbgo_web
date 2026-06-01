@@ -24,11 +24,12 @@ class Profile extends Component
         $this->email = $data['user']['email'] ?? '';
     }
 
+
     public function updateProfileInformation(): void
     {
         $data = session('data');
 
-        if (!isset($data['token'])) {
+        if (! isset($data['token'])) {
             $this->addError('email', 'Debe iniciar sesión nuevamente.');
             return;
         }
@@ -49,23 +50,25 @@ class Profile extends Component
         if ($response->successful()) {
             $userData = $response->json('data');
 
+            $data['user'] = $userData;
+
             session([
-                'data' => [
-                    'token' => $data['token'],
-                    'user'  => $userData,
-                ],
+                'token' => $data['token'],
+                'data' => $data,
             ]);
 
             $this->name = $userData['name'] ?? $this->name;
             $this->email = $userData['email'] ?? $this->email;
 
-            $this->dispatch('profile-updated', name: $userData['name'] ?? $this->name);
-        } else {
-            $this->addError(
-                'email',
-                $response->json('message') ?? 'Error al actualizar el perfil.'
-            );
+            $this->dispatch('profile-updated', name: $this->name);
+
+            return;
         }
+
+        $this->addError(
+            'email',
+            $response->json('message') ?? 'Error al actualizar el perfil.'
+        );
     }
 
     public function render()

@@ -65,12 +65,12 @@
                 <flux:button variant="primary" color="orange" type="submit" class="w-full text-white">Se connecter</flux:button>
             </div>
         </form>
+        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
+            <span>{{ __('Vous n\'avez pas encore de compte ?') }}</span>
 
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('access.register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
+            <flux:link :href="route('access.register')" wire:navigate>
+                {{ __('S’inscrire') }}
+            </flux:link>
+        </div>
     </div>
 
