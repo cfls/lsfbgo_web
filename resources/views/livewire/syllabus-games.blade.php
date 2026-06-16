@@ -97,23 +97,70 @@
                 @foreach([
                     ['type' => 'text',   'label' => 'Traduis en français'],
                     ['type' => 'choice', 'label' => 'Choisis le bon mot'],
+                    ['type' => 'yes-no',  'label' => 'Oui ou Non ?'],
+                    ['type' => 'video-choice',  'label' => 'Choisis la bonne vidéo'],
+                    ['type' => 'match',  'label' => 'Associe les mots'],
                 ] as $item)
-                   <a
-                    wire:navigate
-                    href="{{ route('questions', ['ue' => $ue, 'type' => $item['type']]) }}"
-                    :style="`background-color: ${bg}; transition: background-color 0.3s ease;`"
-                    class="flex items-center justify-between w-full px-5 py-4 rounded-xl shadow-sm active:scale-[0.98] hover:brightness-95 hover:shadow-md"
+                    <a
+                            wire:navigate
+                            href="{{ route('questions', ['ue' => $ue, 'type' => $item['type']]) }}"
+                            :style="`background-color: ${bg}; transition: background-color 0.3s ease;`"
+                            class="flex items-center justify-between w-full px-5 py-4 rounded-xl shadow-sm active:scale-[0.98] hover:brightness-95 hover:shadow-md"
                     >
-                    <span class="text-base md:text-lg font-semibold" :style="`color: ${text};`">
-                {{ $item['label'] }}
-            </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.4 72.4"
-                         class="w-6 h-6 md:w-7 md:h-7 shrink-0" aria-hidden="true">
-                        <circle :fill="text" cx="36.2" cy="36.2" r="36.2"/>
-                        <polygon :fill="bg" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
-                    </svg>
+                     <span class="flex flex-col items-start">
+                            <span class="text-base md:text-lg font-semibold" :style="`color: ${text};`">
+                                {{ $item['label'] }}
+                            </span>
+
+                            @if(!empty($quizCounts) && isset($quizCounts[$item['type']]) && $quizCounts[$item['type']] > 0)
+                             <span class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-0.5 mt-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 shrink-0"></span>
+                                    <span class="text-black font-semibold text-xs">
+                                        {{ $quizCounts[$item['type']] }} complété(s)
+                                    </span>
+                                </span>
+                         @endif
+                     </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.4 72.4"
+                             class="w-6 h-6 md:w-7 md:h-7 shrink-0" aria-hidden="true">
+                            <circle :fill="text" cx="36.2" cy="36.2" r="36.2"/>
+                            <polygon :fill="bg" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                        </svg>
                     </a>
                 @endforeach
+                @if($this->isUnlocked())
+                    <a
+                    wire:navigate
+                    href="{{ route('questions', ['ue' => $ue, 'type' => 'recap']) }}"
+                    class="flex items-center justify-between w-full px-5 py-4 rounded-xl shadow-sm active:scale-[0.98] hover:brightness-95 hover:shadow-md bg-gradient-to-r from-teal-500 to-purple-600"
+                    >
+                        <span class="flex flex-col items-start">
+                            <span class="text-white text-base md:text-lg font-semibold">
+                                🎓 Récapitulation
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-0.5 mt-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 shrink-0"></span>
+                                <span class="text-white text-xs font-medium">Tout débloqué !</span>
+                            </span>
+                         </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.4 72.4"
+                             class="w-6 h-6 md:w-7 md:h-7 shrink-0" aria-hidden="true">
+                            <circle fill="white" cx="36.2" cy="36.2" r="36.2"/>
+                            <polygon fill="#7c3aed" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
+                        </svg>
+                    </a>
+                @else
+                    <div class="flex items-center justify-between w-full px-5 py-4 rounded-xl border border-gray-800 dark:border-zinc-600  cursor-not-allowed">
+                        <span class="flex flex-col items-start">
+                            <span class="text-gray-800 dark:text-zinc-500 text-base md:text-lg font-semibold">
+                                🔒 Récapitulation
+                            </span>
+                            <span class="text-gray-800 dark:text-zinc-500 text-xs mt-1">
+                                Complète les 5 types pour débloquer
+                            </span>
+                        </span>
+                    </div>
+                @endif
             </div>
 
         </div>

@@ -23,8 +23,8 @@
 @if($video && $type !== 'video-choice')
     @php
         $videoId = pathinfo($video, PATHINFO_FILENAME);
-        $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto,w_640,f_auto,c_limit/{$videoId}.mp4";
-        $posterUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/so_0,w_400,q_auto:low/{$videoId}.jpg";
+        $optimizedUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/q_auto,w_960,f_auto,c_limit/{$videoId}.mp4";
+        $posterUrl = "https://res.cloudinary.com/dmhdsjmzf/video/upload/so_0,w_720,q_auto:low/{$videoId}.jpg";
     @endphp
 
     <div class="mb-4 relative" wire:ignore id="main-video-container"
@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <div class="w-full max-w-2xl mx-auto" x-show="!openFeedback">
+        <div class="w-full max-w-[95vw] sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto" x-show="!openFeedback">
             <video
                     x-ref="videoEl"
                     preload="metadata"
@@ -93,7 +93,7 @@
                     src="{{ encode_cloudinary_url($optimizedUrl) }}"
                     controlsList="nodownload"
                     poster="{{ $posterUrl }}"
-                    class="w-full h-auto max-h-[220px] md:max-h-[360px] object-cover rounded-lg transition-opacity duration-300"
+                    class="w-full h-auto max-h-[260px] sm:max-h-[340px] md:max-h-[420px] lg:max-h-[520px] object-contain bg-black rounded-lg transition-opacity duration-300"
                     :class="{ 'opacity-0': !videoLoaded }"
                     muted autoplay loop playsinline
                     x-on:loadeddata="videoLoaded = true; videoError = false; clearTimeout(timeoutId)"

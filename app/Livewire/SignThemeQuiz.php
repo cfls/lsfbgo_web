@@ -4,19 +4,15 @@ namespace App\Livewire;
 
 use AllowDynamicProperties;
 use App\Services\ApiService;
-use Livewire\Component;
 use Illuminate\Support\Facades\Http;
-use Native\Mobile\Attributes\OnNative;
-use Native\Mobile\Events\Alert\ButtonPressed;
-use Native\Mobile\Facades\Browser;
-use Native\Mobile\Facades\Dialog;
-use Native\Mobile\Facades\SecureStorage;
+use Livewire\Component;
 
 #[AllowDynamicProperties]
 class SignThemeQuiz extends Component
 {
-    public $questions = []; // ✅ TODAS las preguntas (25)
-    public $currentIndex = 0; // ✅ Índice actual en el array completo
+    public $questions = [];
+    public $currentIndex = 0;
+    public int $currentQuestionId = 0;
     public $message = '';
     public $image;
     public $answered = false;
@@ -33,6 +29,12 @@ class SignThemeQuiz extends Component
     public $currentQuestion;
     public $selectedLink;
     public $totalQuestions;
+    public $storedData;
+    public bool $showPaymentModal = false;
+    public string $accessCode = '';
+    public string $link = '';
+    public string $theme = '';
+    public $syllabusData = [];
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -40,37 +42,125 @@ class SignThemeQuiz extends Component
 
     public function mount()
     {
+        $this->storedData = session('data');
+
+        if (!$this->storedData || empty(session('token'))) {
+            $this->redirect(route('home'), navigate: true);
+            return;
+        }
+
         $this->hasSubscription = false;
         $this->checkUserSubscription();
 
-        // ✅ Cargar preguntas UNA SOLA VEZ
         if (empty($this->questions)) {
             $this->loadQuestions();
         }
+
+        if (!empty($this->questions)) {
+            $this->currentQuestion = $this->questions[0];
+            $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
+        }
     }
 
-    protected function loadQuestions()
+    protected function loadQuestions(): void
     {
+
         try {
-            $response = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                //->withToken(SecureStorage::get('data.token'))
-                ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug);
+            $token = session('token');
+
+            if (!$token) {
+                $this->questions = [];
+                return;
+            }
+
+            if ($this->type === 'recap') {
+                $this->loadRecapQuestions($token);
+                return;
+            }
+
+           $api = app(ApiService::class);
+            $response = $api->AllThemeForSyllabus($this->slug);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
 
-                // ✅ Mezclar y guardar TODAS las preguntas
-                shuffle($data);
                 $this->questions = $data;
-
-                // ✅ Log para verificar
-               // logger()->info('Preguntas cargadas: ' . count($this->questions));
             }
         } catch (\Throwable $e) {
-            logger()->error('Error cargando preguntas: ' . $e->getMessage());
+            $this->questions = [];
+        }
+    }
+
+    protected function loadRecapQuestions(string $token): void
+    {
+
+        try {
+            $types = ['text', 'choice', 'yes-no', 'video-choice', 'match'];
+            $allQuestions = [];
+            $seenVideos = [];
+
+            // Get all themes for this syllabus
+            $themesResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
+            ])
+                ->withToken($token)
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/' . $this->slug . '/themes');
+
+            if (!$themesResponse->successful()) {
+                $this->questions = [];
+                return;
+            }
+
+            $themes = $themesResponse->json('data', []);
+
+            // 5 themes × 5 types × 2 questions = 50 total
+            foreach ($themes as $theme) {
+                $themeSlug = $theme['attributes']['slug'] ?? null;
+                if (!$themeSlug) continue;
+
+                foreach ($types as $type) {
+                    $response = Http::withOptions([
+                        'verify' => env('API_VERIFY_SSL', true),
+                        'timeout' => 30,
+                        'connect_timeout' => 10,
+                    ])
+                        ->withToken($token)
+                        ->acceptJson()
+                        ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $themeSlug . '?type=' . $type);
+
+                    if (!$response->successful()) continue;
+
+                    $questions = $response->json('data', []);
+
+
+
+                    $added = 0;
+                    foreach ($questions as $question) {
+                        if ($added >= 2) break; // 2 per type per theme = 10 per type total
+
+                        // Deduplicate by video
+                        $videoId = $question['video'] ?? null;
+                        if ($videoId && in_array($videoId, $seenVideos)) {
+                            continue;
+                        }
+                        if ($videoId) {
+                            $seenVideos[] = $videoId;
+                        }
+
+                        $allQuestions[] = $question;
+                        $added++;
+                    }
+                }
+            }
+
+            shuffle($allQuestions);
+            $this->questions = $allQuestions;
+
+        } catch (\Throwable $e) {
+            logger()->error('Error loading recap questions: ' . $e->getMessage());
             $this->questions = [];
         }
     }
@@ -96,10 +186,10 @@ class SignThemeQuiz extends Component
     protected function checkUserSubscription(): void
     {
         try {
-            $storedData = SecureStorage::get('data');
-            $data = json_decode($storedData, true);
+            $data = session('data');
+            $token = session('token');
 
-            if (!$data['user']['id'] || !$data['token']) {
+            if (!$data || !$token || empty($data['user']['id'])) {
                 return;
             }
 
@@ -107,8 +197,10 @@ class SignThemeQuiz extends Component
 
             $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
             ])
-                ->withToken($data['token'])
+                ->withToken($token)
                 ->acceptJson()
                 ->get($url);
 
@@ -116,11 +208,12 @@ class SignThemeQuiz extends Component
                 $subscriptionData = $response->json('data', []);
 
                 foreach ($subscriptionData as $sub) {
-                    if ($sub['attributes']['theme'] === $this->slug) {
-                        if ($sub['attributes']['active'] === 1) {
-                            $this->hasSubscription = true;
-                            return;
-                        }
+                    if (
+                        ($sub['attributes']['theme'] ?? null) === $this->slug &&
+                        ($sub['attributes']['active'] ?? 0) === 1
+                    ) {
+                        $this->hasSubscription = true;
+                        return;
                     }
                 }
             }
@@ -131,6 +224,10 @@ class SignThemeQuiz extends Component
 
     public function selectAnswer($answer)
     {
+        if ($this->answered) {
+            return;
+        }
+
         $this->selectedAnswer = $answer;
 
         $current = $this->questions[$this->currentIndex] ?? null;
@@ -143,349 +240,373 @@ class SignThemeQuiz extends Component
 
             if ($givenAnswer === $correctAnswer) {
                 $this->isCorrect = true;
-                $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+                $this->image = true;
                 $this->score += 10;
             } else {
                 $this->isCorrect = false;
-                $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+                $this->image = true;
                 $this->message = $correctAnswer;
+                $this->userAnswer = $answer;
             }
         }
     }
 
     public function checkAnswer()
     {
-        $this->answered = true;
+        if ($this->answered) {
+            return;
+        }
 
+        if (empty($this->userInput)) {
+            return;
+        }
+
+        $this->answered = true;
         $current = $this->questions[$this->currentIndex];
 
-        $validAnswers = array_map(
-            fn($a) => strtolower($this->normalizeAnswer(trim($a))),
-            explode('/', $current['answer'])
-        );
+        $normalize = function(string $s): string {
+            $s = preg_replace('/[\x{0300}-\x{036f}]/u', '', $s);
+            $s = str_replace(
+                ['á','à','ä','â','ã','å','æ','ç','é','è','ë','ê','í','ì','ï','î','ñ','ó','ò','ö','ô','õ','œ','ú','ù','ü','û','ý','ÿ'],
+                ['a','a','a','a','a','a','ae','c','e','e','e','e','i','i','i','i','n','o','o','o','o','o','oe','u','u','u','u','y','y'],
+                $s
+            );
+            $s = str_replace(['œ','Œ','æ','Æ'], ['oe','OE','ae','AE'], $s);
+            return mb_strtolower(trim($s), 'UTF-8');
+        };
 
-        $givenAnswer = strtolower(
-            $this->normalizeAnswer(
-                $current['type'] === 'text'
-                    ? $this->userInput
-                    : $this->selectedAnswer
-            )
-        );
+        $originalAnswers  = explode(' / ', $current['answer']);
+        $userInputTrimmed = mb_strtolower(trim($this->userInput), 'UTF-8');
 
-        $userAnswers = array_map(
-            fn($a) => strtolower($this->normalizeAnswer(trim($a))),
-            explode('/', $givenAnswer)
-        );
+        $isValid      = false;
+        $isTypo       = false;
+        $isNoAccent   = false;
+        $typoOriginal = '';
 
-        $isValid = false;
-
-        foreach ($userAnswers as $ans) {
-            if (in_array($ans, $validAnswers, true)) {
+        // 1️⃣ Exact match with accents
+        foreach ($originalAnswers as $orig) {
+            if ($userInputTrimmed === mb_strtolower($orig, 'UTF-8')) {
                 $isValid = true;
                 break;
             }
         }
 
-        if ($isValid) {
+        // 2️⃣ Only if not exact, check normalized and levenshtein
+        if (!$isValid) {
+            $validAnswers = array_map(fn($a) => $normalize($a), $originalAnswers);
+            $userAnswers  = array_map(fn($a) => $normalize($a), explode(' / ', $this->userInput));
+
+            foreach ($userAnswers as $userAns) {
+                foreach ($validAnswers as $index => $validAns) {
+
+                    // Without accents
+                    if ($userAns === $validAns) {
+                        $isNoAccent   = true;
+                        $typoOriginal = $originalAnswers[$index];
+                        break 2;
+                    }
+
+                    // Typo: 1 character difference
+                    if (levenshtein($userAns, $validAns) === 1) {
+                        $isTypo       = true;
+                        $typoOriginal = $originalAnswers[$index];
+                    }
+                }
+            }
+        }
+
+        if ($isValid || $isTypo || $isNoAccent) {
             $this->isCorrect = true;
-            $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
+            $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
+
+            if ($isNoAccent) {
+                $this->message = 'Attention aux accents : ' . mb_strtolower($typoOriginal, 'UTF-8');
+            } elseif ($isTypo) {
+                $this->message = 'Attention à l\'orthographe : ' . mb_strtolower($typoOriginal, 'UTF-8');
+            }
         } else {
-            $this->isCorrect = false;
-            $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
-            $this->message = implode(' / ', $validAnswers);
+            $this->isCorrect  = false;
+            $this->image      = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
+            $this->message    = mb_strtolower(implode(' / ', $originalAnswers), 'UTF-8');
+            $this->userAnswer = $this->userInput;
         }
     }
 
     public function nextStep()
     {
-        $data = json_decode(SecureStorage::get('data'), true);
+        $data = session('data');
+        $token = session('token');
 
-        // ✅ Verificar suscripción en la pregunta 3 (índice 2)
-        if ($this->currentIndex == 2 && !$this->hasSubscription) {
-            $syllabusResponse = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken(SecureStorage::get($data['token']))
-                ->acceptJson()
-                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
-
-
-            $this->syllabusData = $syllabusResponse->json('data', []);
-
-            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');
-
-            $this->openPaymentModal($link);
+        if (!$data || !$token) {
+            $this->redirect(route('home'), navigate: true);
             return;
         }
 
-        // ✅ Avanzar a la siguiente pregunta (SIN CARGAR MÁS DATOS)
+        // Skip subscription check for recap
+        if ($this->type !== 'recap' && $this->currentIndex == 2 && !$this->hasSubscription) {
+            $syllabusResponse = Http::withOptions([
+                'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
+            ])
+                ->withToken($token)
+                ->acceptJson()
+                ->get(config('services.api.url') . '/v1/syllabus/settings/' . $this->slug);
+
+            $this->syllabusData = $syllabusResponse->json('data', []);
+            $link = $this->syllabusData['attributes']['link'] ?? config('app.site');
+
+            $this->openPaymentModal($link, $this->slug);
+            return;
+        }
+
         if ($this->currentIndex < count($this->questions) - 1) {
-            $this->dispatch('next-step');
-
-            // ✅ Simplemente incrementar el índice
             $this->currentIndex++;
-
-            // ✅ Obtener la pregunta actual del array existente
             $this->currentQuestion = $this->questions[$this->currentIndex];
+            $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
 
             $this->resetQuestionState();
 
-            // ✅ Actualizar video si existe
             if (!empty($this->currentQuestion['video'])) {
                 $this->dispatch('quiz-video-update', publicId: $this->currentQuestion['video']);
-            } else {
-                $this->dispatch('quiz-video-refresh');
             }
-
-            // ✅ Log para depuración
-            //logger()->info("Pregunta {$this->currentIndex} de " . count($this->questions));
         } else {
-            // ✅ Completar el quiz
             $this->completed();
         }
     }
 
-    public function openPaymentModal($link)
+    public function openPaymentModal($link, $theme = null): void
     {
+        $this->theme = $theme;
         $this->selectedLink = $link;
-
-        Dialog::alert(
-            'Accès Syllabus',
-            'Ce contenu nécessite l\'achat du livre Syllabus. Voulez-vous ouvrir la boutique maintenant?',
-            [
-                'Oui, ouvrir la boutique',
-                'Non, plus tard'
-            ]
-        )->id('alert-demo');
+        $this->showPaymentModal = true;
     }
 
-    #[OnNative(ButtonPressed::class)]
-    public function handleAlert(int $index, string $id): void
+    public function closePaymentModal(): void
     {
-        if ($id === 'alert-demo' && $index === 0 && $this->selectedLink) {
-            Browser::open($this->selectedLink);
+        $this->redirectRoute('games');
+    }
+
+    public function openShop()
+    {
+        if ($this->selectedLink) {
+            return redirect()->away($this->selectedLink);
         }
     }
 
-
-    public function submitFeedback($feedbackData)  // ✅ Recibe array, no Request
+    public function validateCode(): void
     {
+        $this->validate([
+            'accessCode' => ['required', 'string'],
+        ]);
 
         $api = app(ApiService::class);
+        $data = session('data');
 
-        logger()->info('🔵 Feedback received:', ['feedback_data' => $feedbackData]);
+        if (!$data || empty($data['user']['id'])) {
+            $this->addError('accessCode', 'Session invalide');
+            return;
+        }
 
-        try {
-            // Validar los datos del feedback que vienen del frontend
-            $validatedFeedback = validator($feedbackData, [
-                'type' => 'required|in:bug,suggestion,question',
-                'message' => 'required|string|max:1000',
-                'question_id' => 'nullable|integer',
+        $user = $data['user'];
 
-            ])->validate();
+        $verifyUser = $api->Code($user['id'], $this->accessCode, $this->theme);
 
-            logger()->info('✅ Feedback validation passed:', $validatedFeedback);
-
-            // Obtener datos del usuario de SecureStorage
-            $storedData = SecureStorage::get('data');
-            $userData = json_decode($storedData, true);
-
-
-            logger()->info('👤 User data loaded:', [
-                'user_id' => $userData['user']['id'] ?? 'null'
-            ]);
-
-            $completeData = [
-                'user_id' => $userData['user']['id'] ?? null,
-                'type' => $validatedFeedback['type'],
-                'message' => $validatedFeedback['message'],
-                'question_id' => $validatedFeedback['question_id'] ?? null,
-                'status' => 'pending',
-            ];
-
-            logger()->info('📦 Sending to API:', $completeData);
-
-            // ✅ Llamar a la API con el array completo
-            $result = $api->FeedBack($completeData);
-
-            logger()->info('✅ API response:', ['result' => $result]);
-
-            logger()->info('🎉 Feedback saved successfully!');
-
-            return [
-                'success' => true,
-                'message' => 'Feedback received successfully'
-            ];
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            logger()->error('❌ Validation failed:', [
-                'errors' => $e->errors()
-            ]);
-            throw $e;
-
-        } catch (\Exception $e) {
-            logger()->error('❌ Exception:', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ]);
-            throw $e;
+        if ($verifyUser->successful() && $verifyUser->json('data.attributes.active') === 1) {
+            $this->showPaymentModal = false;
+            $this->accessCode = '';
+            $this->hasSubscription = true;
+        } else {
+            $this->addError('accessCode', 'Code invalide');
         }
     }
 
-    protected function resetQuestionState()
+    protected function resetQuestionState(): void
     {
         $this->message = '';
         $this->image = null;
         $this->answered = false;
         $this->isCorrect = false;
-        $this->selectedAnswer = '';
         $this->userInput = '';
+        $this->selectedAnswer = '';
         $this->userAnswer = '';
+        $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
     }
 
-    public function completed()
+    public function completed(): void
     {
         $total = count($this->questions) * 10;
-        $percentage = ($this->score / $total) * 100;
+        $percentage = $total > 0 ? ($this->score / $total) * 100 : 0;
 
         if ($percentage < 80) {
             $this->dispatch('quiz-failed', percentage: round($percentage, 2));
             return;
         }
 
-
-            $this->saveQuizResult();
-
+        $this->saveQuizResult();
 
         $this->dispatch('quiz-finished', [
             'score' => $this->score,
-            'total' => $total
+            'total' => $total,
         ]);
     }
 
-    protected function saveQuizResult()
+    protected function saveQuizResult(): void
     {
         try {
-            $data = json_decode(SecureStorage::get('data'), true);
+            $data = session('data');
+            $token = session('token');
 
+            if (!$data || !$token || empty($data['user']['id'])) {
+                return;
+            }
 
+            // Skip duplicate check for recap
+            if ($this->type !== 'recap') {
+                $checkUrl = sprintf(
+                    '%s/v1/quiz-results/check/%s/%s/%s/%s',
+                    config('services.api.url'),
+                    $data['user']['id'],
+                    $this->slug,
+                    $this->slug_theme,
+                    $this->type
+                );
 
-            $checkUrl = sprintf(
-                '%s/v1/quiz-results/check/%s/%s/%s/%s',
-                config('services.api.url'),
-                $data['user']['id'],
-                $this->slug,
-                $this->slug_theme,
-                $this->type
-            );
+                $checkResponse = Http::withOptions([
+                    'verify' => env('API_VERIFY_SSL', true),
+                    'timeout' => 30,
+                    'connect_timeout' => 10,
+                ])
+                    ->withToken($token)
+                    ->acceptJson()
+                    ->get($checkUrl);
 
-
-
-            $checkResponse = Http::withOptions([
-                'verify' => env('API_VERIFY_SSL', true),
-            ])
-                ->withToken($data['token'])
-                ->acceptJson()
-                ->get($checkUrl);
-
-
-
-            if ($checkResponse->successful()) {
-                $data = $checkResponse->json('data', []);
-                if (!empty($data)) {
+                if ($checkResponse->successful() && !empty($checkResponse->json('data', []))) {
                     return;
                 }
             }
-            $secure = SecureStorage::get('data');
-            $data = json_decode($secure, true);
 
             Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
+                'timeout' => 30,
+                'connect_timeout' => 10,
             ])
-                ->withToken($data['token'])
+                ->withToken($token)
                 ->acceptJson()
                 ->post(config('services.api.url') . '/v1/quiz-results', [
                     'user_id'   => $data['user']['id'],
                     'syllabus'  => $this->slug,
-                    'theme'     => $this->slug_theme,
+                    'theme'     => $this->slug_theme ?? 'recap',
                     'type'      => $this->type,
                     'score'     => $this->score,
                     'played_at' => now()->toDateString(),
                 ]);
 
         } catch (\Throwable $e) {
-            logger()->error('Erreur lors de l’enregistrement du résultat du quiz : ' . $e->getMessage());
-
+            logger()->error('Error guardando resultado del quiz: ' . $e->getMessage());
         }
     }
 
     public function getCanValidateProperty(): bool
     {
-        $current = $this->questions[$this->currentIndex] ?? null;
-
-        if (!$current) {
-            return false;
-        }
-
-        if ($current['type'] === 'text') {
-            return !empty(trim($this->userInput));
-        }
-
-        return !empty($this->selectedAnswer);
+        return !empty(trim($this->userInput));
     }
 
-    private function normalizeAnswer($text)
+    private function normalizeAnswer($text): string
     {
+        $text = preg_replace('/[\x{0300}-\x{036f}]/u', '', $text);
         $text = strtolower(trim($text));
 
         $text = str_replace(
-            ['á', 'à', 'ä', 'â', 'ã', 'å', 'æ',
+            [
+                'á', 'à', 'ä', 'â', 'ã', 'å', 'æ',
                 'ç',
                 'é', 'è', 'ë', 'ê',
                 'í', 'ì', 'ï', 'î',
                 'ñ',
                 'ó', 'ò', 'ö', 'ô', 'õ', 'œ',
                 'ú', 'ù', 'ü', 'û',
-                'ý', 'ÿ'],
-            ['a','a','a','a','a','a','ae',
+                'ý', 'ÿ'
+            ],
+            [
+                'a', 'a', 'a', 'a', 'a', 'a', 'ae',
                 'c',
-                'e','e','e','e',
-                'i','i','i','i',
+                'e', 'e', 'e', 'e',
+                'i', 'i', 'i', 'i',
                 'n',
-                'o','o','o','o','o','oe',
-                'u','u','u','u',
-                'y','y'],
+                'o', 'o', 'o', 'o', 'o', 'oe',
+                'u', 'u', 'u', 'u',
+                'y', 'y'
+            ],
             $text
         );
 
         return $text;
     }
 
-    public function closePaymentModal()
-    {
-        $this->redirect('/syllabus');
-    }
-
-    public function restartQuiz()
+    public function restartQuiz(): void
     {
         $this->currentIndex = 0;
         $this->score = 0;
         $this->completed = false;
 
-        // ✅ Volver a cargar y mezclar las preguntas
         $this->loadQuestions();
         $this->resetQuestionState();
 
         if (!empty($this->questions)) {
             $this->currentQuestion = $this->questions[0];
+            $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
         }
+    }
+
+    public function submitFeedback($feedbackData)
+    {
+        $api = app(ApiService::class);
+
+        try {
+            $validatedFeedback = validator($feedbackData, [
+                'type' => 'required|in:bug,suggestion,question',
+                'message' => 'required|string|max:1000',
+                'question_id' => 'nullable|integer',
+            ])->validate();
+
+            $data = session('data');
+
+            $completeData = [
+                'user_id' => $data['user']['id'] ?? null,
+                'type' => $validatedFeedback['type'],
+                'message' => $validatedFeedback['message'],
+                'question_id' => $validatedFeedback['question_id'] ?? null,
+                'status' => 'pending',
+            ];
+
+            $api->FeedBack($completeData);
+
+            return [
+                'success' => true,
+                'message' => 'Feedback received successfully',
+            ];
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            logger()->error('Validation failed:', ['errors' => $e->errors()]);
+            throw $e;
+        } catch (\Exception $e) {
+            logger()->error('Exception:', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function getIsLastQuestionProperty(): bool
+    {
+        return $this->currentIndex >= count($this->questions) - 1;
     }
 
     public function render()
     {
-        // ✅ Obtener la pregunta actual del array
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
         return view('livewire.sign-theme-quiz', [

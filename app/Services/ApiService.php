@@ -204,6 +204,16 @@ class ApiService
     }
 
 
+    public function GetResultQuizForTopic($user_id, $slug, $type)
+    {
+        return $this->get('/v1/quiz-results/check/' . $user_id . '/' . $slug . '/' . $type);
+    }
+
+    public function AllThemeForSyllabus($ue)
+    {
+        return $this->get('/v1/questions/all/' . $ue);
+    }
+
     public function logout(?string $token = null): Response
     {
         if (!$token) {

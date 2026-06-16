@@ -208,7 +208,6 @@
                 liveQuestionId: @entangle('currentQuestionId'),
                 totalPoints: {{ count($questions) * 10 }},
                 failPercentage: 0,
-                // ✅ Añadir aquí
                 openFeedbackModal() {
                     this.feedbackQuestionId = this.liveQuestionId;
                     this.openFeedback = true;

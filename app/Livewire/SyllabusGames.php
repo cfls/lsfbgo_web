@@ -25,11 +25,14 @@ class SyllabusGames extends Component
     public $syllabusData;
     public $color = '#000000';
     public $selectedSyllabus = null;
+    public array $quizCounts = [];
 
     public function mount(?string $ue = null): void
     {
-        $this->ue = $ue;
 
+        $this->loadQuizCounts();
+
+        $this->ue = $ue;
         $token = session('token');
 
         if (!$token) {
@@ -106,9 +109,43 @@ class SyllabusGames extends Component
         $this->dispatch('color-updated', color: $this->color);
     }
 
+    private function loadQuizCounts(): void
+    {
+        $types = ['text', 'choice', 'yes-no', 'video-choice', 'match'];
+
+        $initialTheme = $this->selectedSyllabus ?: 'ue1-themes';
+        foreach ($types as $type) {
+            $api = app(ApiService::class);
+            $response = $api->GetResultQuizForTopic(
+                session('data.user.id'),
+                $initialTheme,
+                $type
+            );
+
+
+
+            // Asegúrate de castear a int
+            $data = $response->json('data')['count'] ?? ['count' => '0'];
+
+            $this->quizCounts[$type] = is_numeric($data) ? (int) $data : 0;
+
+
+        }
+    }
+
     public function updatedSelectedSyllabus($value): void
     {
+        $this->loadQuizCounts();
         $this->loadTheme($value);
+    }
+
+    public function isUnlocked(): bool
+    {
+        $types = ['text', 'choice', 'yes-no', 'video-choice', 'match'];
+        foreach ($types as $type) {
+            if (($this->quizCounts[$type] ?? 0) < 10) return false;
+        }
+        return true;
     }
 
     public function render()
