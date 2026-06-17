@@ -128,39 +128,53 @@
                         </svg>
                     </a>
                 @endforeach
-                @if($this->isUnlocked())
-                    <a
-                    wire:navigate
-                    href="{{ route('questions', ['ue' => $ue, 'type' => 'recap']) }}"
-                    class="flex items-center justify-between w-full px-5 py-4 rounded-xl shadow-sm active:scale-[0.98] hover:brightness-95 hover:shadow-md bg-gradient-to-r from-teal-500 to-purple-600"
-                    >
+                    @if($syllabusCompleted)
+                        <div class="flex items-center justify-between w-full px-5 py-4 rounded-xl border-2 border-emerald-300 dark:border-emerald-500/40 bg-white dark:bg-zinc-800">
+                            <span class="flex flex-col items-start">
+                                <span class="text-gray-900 dark:text-white text-base md:text-lg font-semibold">
+                                    Syllabus complété ✓
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-500/15 rounded-full px-3 py-0.5 mt-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                    <span class="text-black dark:text-emerald-400 text-xs font-medium">Félicitations, vous avez terminé !</span>
+                                </span>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-7 h-7 text-black dark:text-white shrink-0" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    @elseif($this->isUnlocked())
+                        <a
+                        wire:navigate
+                        href="{{ route('questions', ['ue' => $ue, 'type' => 'recap']) }}"
+                        class="flex items-center justify-between w-full px-5 py-4 rounded-xl shadow-sm active:scale-[0.98] hover:brightness-95 hover:shadow-md bg-gradient-to-r from-teal-500 to-purple-600"
+                        >
                         <span class="flex flex-col items-start">
-                            <span class="text-white text-base md:text-lg font-semibold">
-                                🎓 Récapitulation
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-0.5 mt-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 shrink-0"></span>
-                                <span class="text-white text-xs font-medium">Tout débloqué !</span>
-                            </span>
-                         </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.4 72.4"
-                             class="w-6 h-6 md:w-7 md:h-7 shrink-0" aria-hidden="true">
+            <span class="text-white text-base md:text-lg font-semibold">
+                🎓 Récapitulation
+            </span>
+            <span class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-0.5 mt-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 shrink-0"></span>
+                <span class="text-white text-xs font-medium">Tout débloqué !</span>
+            </span>
+        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.4 72.4" class="w-6 h-6 md:w-7 md:h-7 shrink-0" aria-hidden="true">
                             <circle fill="white" cx="36.2" cy="36.2" r="36.2"/>
                             <polygon fill="#7c3aed" points="12.6 28.3 37.8 28.3 37.8 12.6 61.4 36.2 37.8 59.8 37.8 44.1 12.6 44.1 12.6 28.3"/>
                         </svg>
-                    </a>
-                @else
-                    <div class="flex items-center justify-between w-full px-5 py-4 rounded-xl border border-gray-800 dark:border-zinc-600  cursor-not-allowed">
-                        <span class="flex flex-col items-start">
-                            <span class="text-gray-800 dark:text-zinc-500 text-base md:text-lg font-semibold">
-                                🔒 Récapitulation
-                            </span>
-                            <span class="text-gray-800 dark:text-zinc-500 text-xs mt-1">
-                                Complète les 5 types pour débloquer
-                            </span>
-                        </span>
-                    </div>
-                @endif
+                        </a>
+                    @else
+                        <div class="flex items-center justify-between w-full px-5 py-4 rounded-xl border border-gray-800 dark:border-zinc-600 cursor-not-allowed">
+        <span class="flex flex-col items-start">
+            <span class="text-gray-800 dark:text-zinc-500 text-base md:text-lg font-semibold">
+                🔒 Récapitulation
+            </span>
+            <span class="text-gray-800 dark:text-zinc-500 text-xs mt-1">
+                Complète les 5 types pour débloquer
+            </span>
+        </span>
+                        </div>
+                    @endif
             </div>
 
         </div>

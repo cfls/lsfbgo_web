@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
+use function Laravel\Prompts\progress;
 
 class SyllabusGames extends Component
 {
@@ -26,11 +27,13 @@ class SyllabusGames extends Component
     public $color = '#000000';
     public $selectedSyllabus = null;
     public array $quizCounts = [];
+    public bool $syllabusCompleted = false;
 
     public function mount(?string $ue = null): void
     {
 
         $this->loadQuizCounts();
+        $this->finishQuiz();
 
         $this->ue = $ue;
         $token = session('token');
@@ -133,9 +136,26 @@ class SyllabusGames extends Component
         }
     }
 
+    public function finishQuiz(): void
+    {
+        if (!$this->selectedSyllabus) {
+            $this->selectedSyllabus = $this->ue ?: 'ue1-themes';
+        }
+
+        $api = app(ApiService::class);
+        $response = $api->FinishSyllabus(session('data.user.id'), $this->selectedSyllabus);
+
+        $data = $response->json('data');
+
+        $totalCompleted = $data['progress'][$this->selectedSyllabus]['total_completed'] ?? 0;
+
+        $this->syllabusCompleted = $totalCompleted > 0;
+    }
+
     public function updatedSelectedSyllabus($value): void
     {
         $this->loadQuizCounts();
+        $this->finishQuiz();
         $this->loadTheme($value);
     }
 

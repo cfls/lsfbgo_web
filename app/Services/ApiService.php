@@ -214,6 +214,12 @@ class ApiService
         return $this->get('/v1/questions/all/' . $ue);
     }
 
+    public function FinishSyllabus($userId, $slug)
+    {
+
+        return $this->get('/v1/syllabus-finish/' . $userId . '/' . $slug);
+    }
+
     public function logout(?string $token = null): Response
     {
         if (!$token) {
