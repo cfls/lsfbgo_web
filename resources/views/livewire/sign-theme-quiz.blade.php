@@ -5,7 +5,7 @@
     <div class="rounded-xl w-full mx-auto">
 
         {{-- Modals --}}
-        @include('partials.quiz.modals.success')
+        @include('partials.quiz.modals.syllabus-completed')
         @include('partials.quiz.modals.failure')
         @include('partials.quiz.modals.feedback')
 
@@ -190,7 +190,10 @@
         function quizData() {
             return {
                 slow: false,
-                openCongrats: false,
+                openSyllabusCompleted: false,
+                get openCongrats() {
+                    return this.openSyllabusCompleted;
+                },
                 showFailModal: false,
                 score: 0,
                 openFeedback: false,
@@ -268,10 +271,10 @@
 
                 init() {
                     this._componentId = this.$el.closest('[wire\\:id]')?.getAttribute('wire:id');
-                    // Guardar referencias para poder removerlas
+
                     this._onQuizFailed = (event) => {
                         window.dispatchEvent(new CustomEvent('close-quiz-modals'));
-                        this.openCongrats = false;
+                        this.openSyllabusCompleted = false;
                         this.showFailModal = true;
                         this.failPercentage = event.detail.percentage || 0;
                     };
@@ -279,7 +282,8 @@
                     this._onQuizFinished = (event) => {
                         window.dispatchEvent(new CustomEvent('close-quiz-modals'));
                         this.showFailModal = false;
-                        this.openCongrats = true;
+                        this.openSyllabusCompleted = true;  // ✅ directo, sin condición duplicada
+
                         if (event.detail) {
                             this.liveScore = event.detail.score || this.liveScore;
                             this.totalPoints = event.detail.total || this.totalPoints;
@@ -299,7 +303,7 @@
                     window.addEventListener('next-step', this._onNextStep);
                     window.addEventListener('subscription-required', this._onSubscription);
 
-                    this.$watch('openCongrats', value => {
+                    this.$watch('openSyllabusCompleted', value => {
                         if (value) this.showFailModal = false;
                     });
                 },

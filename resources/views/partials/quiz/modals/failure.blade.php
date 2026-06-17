@@ -1,5 +1,5 @@
 <div x-cloak
-     x-show="showFailModal && !openCongrats"
+     x-show="showFailModal && !openSyllabusCompleted"
      x-transition
      class="fixed inset-0 flex items-center justify-center bg-black z-50 p-4">
     <div class="rounded-2xl shadow-xl p-4 sm:p-6 text-center w-full max-w-md mx-auto animate-fadeIn">

@@ -60,6 +60,10 @@ class SignThemeQuiz extends Component
             $this->currentQuestion = $this->questions[0];
             $this->currentQuestionId = $this->currentQuestion['id'] ?? 0;
         }
+
+        view()->share('ogTitle', "J'ai complété le Syllabus {$this->slug} sur LSFBGO ! 🎉");
+        view()->share('ogDescription', 'Rejoins-moi pour apprendre la langue des signes de Belgique francophone !');
+        view()->share('ogImage', 'https://lsfbo_web.test/img/meta/lsfbgo_og.png');
     }
 
     protected function loadQuestions(): void
@@ -93,6 +97,7 @@ class SignThemeQuiz extends Component
 
     protected function loadRecapQuestions(string $token): void
     {
+
 
         try {
             $types = ['text', 'choice', 'yes-no', 'video-choice', 'match'];
@@ -335,6 +340,7 @@ class SignThemeQuiz extends Component
 
     public function nextStep()
     {
+
         $data = session('data');
         $token = session('token');
 
@@ -458,53 +464,44 @@ class SignThemeQuiz extends Component
             $data = session('data');
             $token = session('token');
 
-            if (!$data || !$token || empty($data['user']['id'])) {
-                return;
-            }
+//            if (!$data || !$token || empty($data['user']['id'])) {
+//                logger()->warning('saveQuizResult: sesión inválida', [
+//                    'has_data' => (bool) $data,
+//                    'has_token' => (bool) $token,
+//                ]);
+//                return;
+//            }
 
-            // Skip duplicate check for recap
-            if ($this->type !== 'recap') {
-                $checkUrl = sprintf(
-                    '%s/v1/quiz-results/check/%s/%s/%s/%s',
-                    config('services.api.url'),
-                    $data['user']['id'],
-                    $this->slug,
-                    $this->slug_theme,
-                    $this->type
-                );
+            $payload = [
+                'user_id'   => $data['user']['id'],
+                'syllabus'  => $this->slug,
+                'theme'     => 'final-exam',
+                'type'      => 'recap',
+                'score'     => $this->score,
+                'played_at' => now()->toDateString(),
+            ];
 
-                $checkResponse = Http::withOptions([
-                    'verify' => env('API_VERIFY_SSL', true),
-                    'timeout' => 30,
-                    'connect_timeout' => 10,
-                ])
-                    ->withToken($token)
-                    ->acceptJson()
-                    ->get($checkUrl);
+//            logger()->info('saveQuizResult: enviando payload', $payload);
 
-                if ($checkResponse->successful() && !empty($checkResponse->json('data', []))) {
-                    return;
-                }
-            }
-
-            Http::withOptions([
+            $response = Http::withOptions([
                 'verify' => env('API_VERIFY_SSL', true),
                 'timeout' => 30,
                 'connect_timeout' => 10,
             ])
                 ->withToken($token)
                 ->acceptJson()
-                ->post(config('services.api.url') . '/v1/quiz-results', [
-                    'user_id'   => $data['user']['id'],
-                    'syllabus'  => $this->slug,
-                    'theme'     => $this->slug_theme ?? 'recap',
-                    'type'      => $this->type,
-                    'score'     => $this->score,
-                    'played_at' => now()->toDateString(),
-                ]);
+                ->post(config('services.api.url') . '/v1/quiz-results', $payload);
+
+//            logger()->info('saveQuizResult: respuesta API', [
+//                'status' => $response->status(),
+//                'body' => $response->json(),
+//                'successful' => $response->successful(),
+//            ]);
 
         } catch (\Throwable $e) {
-            logger()->error('Error guardando resultado del quiz: ' . $e->getMessage());
+            logger()->error('Error guardando resultado del quiz: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 
@@ -605,9 +602,40 @@ class SignThemeQuiz extends Component
         return $this->currentIndex >= count($this->questions) - 1;
     }
 
+    public function getUeLabelProperty(): string
+    {
+        $labels = [
+            'ue1-themes' => 'UE1',
+            'ue2-themes' => 'UE2',
+            'ue3-themes' => 'UE3',
+        ];
+
+        return $labels[$this->slug] ?? 'UE';
+    }
+
     public function render()
     {
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
+
+        if ($this->type === 'recap') {
+            $ogImages = [
+                'ue1-themes' => 'img/meta/lsfbgo_og_ue1.png',
+                'ue2-themes' => 'img/meta/lsfbgo_og_ue2.png',
+                'ue3-themes' => 'img/meta/lsfbgo_og_ue3.png',
+            ];
+
+            $ueLabels = [
+                'ue1-themes' => 'UE1',
+                'ue2-themes' => 'UE2',
+                'ue3-themes' => 'UE3',
+            ];
+
+            $ueLabel = $ueLabels[$this->slug] ?? 'UE';
+
+            view()->share('ogTitle', "J'ai complété le syllabus {$ueLabel} sur LSFBGO ! 🎉");
+            view()->share('ogDescription', 'Rejoins-moi pour apprendre la langue des signes de Belgique francophone !');
+            view()->share('ogImage', asset($ogImages[$this->slug] ?? 'img/meta/lsfbgo_og.png'));
+        }
 
         return view('livewire.sign-theme-quiz', [
             'currentQuestion' => $this->currentQuestion,
@@ -615,6 +643,8 @@ class SignThemeQuiz extends Component
             'currentIndex' => $this->currentIndex,
             'questions' => $this->questions,
             'totalQuestions' => $this->totalQuestions,
+            'isLastQuestion' => $this->isLastQuestion,
+            'ueLabel' => $this->ueLabel,
         ]);
     }
 }

@@ -10,10 +10,9 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    {{-- Open Graph --}}
-    <meta property="og:title" content="Lsfbgo — Apprends la LSFB">
-    <meta property="og:description" content="Plateforme interactive pour apprendre la langue des signes de Belgique francophone.">
-    <meta property="og:image" content="{{ asset('img/meta/lsfbgo_og.png') }}">
+    {{-- Open Graph --}}<meta property="og:title" content="{{ $ogTitle ?? 'Lsfbgo — Apprends la LSFB' }}">
+    <meta property="og:description" content="{{ $ogDescription ?? 'Plateforme interactive pour apprendre la langue des signes de Belgique francophone.' }}">
+    <meta property="og:image" content="{{ $ogImage ?? asset('img/meta/lsfbgo_og.png') }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
@@ -22,8 +21,8 @@
 
     {{-- Twitter --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Lsfbgo — Apprends la LSFB">
-    <meta name="twitter:description" content="Plateforme interactive pour apprendre la langue des signes de Belgique francophone.">
+    <meta name="twitter:title" content="{{ $ogTitle ?? 'Lsfbgo — Apprends la LSFB' }}">
+    <meta name="twitter:description" content="{{ $ogDescription ?? 'Plateforme interactive pour apprendre la langue des signes de Belgique francophone.' }}">
     <meta name="twitter:image" content="{{ asset('img/meta/lsfbgo_og.png') }}">
 
     {{-- Iconos --}}

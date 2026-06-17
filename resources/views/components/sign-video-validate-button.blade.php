@@ -17,5 +17,4 @@
             {{ str($option)->before(' / ')->before(' - ')->lower()->ucfirst() }}
         </button>
     @endforeach
-id
 </div>
