@@ -267,74 +267,44 @@ class SignThemeQuiz extends Component
         }
 
         $this->answered = true;
+
         $current = $this->questions[$this->currentIndex];
 
-        $normalize = function(string $s): string {
-            $s = preg_replace('/[\x{0300}-\x{036f}]/u', '', $s);
-            $s = str_replace(
-                ['á','à','ä','â','ã','å','æ','ç','é','è','ë','ê','í','ì','ï','î','ñ','ó','ò','ö','ô','õ','œ','ú','ù','ü','û','ý','ÿ'],
-                ['a','a','a','a','a','a','ae','c','e','e','e','e','i','i','i','i','n','o','o','o','o','o','oe','u','u','u','u','y','y'],
-                $s
-            );
-            $s = str_replace(['œ','Œ','æ','Æ'], ['oe','OE','ae','AE'], $s);
-            return mb_strtolower(trim($s), 'UTF-8');
-        };
+        $validAnswers = array_map(
+            fn($a) => strtolower($this->normalizeAnswer(trim($a))),
+            explode('/', $current['answer'])
+        );
 
-        $originalAnswers  = explode(' / ', $current['answer']);
-        $userInputTrimmed = mb_strtolower(trim($this->userInput), 'UTF-8');
+        $givenAnswer = strtolower(
+            $this->normalizeAnswer(
+                $current['type'] === 'text'
+                    ? $this->userInput
+                    : $this->selectedAnswer
+            )
+        );
 
-        $isValid      = false;
-        $isTypo       = false;
-        $isNoAccent   = false;
-        $typoOriginal = '';
+        $userAnswers = array_map(
+            fn($a) => strtolower($this->normalizeAnswer(trim($a))),
+            explode('/', $givenAnswer)
+        );
 
-        // 1️⃣ Exact match with accents
-        foreach ($originalAnswers as $orig) {
-            if ($userInputTrimmed === mb_strtolower($orig, 'UTF-8')) {
+        $isValid = false;
+
+        foreach ($userAnswers as $ans) {
+            if (in_array($ans, $validAnswers, true)) {
                 $isValid = true;
                 break;
             }
         }
 
-        // 2️⃣ Only if not exact, check normalized and levenshtein
-        if (!$isValid) {
-            $validAnswers = array_map(fn($a) => $normalize($a), $originalAnswers);
-            $userAnswers  = array_map(fn($a) => $normalize($a), explode(' / ', $this->userInput));
-
-            foreach ($userAnswers as $userAns) {
-                foreach ($validAnswers as $index => $validAns) {
-
-                    // Without accents
-                    if ($userAns === $validAns) {
-                        $isNoAccent   = true;
-                        $typoOriginal = $originalAnswers[$index];
-                        break 2;
-                    }
-
-                    // Typo: 1 character difference
-                    if (levenshtein($userAns, $validAns) === 1) {
-                        $isTypo       = true;
-                        $typoOriginal = $originalAnswers[$index];
-                    }
-                }
-            }
-        }
-
-        if ($isValid || $isTypo || $isNoAccent) {
+        if ($isValid) {
             $this->isCorrect = true;
+            $this->image = '<img src="' . asset('/img/lsfgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
             $this->score += 10;
-            $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
-
-            if ($isNoAccent) {
-                $this->message = 'Attention aux accents : ' . mb_strtolower($typoOriginal, 'UTF-8');
-            } elseif ($isTypo) {
-                $this->message = 'Attention à l\'orthographe : ' . mb_strtolower($typoOriginal, 'UTF-8');
-            }
         } else {
-            $this->isCorrect  = false;
-            $this->image      = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain p-5 dark:bg-gray-200 rounded-full" />';
-            $this->message    = mb_strtolower(implode(' / ', $originalAnswers), 'UTF-8');
-            $this->userAnswer = $this->userInput;
+            $this->isCorrect = false;
+            $this->image = '<img src="' . asset('/img/lsfgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->message = implode(' / ', $validAnswers);
         }
     }
 
@@ -463,14 +433,6 @@ class SignThemeQuiz extends Component
         try {
             $data = session('data');
             $token = session('token');
-
-//            if (!$data || !$token || empty($data['user']['id'])) {
-//                logger()->warning('saveQuizResult: sesión inválida', [
-//                    'has_data' => (bool) $data,
-//                    'has_token' => (bool) $token,
-//                ]);
-//                return;
-//            }
 
             $payload = [
                 'user_id'   => $data['user']['id'],

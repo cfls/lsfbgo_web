@@ -10,7 +10,8 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    {{-- Open Graph --}}<meta property="og:title" content="{{ $ogTitle ?? 'Lsfbgo — Apprends la LSFB' }}">
+    {{-- Open Graph --}}
+    <meta property="og:title" content="{{ $ogTitle ?? 'Lsfbgo — Apprends la LSFB' }}">
     <meta property="og:description" content="{{ $ogDescription ?? 'Plateforme interactive pour apprendre la langue des signes de Belgique francophone.' }}">
     <meta property="og:image" content="{{ $ogImage ?? asset('img/meta/lsfbgo_og.png') }}">
     <meta property="og:image:width" content="1200">
