@@ -2,7 +2,7 @@
 <div x-show="openFeedback"
      x-cloak
      @keydown.escape.window="openFeedback = false"
-     class="relative w-full max-w-sm mx-auto rounded-2xl shadow-xl bg-white dark:bg-zinc-800 p-6"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
      style="display: none;">
 
     {{-- Overlay --}}
