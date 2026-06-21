@@ -141,7 +141,7 @@
                     Disponible sur IOS
                 </span>
                 <a href="https://apps.apple.com/us/app/lsfbgo/id6768643987" target="_blank">
-                    <img src="{{asset('mac_app_store.svg')}}"  alt="Disponible sur IOS"  class="w-16 hover:scale-105 transition"
+                    <img src="{{asset('mac_app_store.svg')}}"  alt="Disponible sur IOS"  class="w-full hover:scale-105 transition"
                     >
                 </a>
             </div>
