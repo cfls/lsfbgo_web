@@ -1,5 +1,39 @@
 <div class="space-y-4">
+    @php
+        $videos = collect(data_get($results, 'attributes.videos', []));
+        $annexes = collect(data_get($results, 'attributes.annexes', []));
 
+        $slugSyllabu = data_get($results, 'attributes.slug_syllabu');
+        $slugTheme = data_get($results, 'attributes.slug');
+
+        $principalVideos = $videos
+            ->where('type', 'principal')
+            ->sortBy('title', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
+            ->map(fn ($video) => [
+                'id' => $video['id'],
+                'title' => $video['title'],
+                'url' => route('syllabus.theme', [
+                    $slugSyllabu,
+                    $slugTheme,
+                    'id' => $video['id'],
+                ]),
+            ]);
+
+        $plusVideos = $annexes
+            ->where('type', 'pour_en_savoir_plus')
+            ->sortBy('title', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
+            ->map(fn ($video) => [
+                'id' => $video['id'],
+                'title' => $video['title'],
+                'url' => route('syllabus.theme', [
+                    $slugSyllabu,
+                    $slugTheme,
+                    'id' => $video['id'],
+                ]),
+            ]);
+    @endphp
      <div class="bg-gradient-to-br from-teal-500 to-purple-600 text-white pt-[var(--inset-top)] rounded-none border-none">
         <div class="px-4">
             <div class="p-2 inline-flex items-center gap-2">
@@ -24,12 +58,42 @@
     </div>
 
     {{-- ✅ Mover x-data al nivel superior --}}
-      <div class="flex-1 overflow-y-auto px-3 py-6 scroll-touch no-scrollbar" x-data="videoSearch()">
-         <flux:heading level="2">
-            <flux:text class="text-center uppercase text-2xl" variant="strong">
-                {{ $this->results['attributes']['title'] }}
-            </flux:text>
-        </flux:heading>
+      <div class="flex-1 overflow-y-auto px-3 py-6 scroll-touch no-scrollbar" x-data="videoSearch('principal')">
+          <flux:heading level="2" class="mb-4">
+              <flux:text class="text-center uppercase text-2xl" variant="strong">
+                  @if($annexes->isEmpty())
+                  {{ data_get($results, 'attributes.title') }}
+                  @endif
+              </flux:text>
+          </flux:heading>
+
+
+          @if($annexes->isNotEmpty())
+              <div class="grid grid-cols-2 gap-2 mt-5 space-x-2">
+                  <button
+                          type="button"
+                          @click="section = 'principal'"
+                          :class="section === 'principal'
+                        ? 'bg-blue-600 text-white shadow-lg scale-105'
+                        : 'bg-white text-gray-700 dark:bg-gray-700 dark:text-gray-200 border border-gray-300'"
+                          class="rounded-lg px-4 py-3 font-bold transition"
+                  >
+                      {{ data_get($results, 'attributes.title') }}
+                  </button>
+
+                  <button
+                          type="button"
+                          @click="section = 'plus'"
+                          :class="section === 'plus'
+                        ? 'bg-blue-600 text-white shadow-lg scale-105'
+                        : 'bg-white text-gray-700 dark:bg-gray-700 dark:text-gray-200 border border-gray-300'"
+                          class="rounded-lg px-4 py-3 font-bold transition"
+                  >
+                      Pour en savoir plus
+                  </button>
+              </div>
+          @endif
+
 
         <!-- 🔍 Campo de búsqueda con contador -->
         <div class="mt-5">
@@ -68,40 +132,35 @@
             </p>
 
 
-            {{-- ✅ <ul role="list"> con id conectado al aria-controls del input --}}
             <ul
-                id="video-list"
-                role="list"
-                class="space-y-2 max-h-[60vh] overflow-y-auto pr-2 scroll-smooth no-scrollbar list-none p-0 m-0"
+                    id="video-list"
+                    role="list"
+                    class="space-y-2 mt-4 max-h-[60vh] overflow-y-auto pr-2 scroll-smooth no-scrollbar list-none p-0 m-0"
             >
-                @foreach ($this->results['attributes']['videos'] as $index => $video)
+                <template x-for="video in filteredVideos" :key="video.id">
                     <li
-                        x-show="visibleVideos[{{ $index }}]"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 scale-95"
-                        x-transition:enter-end="opacity-100 scale-100"
-                        class="rounded-lg font-bold hover:bg-orange-700 transition"
-                        style="background-color: {{ $this->color }};"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            class="rounded-lg font-bold hover:bg-orange-700 transition"
+                            style="background-color: {{ $color }};"
                     >
-                        {{-- ✅ aria-label en el enlace con el título del vídeo --}}
                         <a
-                            href="{{ route('syllabus.theme', [
-                                $this->results['attributes']['slug_syllabu'],
-                                $this->results['attributes']['slug'],
-                                'id' => $video['id']
-                            ]) }}"
-                            aria-label="{{ $video['title'] }}"
-                            class="flex px-4 py-5"
+                                :href="video.url"
+                                :aria-label="video.title"
+                                class="flex px-4 py-5"
                         >
-                            <flux:text class="flex font-bold items-center justify-between text-white w-full">
-                                <span>{{ $video['title'] }}</span>
-                                {{-- ✅ Icono decorativo --}}
-                                <flux:icon.arrow-right-circle class="size-6 text-white" aria-hidden="true"/>
-                            </flux:text>
+                <span class="flex font-bold items-center justify-between text-white w-full">
+                    <span x-text="video.title"></span>
+                    <svg class="size-6 text-white" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
                         </a>
                     </li>
-                @endforeach
+                </template>
             </ul>
+
 
             {{-- ✅ Mensaje de sin resultados: aria-live cubierto por el sr-only de arriba --}}
             <div
@@ -128,37 +187,49 @@
     <script>
         function videoSearch() {
             return {
+                section: localStorage.getItem('theme_section') ?? 'principal',
                 search: '',
-                visibleVideos: {},
-                visibleCount: 0,
-                videos: @json(collect($this->results['attributes']['videos'])->map(fn($v) => strtolower($v['title']))->values()),
+
+                principalVideos: @json($principalVideos),
+                plusVideos: @json($plusVideos),
+
+                get currentVideos() {
+                    return this.section === 'plus'
+                        ? this.plusVideos
+                        : this.principalVideos;
+                },
+
+                get filteredVideos() {
+                    if (this.search.trim() === '') {
+                        return this.currentVideos;
+                    }
+
+                    const searchLower = this.search.toLowerCase();
+
+                    return this.currentVideos.filter(video =>
+                        video.title.toLowerCase().includes(searchLower)
+                    );
+                },
+
+                get visibleCount() {
+                    return this.filteredVideos.length;
+                },
 
                 init() {
-                    // Inicializar todos como visibles
-                    this.videos.forEach((_, index) => {
-                        this.visibleVideos[index] = true;
-                    });
-                    this.visibleCount = this.videos.length;
+                    if (this.section === 'plus' && this.plusVideos.length === 0) {
+                        this.section = 'principal';
+                    }
 
-                    // ✅ Watch para filtrar cuando cambie search
-                    this.$watch('search', (value) => {
-                        this.filterVideos(value);
+                    this.$watch('section', (value) => {
+                        localStorage.setItem('theme_section', value);
+                        this.resetSearch();
                     });
                 },
 
-                filterVideos(searchTerm) {
-                    const searchLower = searchTerm.toLowerCase();
-                    let count = 0;
-
-                    this.videos.forEach((title, index) => {
-                        const isVisible = searchTerm === '' || title.includes(searchLower);
-                        this.visibleVideos[index] = isVisible;
-                        if (isVisible) count++;
-                    });
-
-                    this.visibleCount = count;
+                resetSearch() {
+                    this.search = '';
                 }
             };
         }
     </script>
-@endpush
+@endpush`

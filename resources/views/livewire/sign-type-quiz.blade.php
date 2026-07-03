@@ -128,6 +128,8 @@
                 </div>
             </div>
 
+
+
             @include('partials.quiz.question-header')
 
             @if ($currentQuestion)

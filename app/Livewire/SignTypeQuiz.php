@@ -24,6 +24,7 @@ class SignTypeQuiz extends Component
     public $score = 0;
     public $slug;
     public $type;
+    public $subtype;
     public $slug_theme;
     public $hasSubscription = false;
     public $currentQuestion;
@@ -35,6 +36,7 @@ class SignTypeQuiz extends Component
     public string $link = '';
     public string $theme = '';
     public $syllabusData = [];
+    public ?string $subtheme = null;
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -42,6 +44,8 @@ class SignTypeQuiz extends Component
 
     public function mount()
     {
+
+        $this->subtheme = $this->subtheme ?: 'principal';
         $this->storedData = session('data');
 
         if (!$this->storedData || empty(session('token'))) {
@@ -53,6 +57,7 @@ class SignTypeQuiz extends Component
         $this->checkUserSubscription();
 
         if (empty($this->questions)) {
+
             $this->loadQuestions();
         }
 
@@ -79,7 +84,9 @@ class SignTypeQuiz extends Component
             ])
                 ->withToken($token)
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type);
+                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type . '&subtheme=' . $this->subtheme);
+
+
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
@@ -396,12 +403,13 @@ class SignTypeQuiz extends Component
             }
 
             $checkUrl = sprintf(
-                '%s/v1/quiz-results/check/%s/%s/%s/%s',
+                '%s/v1/quiz-results/check/%s/%s/%s/%s/%s',
                 config('services.api.url'),
                 $data['user']['id'],
                 $this->slug,
                 $this->slug_theme,
-                $this->type
+                $this->type,
+                $this->subtheme
             );
 
             $checkResponse = Http::withOptions([
@@ -431,6 +439,7 @@ class SignTypeQuiz extends Component
                     'user_id'   => $data['user']['id'],
                     'syllabus'  => $this->slug,
                     'theme'     => $this->slug_theme,
+                    'theme_variant' => $this->subtheme,
                     'type'      => $this->type,
                     'score'     => $this->score,
                     'played_at' => now()->toDateString(),
@@ -549,6 +558,8 @@ class SignTypeQuiz extends Component
             'currentIndex' => $this->currentIndex,
             'questions' => $this->questions,
             'totalQuestions' => $this->totalQuestions,
+            'subtheme' => $this->subtheme,
+
         ]);
     }
 }

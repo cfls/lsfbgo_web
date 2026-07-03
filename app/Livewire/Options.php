@@ -14,6 +14,7 @@ class Options extends Component
 
     public function mount(?string $ue = null, ?string $type = null)
     {
+
         $this->ue   = $ue;
         $this->type = $type;
 
@@ -25,6 +26,7 @@ class Options extends Component
     /** Cliente HTTP preconfigurado. */
     private function api(string $path): array
     {
+
         return Http::withOptions([
             'verify'          => env('API_VERIFY_SSL', true),
             'timeout'         => 30,
@@ -41,6 +43,7 @@ class Options extends Component
         return match ($this->type) {
             'text'   => 'Traduis en français',
             'choice' => 'Choisis le bon mot',
+            'yes-no' => 'Oui ou Non',
             'match'  => 'Associer les paires',
             default  => 'Question surprise',
         };
@@ -81,32 +84,53 @@ class Options extends Component
         $themes     = $this->api('/v1/themes/' . $this->ue);
         $doneThemes = collect($this->api('/v1/quiz-results/' . $userId));
 
-        $cards = collect($themes)->map(function ($theme, $index) use ($doneThemes, $bgClass) {
+
+
+        $cards = collect($themes)->flatMap(function ($theme, $index) use ($doneThemes, $bgClass) {
             $slug = $theme['attributes']['slug'];
+            $themeType = $theme['attributes']['type']; // 'principal' | 'pour_en_savoir_plus'
 
-            $done = $doneThemes->contains(fn ($item) =>
-                ($item['theme'] ?? null)    === $slug &&
-                ($item['type'] ?? null)     === $this->type &&
-                ($item['syllabus'] ?? null) === $this->ue
-            );
+            $buildCard = function (string $variant, string $labelSuffix = '') use ($theme, $slug, $doneThemes, $bgClass, $index) {
+                $done = $doneThemes->contains(fn ($item) =>
+                    ($item['theme'] ?? null)                === $slug &&
+                    ($item['type'] ?? null)                 === $this->type &&
+                    ($item['syllabus'] ?? null)              === $this->ue &&
+                    ($item['theme_variant'] ?? 'principal')  === $variant
+                );
 
-            $colorHex = $done ? '#519A66' : $bgClass;
+                $colorHex = $done ? '#519A66' : $bgClass;
 
-            return [
-                'iteration' => $index + 1,
-                'title'     => ucfirst($theme['attributes']['title']),
-                'colorHex'  => $colorHex,
-                'textColor' => self::textColorForBg($colorHex),
-                'done'      => $done,
-                'link'      => route('syllabus.play', [
-                    'ue'    => $this->ue,
-                    'type'  => $this->type,
-                    'theme' => $slug,
-                ]),
-            ];
-        })->all();
+                return [
+                    'iteration' => $index + 1,
+                    'title'     => ucfirst($theme['attributes']['title']) . $labelSuffix,
+                    'type'      => $variant,
+                    'colorHex'  => $colorHex,
+                    'textColor' => self::textColorForBg($colorHex),
+                    'done'      => $done,
+                    'link'      => route('syllabus.play', [
+                        'ue'       => $this->ue,
+                        'type'     => $this->type,
+                        'theme'    => $slug,
+                        'subtheme' => $variant === 'principal' ? null : $variant,
+                    ]),
+                ];
+            };
 
-        return view('livewire.options', [
+            // Card principal — SIEMPRE se evalúa como 'principal', sin importar
+            // el 'type' que traiga el registro del tema.
+            $result = [$buildCard('principal')];
+
+            // Solo si el tema tiene contenido "pour_en_savoir_plus", se agrega la segunda card,
+            // evaluada de forma independiente contra 'pour_en_savoir_plus'.
+            if ($themeType === 'pour_en_savoir_plus') {
+                $result[] = $buildCard('pour_en_savoir_plus');
+            }
+
+            return $result;
+        })->values()->all();
+
+
+        return view ('livewire.options', [
             'title' => $this->gameTitle(),
             'cards' => $cards,
         ])->layout('components.layouts.app.home', ['title' => 'Questions Options']);

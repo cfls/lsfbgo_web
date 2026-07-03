@@ -18,7 +18,7 @@ class SyllabusGameController extends Controller
         'match' => 'types.match'
     ];
 
-    public function index(string $slug, string $type, string $theme)
+    public function index(string $slug, string $type, string $theme, ?string $subtheme = null)
     {
 
 
@@ -28,6 +28,6 @@ class SyllabusGameController extends Controller
 
 
 
-        return view($view, compact('slug', 'type', 'theme'));
+        return view($view, compact('slug', 'type', 'theme', 'subtheme'));
     }
 }

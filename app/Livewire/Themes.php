@@ -20,6 +20,8 @@ class Themes extends Component
         $response = $api->ThemeSyllabus($ue, $theme);
         $responseColor = $api->ThemeColor($ue);
 
+
+
         $this->results = $response->json('data', []);
         $this->color = $responseColor->json('data.attributes.hex_color', '#000000');
     }

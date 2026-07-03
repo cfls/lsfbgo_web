@@ -27,21 +27,27 @@ class SyllabusGames extends Component
     public $color = '#000000';
     public $selectedSyllabus = null;
     public array $quizCounts = [];
+    public int $requiredCount = 10;
+    private array $syllabusThemesCache = [];
     public bool $syllabusCompleted = false;
 
     public function mount(?string $ue = null): void
     {
-
-        $this->loadQuizCounts();
-        $this->finishQuiz();
-
         $this->ue = $ue;
-        $token = session('token');
 
+        $token = session('token');
         if (!$token) {
             $this->redirect(route('home'), navigate: true);
             return;
         }
+
+        $initialTheme = $this->ue ?: 'ue1-themes';
+        $this->selectedSyllabus = $initialTheme;
+
+        $this->allThemes(); // ← MOVER ACÁ, antes de loadQuizCounts()
+
+        $this->loadQuizCounts(); // ahora $this->themes ya está poblado
+        $this->finishQuiz();
 
         if ($this->ue) {
             $syllabusResponse = Http::withOptions([
@@ -56,10 +62,6 @@ class SyllabusGames extends Component
             $this->syllabusData = $syllabusResponse->json('data', []);
         }
 
-        $this->allThemes();
-
-        $initialTheme = $this->ue ?: 'ue1-themes';
-        $this->selectedSyllabus = $initialTheme;
         $this->loadTheme($initialTheme);
     }
 
@@ -115,25 +117,42 @@ class SyllabusGames extends Component
     private function loadQuizCounts(): void
     {
         $types = ['text', 'choice', 'yes-no', 'video-choice', 'match'];
-
         $initialTheme = $this->selectedSyllabus ?: 'ue1-themes';
+
+        $api = app(ApiService::class);
+
         foreach ($types as $type) {
-            $api = app(ApiService::class);
             $response = $api->GetResultQuizForTopic(
                 session('data.user.id'),
                 $initialTheme,
                 $type
             );
 
-
-
-            // Asegúrate de castear a int
-            $data = $response->json('data')['count'] ?? ['count' => '0'];
-
+            $data = $response->json('data')['count'] ?? 0;
             $this->quizCounts[$type] = is_numeric($data) ? (int) $data : 0;
-
-
         }
+
+        $this->requiredCount = $this->calculateRequiredCount($initialTheme);
+    }
+
+    private function calculateRequiredCount(string $ue): int
+    {
+        // Traer los TEMAS individuales de este syllabus específico (no el dropdown de syllabus)
+        $themesResponse = Http::withOptions([
+            'verify' => env('API_VERIFY_SSL', true),
+            'timeout' => 30,
+            'connect_timeout' => 10,
+        ])
+            ->withToken(session('token'))
+            ->acceptJson()
+            ->get(config('services.api.url') . '/v1/themes/' . $ue);
+
+        $themes = collect($themesResponse->json('data', []));
+
+        $count = $themes->count()
+            + $themes->where('attributes.type', 'pour_en_savoir_plus')->count();
+
+        return $count > 0 ? $count : 10; // fallback conservador
     }
 
     public function finishQuiz(): void
@@ -163,7 +182,7 @@ class SyllabusGames extends Component
     {
         $types = ['text', 'choice', 'yes-no', 'video-choice', 'match'];
         foreach ($types as $type) {
-            if (($this->quizCounts[$type] ?? 0) < 10) return false;
+            if (($this->quizCounts[$type] ?? 0) < $this->requiredCount) return false;
         }
         return true;
     }
