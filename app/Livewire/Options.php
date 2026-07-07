@@ -43,7 +43,8 @@ class Options extends Component
         return match ($this->type) {
             'text'   => 'Traduis en français',
             'choice' => 'Choisis le bon mot',
-            'yes-no' => 'Oui ou Non',
+            'yes-no' => 'Oui ou Non ?',
+            'video-choice' => 'Choisis la bonne vidéo',
             'match'  => 'Associer les paires',
             default  => 'Question surprise',
         };
