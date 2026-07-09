@@ -401,6 +401,7 @@ class SignTypeQuiz extends Component
             if (!$data || !$token || empty($data['user']['id'])) {
                 return;
             }
+            $themeVariant = $this->subtheme ?? 'principal';
 
             $checkUrl = sprintf(
                 '%s/v1/quiz-results/check/%s/%s/%s/%s/%s',
@@ -409,7 +410,7 @@ class SignTypeQuiz extends Component
                 $this->slug,
                 $this->slug_theme,
                 $this->type,
-                $this->subtheme
+                $themeVariant
             );
 
             $checkResponse = Http::withOptions([
@@ -439,7 +440,7 @@ class SignTypeQuiz extends Component
                     'user_id'   => $data['user']['id'],
                     'syllabus'  => $this->slug,
                     'theme'     => $this->slug_theme,
-                    'theme_variant' => $this->subtheme,
+                    'theme_variant' => $themeVariant,
                     'type'      => $this->type,
                     'score'     => $this->score,
                     'played_at' => now()->toDateString(),
