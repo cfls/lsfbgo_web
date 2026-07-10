@@ -1,10 +1,8 @@
-<div
-        x-data="quizData()"
-        class="space-y-4 min-h-screen"
->
+<div x-data="quizData()" class="space-y-4 min-h-screen">
     <div class="rounded-xl w-full mx-auto">
-
         {{-- Modals --}}
+
+        @include('partials.quiz.modals.success_types')
         @include('partials.quiz.modals.success')
         @include('partials.quiz.modals.failure')
         @include('partials.quiz.modals.feedback')
@@ -71,10 +69,7 @@
                     </div>
 
                     {{-- Speed Button --}}
-                    <div
-                            x-show="!openFeedback"
-                            x-transition
-                    >
+                    <div x-show="!openFeedback" x-transition>
                         <button
                                 @click="toggleSpeed()"
                                 :aria-pressed="slow.toString()"
@@ -104,11 +99,7 @@
                         Points: {{ $score }} / {{ count($questions) * 10 }}
                     </span>
 
-                    <span
-                            class="sr-only"
-                            aria-live="polite"
-                            aria-atomic="true"
-                    >
+                    <span class="sr-only" aria-live="polite" aria-atomic="true">
                         Points: {{ $score }} / {{ count($questions) * 10 }}
                     </span>
                 </div>
@@ -127,8 +118,6 @@
                     ></div>
                 </div>
             </div>
-
-
 
             @include('partials.quiz.question-header')
 
@@ -149,7 +138,7 @@
                         <x-video-display
                                 :video="$currentQuestion['video']"
                                 :type="$currentQuestion['type']"
-                                :currentIndex="$currentIndex"
+                                :current-index="$currentIndex"
                         />
 
                         {{-- Question Type Components --}}
@@ -177,7 +166,7 @@
 @push('scripts')
     <script>
         // 🐛 Helper function para debug visual
-        window.debugLog = function(message, data = null) {
+        window.debugLog = function (message, data = null) {
             const timestamp = new Date().toLocaleTimeString();
             let logMessage = `<span class="text-yellow-400">[${timestamp}]</span> ${message}`;
 
@@ -185,22 +174,22 @@
                 logMessage += `<br><span class="text-blue-400 ml-4">↳ ${JSON.stringify(data, null, 2)}</span>`;
             }
 
-            // Log to browser console
-            // console.log(`[${timestamp}] ${message}`, data || '');
-
             // Dispatch event for visual console
             window.dispatchEvent(new CustomEvent('debug-log', {
                 detail: logMessage
             }));
         };
+
         function quizData() {
             return {
                 slow: false,
-                openCongrats: false,
+                openCongrats: false,       // modal "success" (repaso por tema)
+                openCongratsTypes: false,  // modal "success_types" (repaso de todo el syllabus)
+                isSynthesis: @js($syntheses),
                 showFailModal: false,
                 score: 0,
                 openFeedback: false,
-                feedbackQuestionId: null,  // ← null por defecto, se asigna al abrir
+                feedbackQuestionId: null, // ← null por defecto, se asigna al abrir
                 feedbackType: 'bug',
                 feedbackMessage: '',
                 feedbackSending: false,
@@ -210,6 +199,7 @@
                 liveQuestionId: @entangle('currentQuestionId'),
                 totalPoints: {{ count($questions) * 10 }},
                 failPercentage: 0,
+
                 openFeedbackModal() {
                     this.feedbackQuestionId = this.liveQuestionId;
                     this.openFeedback = true;
@@ -228,33 +218,20 @@
                             type: this.feedbackType,
                             message: this.feedbackMessage,
                             question_id: this.feedbackQuestionId,
-
                         };
-
-                        // debugLog('📦 Payload prepared', payload);
-                        // debugLog('🚀 Calling Livewire submitFeedback...');
 
                         const response = await @this.call('submitFeedback', payload);
 
-                        // debugLog('✅ Response received', response);
-
-                        // Mostrar notificación de éxito
                         this.$dispatch('notify', {
                             type: 'success',
                             message: 'Merci pour votre retour !'
                         });
 
-                        // Limpiar y cerrar
                         this.feedbackMessage = '';
                         this.feedbackType = 'bug';
                         this.openFeedback = false;
 
                     } catch (error) {
-                        // debugLog('❌ ERROR', {
-                        //     message: error.message,
-                        //     stack: error.stack
-                        // });
-
                         this.$dispatch('notify', {
                             type: 'error',
                             message: 'Erreur lors de l\'envoi'
@@ -274,7 +251,7 @@
 
                 init() {
                     this._componentId = this.$el.closest('[wire\\:id]')?.getAttribute('wire:id');
-                    // Guardar referencias para poder removerlas
+
                     this._onQuizFailed = (event) => {
                         window.dispatchEvent(new CustomEvent('close-quiz-modals'));
                         this.openCongrats = false;
@@ -285,7 +262,13 @@
                     this._onQuizFinished = (event) => {
                         window.dispatchEvent(new CustomEvent('close-quiz-modals'));
                         this.showFailModal = false;
-                        this.openCongrats = true;
+
+                        if (this.isSynthesis) {
+                            this.openCongratsTypes = true;
+                        } else {
+                            this.openCongrats = true;
+                        }
+
                         if (event.detail) {
                             this.liveScore = event.detail.score || this.liveScore;
                             this.totalPoints = event.detail.total || this.totalPoints;
@@ -308,6 +291,13 @@
                     this.$watch('openCongrats', value => {
                         if (value) this.showFailModal = false;
                     });
+
+                    this.$watch('openCongratsTypes', value => {
+                        if (value) this.showFailModal = false;
+                    });
+
+                    // ✅ Necesario para que destroy() realmente se ejecute
+                    this.$root.addEventListener('alpine:destroy', () => this.destroy());
                 },
 
                 // ✅ Limpieza al destruir el componente
@@ -330,8 +320,6 @@
                         this.isTransitioning = false;
                     }, 350);
                 },
-
-
             };
         }
     </script>

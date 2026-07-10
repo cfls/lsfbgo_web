@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Services\ApiService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -11,6 +12,10 @@ class Options extends Component
     public ?string $ue = null;
     public ?string $type = null;
     public ?string $ueLabel = null;
+    public ?string $syntheses = null;
+    public array $quizCounts = [];
+
+
 
     public function mount(?string $ue = null, ?string $type = null)
     {
@@ -64,12 +69,14 @@ class Options extends Component
         return $luminance > 0.5 ? '#000000' : '#ffffff';
     }
 
+
+
     public function render()
     {
 
         if ($this->type === 'recap') {
             return view('syllabus.theme_all',['ue' => $this->ue])
-                ->layout('components.layouts.app.home', ['title' => 'Récapitulation']);
+                ->layout('components.layouts.app.home', ['title' => 'Jeux aléatoires']);
         }
 
         $userId = session('data')['user']['id'];
@@ -98,6 +105,8 @@ class Options extends Component
                     ($item['syllabus'] ?? null)              === $this->ue &&
                     ($item['theme_variant'] ?? 'principal')  === $variant
                 );
+
+               $total = $this->quizCounts[$variant] = $done ? ($this->quizCounts[$variant] ?? 0) + 1 : ($this->quizCounts[$variant] ?? 0);
 
                 $colorHex = $done ? '#519A66' : $bgClass;
 

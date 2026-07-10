@@ -136,6 +136,9 @@ Route::get('/syllabus-games/{ue}/{type?}', Options::class)->name('questions');
 Route::get('/syllabus-games/{ue}/{type}/{theme}/{subtheme?}', [SyllabusGameController::class, 'index'])
     ->name('syllabus.play');
 
+    Route::get('/syllabus-syntheses/{ue}/{type}/{syntheses?}', [SyllabusGameController::class, 'syntheses'])
+        ->name('syllabus.syntheses');
+
 
 Route::get('/dragdrop', DragDrop::class)->name('games.dragdrop');
 

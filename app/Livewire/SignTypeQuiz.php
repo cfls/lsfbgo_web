@@ -37,6 +37,7 @@ class SignTypeQuiz extends Component
     public string $theme = '';
     public $syllabusData = [];
     public ?string $subtheme = null;
+    public string $syntheses = '';
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',
@@ -44,6 +45,8 @@ class SignTypeQuiz extends Component
 
     public function mount()
     {
+
+
 
         $this->subtheme = $this->subtheme ?: 'principal';
         $this->storedData = session('data');
@@ -69,6 +72,14 @@ class SignTypeQuiz extends Component
 
     protected function loadQuestions()
     {
+
+        if (isset($this->syntheses) && $this->syntheses !== '') {
+
+            $url = config('services.api.url') . '/v1/synthesis/' . $this->slug . '/'. $this->type;
+        } else {
+            $url = config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type . '&subtheme=' . $this->subtheme;
+
+        }
         try {
             $token = session('token');
 
@@ -84,7 +95,7 @@ class SignTypeQuiz extends Component
             ])
                 ->withToken($token)
                 ->acceptJson()
-                ->get(config('services.api.url') . '/v1/questions/' . $this->slug . '/' . $this->slug_theme . '?type=' . $this->type . '&subtheme=' . $this->subtheme);
+                ->get($url);
 
 
 
@@ -92,10 +103,23 @@ class SignTypeQuiz extends Component
                 $data = $response->json('data', []);
                 shuffle($data);
                 $this->questions = $data;
+
             }
         } catch (\Throwable $e) {
             $this->questions = [];
         }
+    }
+
+    public function type($type)
+    {
+        return match ($type) {
+            'text'         => 'Traduis en Français',
+            'choice'       => 'Choisis la bonne réponse',
+            'yes-no'       => 'Vrai ou faux',
+            'match'        => 'Associe les éléments',
+            'video-choice' => 'Regarde et choisis',
+            default        => $type,
+        };
     }
 
     public function onMatchAnswered($correct)
@@ -214,6 +238,7 @@ class SignTypeQuiz extends Component
         };
 
         $originalAnswers  = explode(' / ', $current['answer']);
+
         $userInputTrimmed = mb_strtolower(trim($this->userInput), 'UTF-8');
 
         $isValid      = false;
@@ -551,6 +576,7 @@ class SignTypeQuiz extends Component
 
     public function render()
     {
+
         $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
 
         return view('livewire.sign-type-quiz', [
