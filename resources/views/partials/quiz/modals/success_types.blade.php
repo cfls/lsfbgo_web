@@ -14,7 +14,7 @@
 
         <p class="mb-2 text-base sm:text-lg font-semibold text-gray-800 dark:text-white">
             {{ str($slug)->before('-')->upper()->replace('UE', 'UE ') }}
-            Vous avez complété le syntheses completed avec type {{ $this->type($type) }}
+            Vous avez complété la synthèse complète avec des questions de types {{ $this->type($type) }}
         </p>
 
         <p class="mb-6 text-base sm:text-lg text-gray-800 dark:text-white">

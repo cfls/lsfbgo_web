@@ -115,7 +115,7 @@ class SignTypeQuiz extends Component
         return match ($type) {
             'text'         => 'Traduis en Français',
             'choice'       => 'Choisis la bonne réponse',
-            'yes-no'       => 'Vrai ou faux',
+            'yes-no'       => 'Oui ou Non',
             'match'        => 'Associe les éléments',
             'video-choice' => 'Regarde et choisis',
             default        => $type,
@@ -131,7 +131,7 @@ class SignTypeQuiz extends Component
             $this->score += 10;
             $this->image = '<img src="' . asset('/img/lsfbgo/good.png') . '" alt="bon" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         } else {
-            $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mal" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
+            $this->image = '<img src="' . asset('/img/lsfbgo/bad.png') . '" alt="mauvais" class="w-40 h-40 object-contain dark:bg-gray-200 rounded-full" />';
         }
     }
 
