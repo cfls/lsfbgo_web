@@ -38,6 +38,8 @@ class SignTypeQuiz extends Component
     public $syllabusData = [];
     public ?string $subtheme = null;
     public string $syntheses = '';
+    public $ueLabel = '';
+
 
     protected $listeners = [
         'match-answered' => 'onMatchAnswered',

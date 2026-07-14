@@ -41,16 +41,9 @@ class SyllabusGameController extends Controller
         return view($view, compact('slug', 'type', 'theme', 'subtheme'));
     }
 
-    public function syntheses(string $slug, string $type, string $syntheses)
+    public function syntheses(string $slug, string $type, ?string $syntheses = null)
     {
-
-
-        //dd(self::GAME_VIEWS[$type]);
-
         $view = self::GAME_VIEWS['syntheses'][$type];
-
-
-
-        return view($view, compact('slug', 'type','syntheses'));
+        return view($view, compact('slug', 'type', 'syntheses'));
     }
 }
