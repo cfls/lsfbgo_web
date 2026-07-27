@@ -19,6 +19,11 @@ class Dictionary extends Component
     public int $currentPage = 1;
     public bool $hasMorePages = true;
 
+    /** Sugerencia de nueva seña */
+    public bool $showSuggestModal = false;
+    public string $suggestWord = '';
+    public bool $suggestionSent = false;
+
     /** UI */
     public bool $isLoading = false;
     public bool $isLoadingMore = false;
@@ -192,6 +197,67 @@ class Dictionary extends Component
         ];
 
         $this->showModal = true;
+    }
+
+    /** Abrir el formulario de sugerencia */
+    public function openSuggestModal(): void
+    {
+        $this->suggestWord = $this->search; // pre-rellena con lo que buscaba, si aplica
+        $this->suggestionSent = false;
+        $this->showSuggestModal = true;
+    }
+
+    /** Cerrar el formulario */
+    public function closeSuggestModal(): void
+    {
+        if ($this->suggestionSent) {
+            $this->js('window.location.reload()');
+            return;
+        }
+
+        $this->showSuggestModal = false;
+        $this->suggestWord = '';
+        $this->suggestionSent = false;
+    }
+
+    public function submitSuggestion(): void
+    {
+        if (!session('token') && !session('data')) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Vous devez être connecté(e) pour suggérer un mot.',
+            ]);
+            return;
+        }
+
+        $this->validate([
+            'suggestWord' => 'required|string|min:2|max:100',
+        ], [
+            'suggestWord.required' => 'Merci d\'indiquer un mot.',
+            'suggestWord.min' => 'Le mot est trop court.',
+        ]);
+
+        $response = $this->http()->post('/v1/dictionnaire/suggestions', [
+            'word'    => $this->suggestWord,
+            'user_id' => session('data.user.id')
+        ]);
+
+
+
+        if ($response->successful()) {
+            $this->suggestionSent = true;
+            $this->suggestWord = '';
+
+            $this->dispatch('notify', [
+                'type' => 'success',
+                'message' => 'Merci ! Votre suggestion a bien été envoyée.',
+            ]);
+        } else {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Erreur lors de l\'envoi de la suggestion.',
+            ]);
+        }
     }
 
     /** Cliente HTTP */

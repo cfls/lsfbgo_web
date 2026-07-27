@@ -166,6 +166,8 @@ class SyllabusGames extends Component
 
         $data = $response->json('data');
 
+
+
         $totalCompleted = $data['progress'][$this->selectedSyllabus]['total_completed'] ?? 0;
 
         $this->syllabusCompleted = $totalCompleted > 0;

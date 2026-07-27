@@ -45,6 +45,17 @@
                 </x-slot>
             </flux:input>
         </flux:field>
+        {{-- Botón: sugerir una seña --}}
+        <div class="flex justify-end">
+            <flux:button
+                    size="sm"
+                    variant="ghost"
+                    icon="plus-circle"
+                    wire:click="openSuggestModal"
+            >
+                Vous ne trouvez pas un signe ?
+            </flux:button>
+        </div>
 
         {{-- Anuncio sr-only --}}
         <span class="sr-only" aria-live="polite" aria-atomic="true">
@@ -183,6 +194,75 @@
         </div>
 
     </div>
+
+
+    {{-- Modal: sugerir una seña --}}
+    @if($showSuggestModal)
+        <div
+                x-data
+                @keydown.escape.window="$wire.closeSuggestModal()"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="suggest-modal-title"
+        >
+            <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+
+                <button
+                        type="button"
+                        wire:click="closeSuggestModal"
+                        aria-label="Fermer"
+                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                    <flux:icon icon="x-mark" class="w-5 h-5" />
+                </button>
+
+                @if($suggestionSent)
+                    {{-- Mensaje de agradecimiento --}}
+                    <div class="text-center py-6">
+                        <flux:icon icon="check-circle" class="w-12 h-12 text-emerald-600 mx-auto mb-3" />
+                        <h3 class="text-lg font-semibold mb-1">Merci !</h3>
+                        <p class="text-gray-500 text-sm mb-4">
+                            Nous avons bien reçu votre suggestion et nous vous tiendrons informé(e).
+                        </p>
+                        <flux:button variant="primary" wire:click="closeSuggestModal">
+                            Fermer
+                        </flux:button>
+                    </div>
+                @else
+                    <h3 id="suggest-modal-title" class="text-lg font-semibold mb-2">
+                        Suggérer un mot
+                    </h3>
+                    <p class="text-sm text-gray-500 mb-4">
+                        Vous cherchez le signe d'un mot qui n'est pas dans le dictionnaire ? Indiquez-le ci-dessous, nous l'ajouterons prochainement.
+                    </p>
+
+                    <form wire:submit.prevent="submitSuggestion">
+                        <flux:field>
+                            <flux:label for="suggest-word">Mot souhaité</flux:label>
+                            <flux:textarea
+                                    id="suggest-word"
+                                    wire:model="suggestWord"
+                                    placeholder="Ex : anniversaire"
+                                    rows="3"
+                            />
+                            <flux:error name="suggestWord" />
+                        </flux:field>
+
+                        <div class="flex justify-end gap-2 mt-4">
+                            <flux:button type="button" variant="ghost" wire:click="closeSuggestModal">
+                                Annuler
+                            </flux:button>
+                            <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="submitSuggestion">
+                                <span wire:loading.remove wire:target="submitSuggestion">Envoyer</span>
+                                <span wire:loading wire:target="submitSuggestion">Envoi…</span>
+                            </flux:button>
+                        </div>
+                    </form>
+                @endif
+            </div>
+        </div>
+    @endif
 
     @livewire('video-modal')
 </div>

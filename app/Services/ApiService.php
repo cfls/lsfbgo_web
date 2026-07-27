@@ -166,7 +166,7 @@ class ApiService
 
     public function FeedBack(array $data)
     {
-        logger()->info('api_data: ' . print_r($data, true));
+       // logger()->info('api_data: ' . print_r($data, true));
         return $this->post('/v1/feedback', [
             'user_id' => $data['user_id'] ?? null,
             'type' => $data['type'],
