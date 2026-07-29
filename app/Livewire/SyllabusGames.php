@@ -28,7 +28,6 @@ class SyllabusGames extends Component
     public $selectedSyllabus = null;
     public array $quizCounts = [];
     public int $requiredCount = 10;
-    private array $syllabusThemesCache = [];
     public bool $syllabusCompleted = false;
 
     public function mount(?string $ue = null): void

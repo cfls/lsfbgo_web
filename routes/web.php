@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\NetworkController;
+
 use App\Http\Controllers\SyllabusGameController;
 use App\Livewire\AlphabetSigner;
 use App\Livewire\Auth\ForgotPassword;
@@ -27,8 +27,7 @@ use App\Livewire\TableuBord;
 use App\Livewire\Theme;
 use App\Livewire\Themes;
 use Illuminate\Support\Facades\Route;
-use Native\Mobile\Edge\Edge;
-use Native\Mobile\Facades\SecureStorage;
+
 
 
 /*
@@ -148,10 +147,7 @@ Route::get('settings/profile', ProfileUser::class)->name('profile.edit');
 Route::get('/settings/parameters', Profile::class)->name('profile.parameters');
 Route::get('settings/password', Password::class)->name('user-password.edit');
 Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
-
-
-    Route::get('settings/delete-account', DeleteUserForm::class)
-        ->name('profile.delete');
+Route::get('settings/delete-account', DeleteUserForm::class)->name('profile.delete');
 
     Route::match(['get', 'post'], '/logout', [Logout::class, '__invoke'])
         ->name('access.logout');
